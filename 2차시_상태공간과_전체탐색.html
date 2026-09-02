@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1차시 · 탐색기반 알고리즘의 선형 구조</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" />
+<style>
+  :root{
+    --bg:#f8f7f3;
+    --bg-alt:#f1efe8;
+    --surface:#ffffff;
+    --surface-2:#eeece4;
+    --line:#dedad0;
+    --text:#1c1b18;
+    --text-dim:#635f57;
+    --text-faint:#9b978c;
+    --teal:#0d8c7a;
+    --teal-dim:#cfeae3;
+    --amber:#c2760f;
+    --amber-dim:#f4e1bc;
+    --coral:#c2492e;
+    --shadow:0 1px 2px rgba(28,27,24,0.05), 0 6px 16px rgba(28,27,24,0.05);
+    --font-kr:'Pretendard Variable','Pretendard',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    --font-display:'Space Grotesk',var(--font-kr);
+    --font-mono:'JetBrains Mono',monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{
+    height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-kr);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--teal);color:#ffffff;}
+
+  /* ---------- background texture ---------- */
+  .bg-grid{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      radial-gradient(circle at 18% 20%, rgba(13,140,122,0.055), transparent 40%),
+      radial-gradient(circle at 85% 75%, rgba(194,118,15,0.05), transparent 45%);
+  }
+
+  /* ---------- slide deck ---------- */
+  #deck{position:relative;height:100vh;width:100vw;z-index:1;overflow:hidden;}
+  .slides-wrapper{
+    height:100%;width:100%;display:flex;flex-direction:row;
+    transition:transform .65s cubic-bezier(.65,0,.35,1);
+  }
+  .slide{
+    height:100vh;width:100vw;flex-shrink:0;
+    display:flex;flex-direction:column;
+    justify-content:center;
+    padding:0 9vw;
+    position:relative;
+  }
+  .slide.scrollable{
+    overflow-y:auto;
+    justify-content:flex-start;
+    padding-top:9vh;
+    padding-bottom:6vh;
+  }
+  .slide.scrollable::-webkit-scrollbar{width:6px;}
+  .slide.scrollable::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:3px;}
+
+  .eyebrow{
+    font-family:var(--font-display);
+    font-size:.78rem;
+    letter-spacing:.22em;
+    color:var(--teal);
+    font-weight:600;
+    margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{
+    content:'';width:22px;height:1px;background:var(--teal);display:inline-block;
+  }
+  h1.slide-title{
+    font-size:3.1rem;
+    font-weight:800;
+    letter-spacing:-.01em;
+    line-height:1.18;
+    max-width:14ch;
+    margin-bottom:22px;
+  }
+  h2.section-title{
+    font-size:2.1rem;
+    font-weight:800;
+    margin-bottom:14px;
+    letter-spacing:-.01em;
+  }
+  p.lead{
+    font-size:1.15rem;
+    color:var(--text-dim);
+    max-width:56ch;
+    line-height:1.7;
+    font-weight:400;
+  }
+  .accent-teal{color:var(--teal);}
+  .accent-amber{color:var(--amber);}
+
+  /* ---------- nav dots / state-space graph ---------- */
+  #nav-graph{
+    position:fixed;right:32px;top:50%;transform:translateY(-50%);
+    z-index:50;display:flex;flex-direction:column;align-items:center;gap:0;
+  }
+  .nav-node-group{display:flex;flex-direction:column;align-items:center;}
+  .nav-edge{width:1px;height:22px;background:var(--line);transition:background .4s;}
+  .nav-edge.lit{background:var(--teal);}
+  .nav-node{
+    width:11px;height:11px;border-radius:50%;
+    background:var(--surface-2);border:1.5px solid var(--line);
+    cursor:pointer;transition:all .3s;position:relative;
+  }
+  .nav-node:hover{border-color:var(--text-dim);}
+  .nav-node.visited{background:var(--teal-dim);border-color:var(--teal);}
+  .nav-node.current{
+    background:var(--amber);border-color:var(--amber);
+    width:15px;height:15px;
+    box-shadow:0 0 0 4px rgba(194,118,15,0.16);
+  }
+  .nav-label{
+    position:absolute;right:24px;top:50%;transform:translateY(-50%);
+    font-family:var(--font-mono);font-size:.68rem;color:var(--text);
+    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:5px 10px;border-radius:5px;white-space:nowrap;
+    opacity:0;pointer-events:none;transition:opacity .2s;
+  }
+  .nav-node:hover .nav-label{opacity:1;}
+
+  /* ---------- bottom bar ---------- */
+  #bottom-bar{
+    position:fixed;left:0;bottom:0;width:100%;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:22px 9vw;pointer-events:none;
+  }
+  #counter{
+    font-family:var(--font-mono);font-size:.82rem;color:var(--text-faint);
+    letter-spacing:.05em;
+  }
+  #counter .cur{color:var(--amber);}
+  .arrow-btns{display:flex;gap:8px;pointer-events:all;}
+  .arrow-btn{
+    width:38px;height:38px;border-radius:50%;
+    background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+    color:var(--text-dim);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .2s;font-size:1rem;
+  }
+  .arrow-btn:hover{border-color:var(--teal);color:var(--teal);}
+  .arrow-btn:disabled{opacity:.3;cursor:default;}
+  .arrow-btn:disabled:hover{border-color:var(--line);color:var(--text-dim);}
+
+  /* ---------- progress line top ---------- */
+  #progress-top{position:fixed;top:0;left:0;height:2px;background:var(--amber);z-index:60;transition:width .5s ease;}
+
+  /* ---------- shared components ---------- */
+  .card{
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;padding:26px 24px;box-shadow:var(--shadow);
+  }
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .tag{
+    display:inline-block;font-family:var(--font-mono);font-size:.72rem;
+    color:var(--text-faint);border:1px solid var(--line);border-radius:20px;
+    padding:3px 11px;margin-bottom:12px;
+  }
+  code, .mono{font-family:var(--font-mono);}
+
+  /* ============ SLIDE 0 : TITLE ============ */
+  #s0{align-items:flex-start;}
+  .title-graph{
+    position:absolute;right:8vw;top:50%;transform:translateY(-50%);
+    width:320px;height:320px;opacity:0;
+  }
+  .title-goals{
+    margin-top:28px;display:flex;flex-direction:column;gap:10px;
+  }
+  .goal-item{display:flex;align-items:baseline;gap:10px;font-size:1.02rem;color:var(--text-dim);}
+  .goal-item .n{font-family:var(--font-mono);color:var(--teal);font-size:.85rem;}
+  .unit-tag{
+    font-family:var(--font-mono);font-size:.85rem;color:var(--text-faint);
+    margin-top:40px;letter-spacing:.02em;
+  }
+
+  /* ============ SLIDE 1 : 도입 ============ */
+  .bookshelf-compare{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:36px;max-width:900px;}
+  .shelf-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:var(--shadow);}
+  .shelf-card h3{font-size:1.05rem;margin-bottom:14px;font-weight:700;}
+  .shelf-row{display:flex;gap:5px;margin-bottom:6px;}
+  .book{
+    height:52px;border-radius:2px;flex:1;
+    display:flex;align-items:flex-end;justify-content:center;
+    font-family:var(--font-mono);font-size:.62rem;color:#0a0d12;font-weight:700;
+    padding-bottom:4px;
+  }
+  .shelf-note{margin-top:14px;font-size:.88rem;color:var(--text-dim);line-height:1.6;}
+
+  /* ============ SLIDE 1 : 전체 지도 ============ */
+  .outline-tree, .outline-tree ul{list-style:none;margin:0;padding-left:0;}
+  .outline-tree{margin-top:28px;max-width:760px;}
+  .outline-tree > li{margin-top:6px;}
+  .outline-tree ul{margin-left:20px;padding-left:22px;border-left:1.5px solid var(--line);margin-top:10px;}
+  .outline-tree li{position:relative;padding:9px 0;}
+  .outline-tree ul li::before{content:'';position:absolute;left:-22px;top:23px;width:20px;height:1.5px;background:var(--line);}
+  .outline-tree .node-title{font-weight:700;font-size:1.02rem;color:var(--text);display:flex;align-items:center;gap:8px;}
+  .outline-tree .node-desc{font-size:.83rem;color:var(--text-dim);margin-top:3px;line-height:1.55;}
+  .outline-tree .today-badge{
+    font-family:var(--font-mono);font-size:.68rem;color:var(--amber);
+    background:rgba(194,118,15,0.09);padding:2px 9px;border-radius:10px;font-weight:600;
+  }
+
+  /* ============ SLIDE 2 : 도입 (숫자 맞히기 게임) ============ */
+  .guess-wrap{display:flex;gap:24px;align-items:stretch;margin-top:32px;max-width:720px;flex-wrap:wrap;}
+  .guess-panel{
+    flex:1;min-width:340px;background:var(--surface);border:1px solid var(--line);
+    border-radius:14px;padding:26px;box-shadow:var(--shadow);
+  }
+  .guess-input-row{display:flex;gap:10px;margin-bottom:16px;}
+  .guess-input-row input{
+    width:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;
+    color:var(--text);font-family:var(--font-mono);font-size:1rem;padding:9px 12px;
+  }
+  .guess-input-row input:focus{outline:none;border-color:var(--teal);}
+  .guess-feedback{
+    font-size:1.15rem;font-weight:700;color:var(--text);min-height:30px;margin-bottom:14px;
+  }
+  .guess-feedback.up{color:var(--amber);} .guess-feedback.down{color:var(--coral);} .guess-feedback.win{color:var(--teal);}
+  .guess-history{display:flex;gap:6px;flex-wrap:wrap;}
+  .guess-chip{
+    font-family:var(--font-mono);font-size:.78rem;width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim);
+  }
+  .guess-chip.up{border-color:var(--amber);color:var(--amber);}
+  .guess-chip.down{border-color:var(--coral);color:var(--coral);}
+  .guess-chip.win{border-color:var(--teal);color:var(--teal);background:var(--teal-dim);}
+  .guess-count-box{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+    padding:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-width:140px;gap:6px;
+  }
+  .guess-count-box .k{font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);letter-spacing:.05em;}
+  .guess-count-box .v{font-family:var(--font-display);font-size:2.6rem;font-weight:700;color:var(--amber);}
+
+  /* ============ SLIDE 2 : 개념 ============ */
+  .type-card{position:relative;}
+  .type-card .tnum{
+    font-family:var(--font-display);font-size:2.4rem;font-weight:700;
+    color:var(--surface-2);position:absolute;top:14px;right:18px;
+  }
+  .type-card h3{font-size:1.15rem;margin-bottom:10px;font-weight:700;}
+  .type-card p{font-size:.92rem;color:var(--text-dim);line-height:1.6;margin-bottom:12px;}
+  .type-card .example{
+    font-family:var(--font-mono);font-size:.78rem;color:var(--amber);
+    background:rgba(194,118,15,0.09);border-radius:6px;padding:8px 10px;
+  }
+
+  /* ============ SLIDE 3 : 상태공간 구성요소 ============ */
+  .puzzle-wrap{display:flex;gap:50px;align-items:center;margin-top:30px;flex-wrap:wrap;}
+  .puzzle-grid{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,52px);gap:4px;}
+  .puzzle-cell{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:6px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-weight:600;color:var(--text);
+  }
+  .puzzle-cell.empty{background:transparent;border:1px dashed var(--line);}
+  .puzzle-label{font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint);margin-top:10px;text-align:center;}
+  .linear-elem-wrap{display:flex;gap:56px;align-items:flex-start;margin-top:30px;flex-wrap:wrap;}
+  .elem-init{border-color:var(--amber) !important;color:var(--amber) !important;}
+  .elem-goal{border-color:var(--teal) !important;color:var(--teal) !important;background:var(--teal-dim) !important;}
+  .elem-idx-row{display:flex;gap:6px;margin-top:6px;}
+  .elem-idx{width:54px;text-align:center;font-family:var(--font-mono);font-size:.7rem;color:var(--text-faint);}
+  .elem-idx.amber{color:var(--amber);font-weight:700;}
+  .elem-idx.teal{color:var(--teal);font-weight:700;}
+  .elements-list{display:flex;flex-direction:column;gap:14px;flex:1;min-width:280px;}
+  .linear-types-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px;max-width:1040px;}
+  .lt-card .lt-tag{
+    font-family:var(--font-mono);font-size:.68rem;color:var(--teal);background:var(--surface-2);
+    padding:3px 9px;border-radius:6px;display:inline-block;margin-bottom:10px;
+  }
+  .lt-card h4{font-size:1rem;font-weight:700;margin-bottom:6px;}
+  .lt-card p{font-size:.83rem;color:var(--text-dim);line-height:1.6;}
+  .lt-example{
+    font-family:var(--font-mono);font-size:.74rem;color:var(--amber);
+    background:rgba(194,118,15,0.08);border-radius:6px;padding:7px 10px;margin-top:10px;line-height:1.5;
+  }
+  .elem-row{display:flex;gap:14px;align-items:flex-start;}
+  .elem-dot{width:9px;height:9px;border-radius:50%;margin-top:7px;flex-shrink:0;}
+  .elem-row h4{font-size:.98rem;font-weight:700;margin-bottom:3px;}
+  .elem-row p{font-size:.86rem;color:var(--text-dim);line-height:1.55;}
+
+  /* ============ SLIDE 4 : 선형 탐색 ============ */
+  .search-demo{margin-top:14px;}
+  .array-row{display:flex;gap:6px;margin:18px 0;flex-wrap:wrap;}
+  .array-cell{
+    width:54px;height:54px;border-radius:8px;background:var(--surface-2);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-weight:600;font-size:1.05rem;
+    transition:all .3s;position:relative;
+  }
+  .array-cell.checking{border-color:var(--amber);background:rgba(194,118,15,0.12);}
+  .array-cell.checked{border-color:var(--text-faint);opacity:.4;}
+  .array-cell.found{border-color:var(--teal);background:rgba(13,140,122,0.14);color:var(--teal);}
+  .array-cell.excluded{opacity:.15;}
+  .demo-controls{display:flex;gap:10px;margin-top:6px;align-items:center;}
+  .btn{
+    font-family:var(--font-mono);font-size:.78rem;background:var(--surface-2);
+    border:1px solid var(--line);color:var(--text);border-radius:7px;
+    padding:9px 16px;cursor:pointer;transition:all .2s;
+  }
+  .btn:hover{border-color:var(--teal);color:var(--teal);}
+  .demo-status{font-family:var(--font-mono);font-size:.8rem;color:var(--text-dim);min-height:20px;}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:10px;}
+  .method-block h3{font-size:1.05rem;margin-bottom:4px;font-weight:700;}
+  .method-block .complexity{font-family:var(--font-mono);color:var(--amber);font-size:.85rem;margin-bottom:12px;display:block;}
+
+  /* ============ SLIDE 5 : 비선형 탐색 (DFS/BFS) ============ */
+  .tree-wrap{margin-top:18px;}
+  svg#tree-svg{overflow:visible;}
+  .tnode{fill:var(--surface-2);stroke:var(--line);stroke-width:1.5;transition:all .35s;}
+  .tnode.active{fill:var(--amber);stroke:var(--amber);}
+  .tnode.done{fill:var(--teal-dim);stroke:var(--teal);}
+  .tedge{stroke:var(--line);stroke-width:1.5;}
+  .tlabel{font-family:var(--font-mono);font-size:12px;fill:var(--text);text-anchor:middle;pointer-events:none;}
+  .order-track{display:flex;gap:6px;margin-top:16px;flex-wrap:wrap;min-height:30px;}
+  .order-chip{
+    font-family:var(--font-mono);font-size:.78rem;width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text-faint);
+    transition:all .3s;
+  }
+  .order-chip.filled{background:var(--teal-dim);border-color:var(--teal);color:var(--teal);}
+  .dfsbfs-btns{display:flex;gap:10px;margin-top:20px;}
+  .btn.mode-active{border-color:var(--teal);color:var(--teal);background:rgba(79,216,196,0.08);}
+
+  /* ============ SLIDE 6 : 실습 ============ */
+  .practice-head{max-width:640px;}
+  .practice-body{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;margin-top:28px;align-items:start;}
+  .coin-set{display:flex;gap:12px;margin:16px 0 22px;}
+  .coin{
+    width:56px;height:56px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-weight:700;font-size:.82rem;
+    border:2px solid;
+  }
+  .coin.c100{border-color:var(--amber);color:var(--amber);}
+  .coin.c50{border-color:var(--teal);color:var(--teal);}
+  .coin.c10{border-color:var(--coral);color:var(--coral);}
+  textarea.worksheet{
+    width:100%;min-height:220px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);
+    border-radius:10px;color:var(--text);font-family:var(--font-mono);font-size:.86rem;
+    padding:16px;line-height:1.7;resize:vertical;
+  }
+  textarea.worksheet:focus{outline:none;border-color:var(--teal);}
+  .hint-box{margin-top:14px;}
+  .hint-toggle{
+    font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint);
+    cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px;
+  }
+  .hint-toggle:hover{color:var(--teal);}
+  .hint-content{
+    margin-top:10px;padding:16px;background:var(--surface);border:1px solid var(--line);
+    border-radius:10px;display:none;font-size:.86rem;color:var(--text-dim);line-height:1.7;
+  }
+  .hint-content.show{display:block;}
+  .pw-row{display:flex;gap:8px;margin-bottom:10px;}
+  .pw-row input{
+    background:var(--surface-2);border:1px solid var(--line);border-radius:6px;
+    color:var(--text);font-family:var(--font-mono);padding:7px 10px;font-size:.8rem;width:140px;
+  }
+  .pw-row input:focus{outline:none;border-color:var(--teal);}
+
+  /* ---- 코드 풀어보기 / 실습 코드 ---- */
+  pre.code-block{
+    background:#211f1a;color:#e8e6df;border-radius:10px;padding:20px 22px;
+    font-family:var(--font-mono);font-size:.82rem;line-height:1.85;overflow-x:auto;box-shadow:var(--shadow);
+  }
+  pre.code-block .kw{color:#f2a93b;} pre.code-block .fn{color:#6fd8c4;} pre.code-block .cm{color:#8b96a8;} pre.code-block .num{color:#e8735c;}
+  pre.code-block .ln{display:inline-block;width:22px;color:#5b6579;user-select:none;}
+  .code-explain-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:28px;margin-top:24px;max-width:1040px;align-items:start;}
+  .explain-col{display:flex;flex-direction:column;gap:12px;}
+  .explain-row{display:flex;gap:12px;font-size:.86rem;color:var(--text-dim);line-height:1.6;}
+  .explain-row .ln2{font-family:var(--font-mono);color:var(--teal);flex-shrink:0;width:44px;font-size:.78rem;padding-top:1px;}
+  .trace-io{
+    margin-top:18px;display:inline-flex;gap:14px;align-items:center;
+    font-family:var(--font-mono);font-size:.82rem;background:var(--surface);border:1px solid var(--line);
+    border-radius:8px;padding:9px 16px;box-shadow:var(--shadow);
+  }
+  .trace-io .arrow{color:var(--text-faint);}
+  .trace-io .in{color:var(--text-dim);} .trace-io .out{color:var(--teal);font-weight:700;}
+  .practice-block{margin-bottom:38px;}
+  .practice-block:last-child{margin-bottom:0;}
+  .practice-block .problem-box{
+    background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    padding:14px 18px;font-size:.9rem;color:var(--text);line-height:1.6;margin-bottom:16px;box-shadow:var(--shadow);
+  }
+
+  /* ---- 애니메이션 해설 슬라이드 ---- */
+  .anim-layout{display:grid;grid-template-columns:1.25fr 1fr;gap:36px;margin-top:26px;align-items:start;}
+  .anim-status{font-family:var(--font-mono);font-size:.82rem;color:var(--text-dim);min-height:42px;margin-top:14px;line-height:1.6;}
+  .btn.mini{padding:6px 12px;font-size:.74rem;}
+
+  /* 이분 탐색 포인터 */
+  .ptr-row{display:flex;gap:6px;margin-bottom:4px;}
+  .ptr-cell{width:54px;height:22px;display:flex;align-items:center;justify-content:center;gap:3px;}
+  .ptr-badge{font-family:var(--font-mono);font-size:.6rem;font-weight:700;padding:1px 4px;border-radius:4px;}
+  .ptr-badge.low{background:var(--teal-dim);color:var(--teal);}
+  .ptr-badge.high{background:var(--amber-dim);color:var(--amber);}
+  .ptr-badge.mid{background:var(--coral);color:#fff;}
+  .array-cell.bs-mid{border-color:var(--coral);background:rgba(194,73,46,0.12);color:var(--coral);}
+  .array-cell.bs-out{opacity:.22;}
+  .array-cell.bs-found{border-color:var(--teal);background:var(--teal-dim);color:var(--teal);}
+
+  /* 코드 라인 하이라이트 */
+  pre.code-block .cl{display:block;padding:1px 6px;margin:0 -6px;border-radius:4px;transition:background .25s;}
+  pre.code-block .cl.hot{background:rgba(242,169,59,0.22);}
+
+  /* 스택 문자열 */
+  .str-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .str-char{
+    width:46px;height:52px;border-radius:9px;background:var(--surface);border:1.5px solid var(--line);
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:1.3rem;font-weight:700;color:var(--text-dim);transition:all .25s;
+  }
+  .str-char.cur{border-color:var(--amber);background:var(--amber-dim);color:var(--amber);transform:translateY(-4px);}
+  .str-char.done{opacity:.35;}
+  .str-char.bad{border-color:var(--coral);background:rgba(194,73,46,0.12);color:var(--coral);}
+  .str-select{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+  /* 스택 패널 */
+  .stack-panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:var(--shadow);}
+  .stack-title{font-family:var(--font-mono);font-size:.76rem;color:var(--text-faint);margin-bottom:12px;letter-spacing:.05em;}
+  .stack-box{
+    min-height:190px;display:flex;flex-direction:column-reverse;gap:6px;align-items:center;justify-content:flex-start;
+    background:var(--bg-alt);border-radius:8px;padding:12px;
+  }
+  .stack-item{
+    width:70px;height:38px;border-radius:7px;background:var(--surface);border:1.5px solid var(--teal);
+    display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:1.05rem;
+    font-weight:700;color:var(--teal);box-shadow:var(--shadow);
+    animation:stackin .28s ease;
+  }
+  @keyframes stackin{0%{opacity:0;transform:translateY(-14px) scale(.85);}100%{opacity:1;transform:none;}}
+  .stack-base{text-align:center;font-family:var(--font-mono);font-size:.68rem;color:var(--text-faint);margin-top:8px;}
+
+  /* ============ SLIDE 7 : 정리 ============ */
+  .summary-list{display:flex;flex-direction:column;gap:16px;max-width:640px;margin-top:26px;}
+  .summary-row{display:flex;gap:16px;align-items:flex-start;padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .summary-row:last-child{border-bottom:none;}
+  .summary-num{font-family:var(--font-display);color:var(--teal);font-weight:600;font-size:.95rem;width:26px;flex-shrink:0;}
+  .summary-row h4{font-size:1rem;font-weight:700;margin-bottom:4px;}
+  .summary-row p{font-size:.88rem;color:var(--text-dim);line-height:1.6;}
+  .next-up{
+    margin-top:34px;padding:20px 22px;border-radius:12px;
+    background:linear-gradient(135deg, rgba(194,118,15,0.08), rgba(13,140,122,0.06));
+    border:1px solid var(--line);max-width:640px;box-shadow:var(--shadow);
+  }
+  .next-up .tag{margin-bottom:8px;}
+  .next-up h4{font-size:1.05rem;font-weight:700;}
+  .next-up p{font-size:.86rem;color:var(--text-dim);margin-top:4px;}
+
+  @media (max-width:900px){
+    .slide{padding:0 6vw;}
+    h1.slide-title{font-size:2.1rem;}
+    .grid-3{grid-template-columns:1fr;}
+    .two-col,.practice-body,.bookshelf-compare,.grid-2{grid-template-columns:1fr;}
+    #nav-graph{display:none;}
+    .title-graph{display:none;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div id="progress-top" style="width:8.33%"></div>
+
+<div id="deck">
+  <div class="slides-wrapper" id="wrapper">
+
+    <!-- SLIDE 0 : 표지 -->
+    <section class="slide" id="s0">
+      <div class="eyebrow">SEARCH-BASED ALGORITHMS</div>
+      <h1 class="slide-title">탐색기반 알고리즘의<br>선형 구조</h1>
+      <p class="lead">문제의 답이 될 수 있는 모든 경우를 <span class="accent-teal">상태 공간</span>으로 구조화하고, 그중 순서가 정해진 <span class="accent-amber">선형 구조</span>를 탐색하는 방법을 배웁니다.</p>
+      <div class="title-goals">
+        <div class="goal-item"><span class="n">GOAL 01</span> 문제를 분석하여 상태 공간으로 구조화할 수 있다</div>
+        <div class="goal-item"><span class="n">GOAL 02</span> 선형 구조의 상태 공간을 순차 탐색·이분 탐색으로 설계할 수 있다</div>
+      </div>
+      <div class="unit-tag">세종과학고등학교 · 정보과학 · 1학년</div>
+      <svg class="title-graph" id="title-graph" viewBox="0 0 320 320"></svg>
+    </section>
+
+    <!-- SLIDE 1 : 전체 지도 -->
+    <section class="slide" id="s1">
+      <div class="eyebrow">전체 지도</div>
+      <h2 class="section-title">탐색기반 알고리즘, 큰 그림에서 보기</h2>
+      <p class="lead" style="font-size:.95rem;">교과서 대단원 마인드맵 기준 분류다. 알고리즘은 크게 <b>탐색기반 알고리즘</b>과 <b>관계기반 알고리즘</b>으로 나뉘고, 탐색기반 알고리즘은 다시 <b>전체 탐색</b>과 <b>상태 공간 배제</b>로 나뉜다.</p>
+
+      <ul class="outline-tree">
+        <li>
+          <div class="node-title">탐색기반 알고리즘</div>
+          <div class="node-desc">가능한 경우를 탐색해 원하는 결과를 얻는 방법</div>
+          <ul>
+            <li>
+              <div class="node-title">전체 탐색<span class="today-badge">오늘 · 다음 시간</span></div>
+              <div class="node-desc">해가 존재할 수 있는 상태 공간 전체를 탐색하는 방법. 상태 공간의 형태에 따라 나뉜다</div>
+              <ul>
+                <li><div class="node-title" style="font-size:.92rem;">선형 전체 탐색</div><div class="node-desc">순차 탐색, 이분 탐색</div></li>
+                <li><div class="node-title" style="font-size:.92rem;">비선형 전체 탐색</div><div class="node-desc">깊이 우선 탐색(DFS), 너비 우선 탐색(BFS)</div></li>
+              </ul>
+            </li>
+            <li>
+              <div class="node-title">상태 공간 배제</div>
+              <div class="node-desc">탐색해야 할 문제 공간의 크기를 줄여 알고리즘의 효율을 높이는 방법</div>
+              <ul>
+                <li><div class="node-title" style="font-size:.92rem;">탐욕법</div><div class="node-desc">현재 상태에서 가장 최선의 선택만 반복해서 고른다</div></li>
+                <li><div class="node-title" style="font-size:.92rem;">분기 한정법</div><div class="node-desc">불필요한 부분을 가지치기(pruning)하여 배제한다</div></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <div class="node-title">관계기반 알고리즘</div>
+          <div class="node-desc">전체 문제와 부분 문제 간의 관계로 문제를 해결하는 방법</div>
+          <ul>
+            <li><div class="node-title" style="font-size:.92rem;">분할 정복법</div></li>
+            <li><div class="node-title" style="font-size:.92rem;">동적 계획법</div><div class="node-desc">재귀 함수를 활용한 방식, 반복문을 활용한 방식</div></li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <!-- SLIDE 2 : 탐색 기법 살펴보기 -->
+    <section class="slide" id="s2">
+      <div class="eyebrow">전체 지도 · 하나씩 살펴보기</div>
+      <h2 class="section-title">탐색기반 알고리즘, 네 가지 방법</h2>
+      <p class="lead" style="font-size:.95rem;">전체 탐색과 상태 공간 배제는 각각 두 가지 방법으로 나뉜다. 오늘은 이 중 <span class="accent-amber">선형 전체 탐색</span>부터 시작한다.</p>
+      <div class="grid-2" style="margin-top:30px;max-width:940px;">
+        <div class="card type-card">
+          <h3>선형 전체 탐색</h3>
+          <p>리스트·큐·스택처럼 순서가 정해진 상태 공간에서, 첫 원소부터 끝까지 하나씩 탐색하는 방법. <b>순차 탐색</b>과 <b>이분 탐색</b>이 있다.</p>
+          <div class="example">오늘 배우는 내용</div>
+        </div>
+        <div class="card type-card">
+          <h3>비선형 전체 탐색</h3>
+          <p>선형 탐색과 달리 순차적으로 진행되지 않으며, 트리·그래프 구조에서 연결된 노드를 따라가며 탐색하는 방법. <b>깊이 우선 탐색(DFS)</b>과 <b>너비 우선 탐색(BFS)</b>이 있다.</p>
+          <div class="example">다음 시간에 배우는 내용</div>
+        </div>
+        <div class="card type-card">
+          <h3>탐욕법</h3>
+          <p>전체 상태 공간 중 일부를 배제하는 알고리즘. 현재 상태에서 다음 상태를 탐색할 때 모든 가능한 상태를 고려하지 않고 <b>최선의 상태만 선택</b>한다. 그리디 알고리즘이라고도 부른다.</p>
+          <div class="example">이후 배우는 내용</div>
+        </div>
+        <div class="card type-card">
+          <h3>분기 한정법 (가지치기)</h3>
+          <p>모든 가능한 해를 탐색하되, <b>필요 없는 부분은 가지치기(pruning)</b>하여 효율성을 높이는 기법. 깊이 우선 탐색 형태로 진행하다가 불필요한 노드를 만나면 백트랙한다.</p>
+          <div class="example">이후 배우는 내용</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 : 도입 -->
+    <section class="slide" id="s3">
+      <div class="eyebrow">도입 · 생각 톡톡</div>
+      <h2 class="section-title">1부터 100 사이의 숫자를 맞혀보자</h2>
+      <p class="lead">컴퓨터가 정한 숫자를 맞혀보세요. 맞힐 때마다 <span class="accent-teal">"더 커요" / "더 작아요"</span> 힌트를 줍니다. 몇 번 만에 맞히는지, 그리고 <b>어떤 순서로 숫자를 골랐는지</b> 잘 기억해두세요.</p>
+
+      <div class="guess-wrap">
+        <div class="guess-panel">
+          <div class="guess-input-row">
+            <input type="number" id="guess-input" min="1" max="100" placeholder="1~100">
+            <button class="btn" id="guess-submit">확인</button>
+            <button class="btn" id="guess-reset">다시 시작</button>
+          </div>
+          <div class="guess-feedback" id="guess-feedback">숫자를 입력하고 확인을 눌러보세요</div>
+          <div class="guess-history" id="guess-history"></div>
+        </div>
+        <div class="guess-count-box">
+          <span class="k">시도 횟수</span>
+          <span class="v" id="guess-count">0</span>
+        </div>
+      </div>
+
+      <p class="lead" style="margin-top:24px;font-size:.95rem;">→ 처음에 1, 2, 3 순서대로 찍었나요, 아니면 50부터 시작해 범위를 절반씩 좁혀갔나요? 이 두 가지 전략이 바로 오늘 배울 <b>순차 탐색</b>과 <b>이분 탐색</b>입니다.</p>
+    </section>
+
+    <!-- SLIDE 4 : 탐색기반 알고리즘의 개념 -->
+    <section class="slide" id="s4">
+      <div class="eyebrow">개념 01 · 탐색기반 알고리즘</div>
+      <h2 class="section-title">상태 공간을 탐색하여 해를 찾는다</h2>
+      <p class="lead">문제의 해가 될 수 있는 원소들의 집합을 <span class="accent-teal">상태 공간(state space)</span>이라 하고, 이를 체계적으로 탐색해 최적의 해를 찾는 방식을 <b>탐색기반 알고리즘</b>이라 한다.</p>
+      <div class="grid-3" style="margin-top:32px;max-width:1000px;">
+        <div class="card type-card">
+          <div class="tnum">01</div>
+          <h3>탐색 <span class="mono" style="font-size:.75rem;color:var(--text-faint);">Search</span></h3>
+          <p>조건을 만족하는 해를 찾는 문제</p>
+          <div class="example">"112일까? 113일까?"</div>
+        </div>
+        <div class="card type-card">
+          <div class="tnum">02</div>
+          <h3>카운팅 <span class="mono" style="font-size:.75rem;color:var(--text-faint);">Counting</span></h3>
+          <p>조건을 만족하는 해의 개수를 세는 문제</p>
+          <div class="example">"무게 10g인 것은 몇 개?"</div>
+        </div>
+        <div class="card type-card">
+          <div class="tnum">03</div>
+          <h3>최적화 <span class="mono" style="font-size:.75rem;color:var(--text-faint);">Optimization</span></h3>
+          <p>탐색한 해 중 가장 좋은 해를 찾는 문제</p>
+          <div class="example">"어떤 과자가 가장 저렴할까?"</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 : 왜 상태 공간을 정의할까 -->
+    <section class="slide" id="s5">
+      <div class="eyebrow">개념 01-1 · 상태 공간을 정의하는 이유</div>
+      <h2 class="section-title">왜 굳이 상태 공간을 정의할까?</h2>
+      <p class="lead" style="font-size:.98rem;">컴퓨터는 "정답이 뭘까?"를 직관적으로 알아내지 못해요. 대신 할 수 있는 건 딱 하나입니다 — 가능한 경우들을 하나씩 확인해보는 것. 그래서 문제를 풀기 전에 먼저 "확인해볼 수 있는 모든 경우"를 하나의 집합으로 만들어두고, 그 집합의 원소들을 체계적으로 훑으면서 "이게 조건을 만족하나?"를 검사합니다. 이 "확인해볼 수 있는 모든 경우의 집합"이 상태 공간이고, 그걸 훑는 행위가 탐색입니다.</p>
+
+      <div class="card" style="margin-top:22px;max-width:640px;">
+        <div class="tag" style="margin-bottom:10px;">예시로 보기</div>
+        <p style="font-size:.9rem;color:var(--text);line-height:1.7;">
+          "10의 약수의 합을 구하라"는 문제도, 사람은 "약수가 뭔지 안다"고 느끼지만 컴퓨터 입장에서는<br>
+          <span class="mono accent-teal">상태 공간 {1, 2, ..., 10}</span> 을 만들어두고, 각 원소에 대해<br>
+          <span class="mono accent-amber">"10을 나누어떨어뜨리는가?"</span> 라는 조건을 하나씩 검사하는 것뿐이다.
+        </p>
+      </div>
+
+      <div class="grid-2" style="margin-top:26px;max-width:920px;">
+        <div class="card type-card">
+          <h3 style="font-size:1rem;">① 계산 가능한 형태로 바꾸기 위해</h3>
+          <p>"책장에서 책을 찾는다"처럼 애매한 문제도, 상태 공간·상태 전이·목표 상태를 정의하는 순간 알고리즘으로 옮길 수 있는 문제가 된다.</p>
+        </div>
+        <div class="card type-card">
+          <h3 style="font-size:1rem;">② 문제의 크기를 가늠하기 위해</h3>
+          <p>상태 공간의 크기를 알아야 이 방식이 현실적으로 풀릴지(O(n)), 손도 못 댈 만큼 커질지(O(2ⁿ))를 미리 판단할 수 있다.</p>
+        </div>
+        <div class="card type-card">
+          <h3 style="font-size:1rem;">③ 같은 방식으로 다루기 위해</h3>
+          <p>책 찾기든 약수 구하기든 동전 조합이든, 상태 공간으로 표현되면 전부 "탐색 문제"가 되어 같은 도구를 재사용할 수 있다.</p>
+        </div>
+        <div class="card type-card">
+          <h3 style="font-size:1rem;">④ 구조에 맞는 전략을 고르기 위해</h3>
+          <p>상태 공간이 리스트처럼 선형인지, 트리처럼 비선형인지에 따라 쓸 수 있는 탐색 방법(순차·이분·DFS·BFS)이 달라진다.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 : 상태 공간의 구성요소 -->
+    <section class="slide" id="s6">
+      <div class="eyebrow">개념 02 · 상태 공간의 구성요소</div>
+      <h2 class="section-title">상태 공간을 이루는 다섯 가지 요소</h2>
+      <div class="linear-elem-wrap">
+        <div>
+          <div class="tag">순차 탐색으로 배열에서 값 25 찾기</div>
+          <div class="array-row" id="elem-array">
+            <div class="array-cell elem-init">3</div>
+            <div class="array-cell">7</div>
+            <div class="array-cell">12</div>
+            <div class="array-cell">19</div>
+            <div class="array-cell elem-goal">25</div>
+            <div class="array-cell">31</div>
+            <div class="array-cell">40</div>
+          </div>
+          <div class="elem-idx-row">
+            <span class="elem-idx amber">i=0</span><span class="elem-idx">i=1</span><span class="elem-idx">i=2</span><span class="elem-idx">i=3</span><span class="elem-idx teal">i=4</span><span class="elem-idx">i=5</span><span class="elem-idx">i=6</span>
+          </div>
+          <div class="trace-io" style="margin-top:20px;">
+            <span class="in">초기 상태 i=0</span><span class="arrow">→ (i→i+1) 4번 →</span><span class="out">목표 상태 i=4, 탐색 깊이 4</span>
+          </div>
+        </div>
+        <div class="elements-list">
+          <div class="elem-row"><div class="elem-dot" style="background:var(--amber);"></div><div><h4>초기 상태 (Initial State)</h4><p>탐색을 시작하는 지점 — 배열의 첫 인덱스 i=0</p></div></div>
+          <div class="elem-row"><div class="elem-dot" style="background:var(--teal);"></div><div><h4>목표 상태 (Goal State)</h4><p>조건을 만족하는 지점 — arr[i] == 25가 되는 인덱스 i=4</p></div></div>
+          <div class="elem-row"><div class="elem-dot" style="background:var(--coral);"></div><div><h4>상태 전이 (State Transition)</h4><p>상태를 바꾸는 규칙 — i를 1 증가시킨다 (i → i+1). 이 규칙 하나뿐이라 다음 상태가 항상 하나로 정해진다</p></div></div>
+          <div class="elem-row"><div class="elem-dot" style="background:var(--text-dim);"></div><div><h4>경로 (Path)</h4><p>i=0→1→2→3→4로 이어지는 단 하나의 경로 — 선형 구조라 갈림길이 없다</p></div></div>
+          <div class="elem-row"><div class="elem-dot" style="background:var(--text-faint);"></div><div><h4>탐색 깊이 (Search Depth)</h4><p>목표까지 거친 전이 횟수 = 4번 — 그대로 비교 횟수(시간복잡도)가 된다</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 : 선형 구조의 종류 -->
+    <section class="slide" id="s7">
+      <div class="eyebrow">개념 03 · 선형 구조의 종류</div>
+      <h2 class="section-title">선형 구조에는 어떤 것들이 있을까?</h2>
+      <p class="lead" style="font-size:.95rem;">선형 구조란 원소들이 한 줄로 늘어서 있고, 각 원소가 앞/뒤 원소를 하나씩만 가지는 구조를 말한다. 배열은 그중 하나일 뿐, 아래처럼 다양한 형태가 있다.</p>
+      <div class="linear-types-grid">
+        <div class="card lt-card">
+          <span class="lt-tag">인덱스 접근 O(1)</span>
+          <h4>배열 (Array)</h4>
+          <p>원소들이 순서대로 저장되며, 인덱스로 각 원소에 즉시 접근할 수 있다.</p>
+          <div class="lt-example">예제 문제: 정렬된 배열에서 이분 탐색으로 특정 값 찾기</div>
+        </div>
+        <div class="card lt-card">
+          <span class="lt-tag">가변 크기</span>
+          <h4>리스트 (List)</h4>
+          <p>배열과 비슷하게 원소를 순서대로 저장하지만, 크기를 자유롭게 늘리고 줄일 수 있다. 파이썬의 list가 대표적인 예.</p>
+          <div class="lt-example">예제 문제: 학생 성적 리스트에서 평균과 최댓값 구하기</div>
+        </div>
+        <div class="card lt-card">
+          <span class="lt-tag" style="color:var(--coral);">순차 접근만 가능</span>
+          <h4>연결 리스트 (Linked List)</h4>
+          <p>각 원소(노드)가 다음 원소의 위치(주소)를 가지고 사슬처럼 연결된 구조. 인덱스로 바로 점프할 수 없어 처음부터 하나씩 따라가야 한다 — 그래서 <b>이분 탐색을 쓸 수 없다.</b></p>
+          <div class="lt-example">예제 문제: 연결 리스트를 순회하며 특정 값이 있는지 찾기</div>
+        </div>
+        <div class="card lt-card">
+          <span class="lt-tag">후입선출 · LIFO</span>
+          <h4>스택 (Stack)</h4>
+          <p>마지막에 넣은 원소를 가장 먼저 꺼낸다.</p>
+          <div class="lt-example">예제 문제: 문자열의 괄호 " ( ) " 짝이 맞는지 검사하기</div>
+        </div>
+        <div class="card lt-card">
+          <span class="lt-tag">선입선출 · FIFO</span>
+          <h4>큐 (Queue)</h4>
+          <p>먼저 넣은 원소를 먼저 꺼낸다.</p>
+          <div class="lt-example">예제 문제: 인쇄 대기열에서 요청된 순서대로 문서 처리하기</div>
+        </div>
+        <div class="card lt-card">
+          <span class="lt-tag">인덱스 접근 O(1)</span>
+          <h4>문자열 (String)</h4>
+          <p>문자들이 순서대로 나열된 구조로, 배열처럼 인덱스로 각 글자에 접근할 수 있다.</p>
+          <div class="lt-example">예제 문제: 문자열이 회문(palindrome)인지 판별하기</div>
+        </div>
+      </div>
+      <div class="trace-io" style="margin-top:22px;max-width:900px;white-space:normal;">
+        <span class="out">→</span><span class="in" style="color:var(--text);">인덱스로 바로 접근 가능한 배열·리스트·문자열은 이분 탐색을 쓸 수 있지만, 연결 리스트처럼 순서대로만 접근 가능한 구조에서는 이분 탐색을 쓸 수 없다.</span>
+      </div>
+    </section>
+
+    <!-- SLIDE 8 : 선형 전체 탐색 -->
+    <section class="slide" id="s8">
+      <div class="eyebrow">개념 04 · 선형 전체 탐색</div>
+      <h2 class="section-title">순서가 정해진 구조를 탐색한다</h2>
+      <p class="lead" style="font-size:.92rem;margin-bottom:6px;">아까 1~100 숫자 맞히기 게임, 기억나시나요? 그 게임을 정렬된 배열로 옮기면 바로 아래와 같은 모습이 됩니다.</p>
+      <div class="two-col">
+        <div class="method-block">
+          <h3>순차 탐색 <span class="mono" style="font-size:.8rem;color:var(--text-faint);">Linear Search</span></h3>
+          <span class="complexity">O(n)</span>
+          <p style="font-size:.88rem;color:var(--text-dim);margin-bottom:14px;">첫 원소부터 끝까지 하나씩 비교하며 찾는다. 정렬 여부와 무관하게 사용 가능하다.</p>
+          <div class="array-row" id="arr-linear"></div>
+          <div class="demo-controls">
+            <button class="btn" id="btn-linear">순차 탐색 재생 (값 61 찾기)</button>
+          </div>
+          <div class="demo-status" id="status-linear"></div>
+        </div>
+        <div class="method-block">
+          <h3>이분 탐색 <span class="mono" style="font-size:.8rem;color:var(--text-faint);">Binary Search</span></h3>
+          <span class="complexity">O(log n)</span>
+          <p style="font-size:.88rem;color:var(--text-dim);margin-bottom:14px;">정렬된 배열에서만 사용 가능. 가운데 값과 비교하며 절반씩 범위를 좁혀간다.</p>
+          <div class="array-row" id="arr-binary"></div>
+          <div class="demo-controls">
+            <button class="btn" id="btn-binary">이분 탐색 재생 (값 61 찾기)</button>
+          </div>
+          <div class="demo-status" id="status-binary"></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- SLIDE 9 : 정리 -->
+    <section class="slide" id="s9">
+      <div class="eyebrow">정리</div>
+      <h2 class="section-title">오늘 배운 내용</h2>
+      <div class="summary-list">
+        <div class="summary-row">
+          <div class="summary-num">01</div>
+          <div><h4>상태 공간(State Space)</h4><p>문제의 해가 될 수 있는 모든 경우의 집합. 탐색기반 알고리즘은 이를 체계적으로 탐색해 해를 찾는다.</p></div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-num">02</div>
+          <div><h4>상태 공간의 구성요소</h4><p>초기 상태 · 목표 상태 · 상태 전이 · 경로 · 탐색 깊이</p></div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-num">03</div>
+          <div><h4>선형 전체 탐색</h4><p>순차 탐색 O(n), 이분 탐색 O(log n) — 정렬 여부에 따라 선택, Colab 노트북으로 직접 구현</p></div>
+        </div>
+      </div>
+      <div class="next-up">
+        <div class="tag">NEXT · 2차시</div>
+        <h4>비선형 전체 탐색 — 깊이 우선 탐색 · 너비 우선 탐색</h4>
+        <p>상태 공간이 트리·그래프처럼 비선형 구조일 때는 어떻게 탐색할까요? <b>동전 조합 문제</b>를 통해 <b>DFS(깊이 우선 탐색)</b>와 <b>BFS(너비 우선 탐색)</b>를 직접 비교하며 배웁니다.</p>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 : 실습 해설 - 이분 탐색 애니메이션 -->
+    <section class="slide" id="s10">
+      <div class="eyebrow">실습 해설 · Colab 문제 3</div>
+      <h2 class="section-title">이분 탐색은 이렇게 동작한다</h2>
+      <p class="lead" style="font-size:.93rem;">배열 <span class="mono accent-teal">[2, 4, 6, 8, 10, 12, 14]</span> 에서 <span class="mono accent-amber">target = 10</span> 을 찾아보자. 재생 버튼을 눌러 low·high·mid가 어떻게 움직이는지 관찰하자.</p>
+
+      <div class="anim-layout">
+        <div>
+          <div class="ptr-row" id="bs-ptrs"></div>
+          <div class="array-row" id="bs-array"></div>
+          <div class="dfsbfs-btns" style="margin-top:18px;">
+            <button class="btn" id="bs-play">재생</button>
+            <button class="btn" id="bs-step">한 단계씩</button>
+            <button class="btn" id="bs-reset">초기화</button>
+          </div>
+          <div class="anim-status" id="bs-status">재생 버튼을 눌러보세요</div>
+        </div>
+        <div>
+          <pre class="code-block" id="bs-code" style="font-size:.76rem;"><span class="cl" data-l="1">low, high = 0, len(arr) - 1</span>
+<span class="cl" data-l="2">for _ in range(len(arr)):</span>
+<span class="cl" data-l="3">    mid = (low + high) // 2</span>
+<span class="cl" data-l="4">    if arr[mid] == target:</span>
+<span class="cl" data-l="5">        result = mid; break</span>
+<span class="cl" data-l="6">    elif arr[mid] &lt; target:</span>
+<span class="cl" data-l="7">        low = mid + 1</span>
+<span class="cl" data-l="8">    else:</span>
+<span class="cl" data-l="9">        high = mid - 1</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11 : 실습 해설 - 스택 괄호 애니메이션 -->
+    <section class="slide" id="s11">
+      <div class="eyebrow">실습 해설 · Colab 문제 4</div>
+      <h2 class="section-title">스택으로 괄호 짝 맞추기</h2>
+      <p class="lead" style="font-size:.93rem;">문자열 <span class="mono accent-teal">"(()())"</span> 를 한 글자씩 읽으며, 여는 괄호는 스택에 <b>push</b>, 닫는 괄호를 만나면 <b>pop</b> 한다. 스택이 어떻게 쌓이고 비워지는지 확인하자.</p>
+
+      <div class="anim-layout">
+        <div>
+          <div class="str-row" id="st-string"></div>
+          <div class="dfsbfs-btns" style="margin-top:20px;">
+            <button class="btn" id="st-play">재생</button>
+            <button class="btn" id="st-step">한 단계씩</button>
+            <button class="btn" id="st-reset">초기화</button>
+          </div>
+          <div class="anim-status" id="st-status">재생 버튼을 눌러보세요</div>
+          <div class="str-select" style="margin-top:16px;">
+            <span style="font-size:.8rem;color:var(--text-faint);">테스트 문자열:</span>
+            <button class="btn mini str-opt mode-active" data-s="(()())">(()())</button>
+            <button class="btn mini str-opt" data-s="(()">(()</button>
+            <button class="btn mini str-opt" data-s=")(">)(</button>
+          </div>
+        </div>
+        <div class="stack-panel">
+          <div class="stack-title">스택 (Stack)</div>
+          <div class="stack-box" id="st-stack"></div>
+          <div class="stack-base">바닥</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div id="nav-graph"></div>
+
+<div id="bottom-bar">
+  <div id="counter"><span class="cur">01</span> / 12</div>
+  <div class="arrow-btns">
+    <button class="arrow-btn" id="prev-btn">←</button>
+    <button class="arrow-btn" id="next-btn">→</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOTAL = 12;
+  let current = 0;
+  const wrapper = document.getElementById('wrapper');
+  const slides = document.querySelectorAll('.slide');
+  const progressTop = document.getElementById('progress-top');
+  const counterCur = document.querySelector('#counter .cur');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const navGraph = document.getElementById('nav-graph');
+
+  const slideNames = [
+    '표지','전체 지도','탐색 기법 살펴보기','도입','개념: 탐색기반','왜 상태공간을 정의할까','상태공간 구성요소',
+    '선형 구조의 종류','선형 전체탐색','정리','해설: 이분 탐색','해설: 스택 괄호'
+  ];
+
+  // build nav graph
+  slideNames.forEach((name, i) => {
+    const group = document.createElement('div');
+    group.className = 'nav-node-group';
+    if(i > 0){
+      const edge = document.createElement('div');
+      edge.className = 'nav-edge';
+      edge.dataset.idx = i;
+      navGraph.appendChild(edge);
+    }
+    const node = document.createElement('div');
+    node.className = 'nav-node';
+    node.dataset.idx = i;
+    const label = document.createElement('div');
+    label.className = 'nav-label';
+    label.textContent = (i+1) + '. ' + name;
+    node.appendChild(label);
+    node.addEventListener('click', () => goTo(i));
+    navGraph.appendChild(node);
+  });
+
+  function updateNav(){
+    document.querySelectorAll('.nav-node').forEach(n => {
+      const idx = +n.dataset.idx;
+      n.classList.remove('visited','current');
+      if(idx < current) n.classList.add('visited');
+      if(idx === current) n.classList.add('current');
+    });
+    document.querySelectorAll('.nav-edge').forEach(e => {
+      const idx = +e.dataset.idx;
+      e.classList.toggle('lit', idx <= current);
+    });
+  }
+
+  function goTo(i){
+    current = Math.max(0, Math.min(TOTAL-1, i));
+    wrapper.style.transform = `translateX(-${current*100}vw)`;
+    progressTop.style.width = ((current+1)/TOTAL*100) + '%';
+    counterCur.textContent = String(current+1).padStart(2,'0');
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === TOTAL-1;
+    updateNav();
+    if(current === 0) setTimeout(drawTitleGraph, 300);
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current-1));
+  nextBtn.addEventListener('click', () => goTo(current+1));
+
+  window.addEventListener('keydown', (e) => {
+    const activeTag = document.activeElement.tagName;
+    if(activeTag === 'TEXTAREA' || activeTag === 'INPUT') return;
+    if(['ArrowDown','ArrowRight',' '].includes(e.key)){ e.preventDefault(); goTo(current+1); }
+    if(['ArrowUp','ArrowLeft'].includes(e.key)){ e.preventDefault(); goTo(current-1); }
+  });
+
+  // scroll wheel navigation only when slide isn't independently scrollable / already at edge
+  let wheelLock = false;
+  document.getElementById('deck').addEventListener('wheel', (e) => {
+    const activeSlide = slides[current];
+    if(activeSlide.classList.contains('scrollable')){
+      const atTop = activeSlide.scrollTop <= 0;
+      const atBottom = activeSlide.scrollTop + activeSlide.clientHeight >= activeSlide.scrollHeight - 2;
+      if(!(e.deltaY < 0 && atTop) && !(e.deltaY > 0 && atBottom)) return;
+    }
+    if(wheelLock) return;
+    if(Math.abs(e.deltaY) < 12) return;
+    wheelLock = true;
+    if(e.deltaY > 0) goTo(current+1); else goTo(current-1);
+    setTimeout(() => wheelLock = false, 550);
+  }, {passive:true});
+
+  goTo(0);
+
+  /* ---------------- Slide 0: title graph animation ---------------- */
+  function drawTitleGraph(){
+    const svg = document.getElementById('title-graph');
+    if(svg.dataset.done) { svg.style.opacity = 1; return; }
+    svg.dataset.done = '1';
+    const nodes = [
+      {x:20,y:160},{x:60,y:160},{x:100,y:160},{x:140,y:160},
+      {x:180,y:160},{x:220,y:160},{x:260,y:160},{x:300,y:160}
+    ];
+    const edges = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7]];
+    const goalIdx = 5;
+    let svgHTML = '';
+    edges.forEach(([a,b],i) => {
+      const n1=nodes[a], n2=nodes[b];
+      svgHTML += `<line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="#dedad0" stroke-width="1.5" opacity="0" style="animation:fadein .4s ease forwards ${i*0.16+0.1}s"/>`;
+    });
+    nodes.forEach((n,i) => {
+      const isGoal = i===goalIdx;
+      svgHTML += `<circle cx="${n.x}" cy="${n.y}" r="7" fill="${isGoal?'#c2760f':'#ffffff'}" stroke="${isGoal?'#c2760f':'#0d8c7a'}" stroke-width="1.5" opacity="0" style="animation:popin .4s ease forwards ${i*0.16}s"/>`;
+      if(isGoal){
+        svgHTML += `<circle cx="${n.x}" cy="${n.y}" r="13" fill="none" stroke="#c2760f" stroke-width="1.2" opacity="0" style="animation:ringpop .5s ease forwards ${i*0.16+0.25}s"/>`;
+      }
+    });
+    svg.innerHTML = `<style>
+      @keyframes fadein{to{opacity:1;}}
+      @keyframes popin{0%{opacity:0;transform:scale(.3);}100%{opacity:1;transform:scale(1);}}
+      @keyframes ringpop{0%{opacity:0;transform:scale(.6);}60%{opacity:.8;}100%{opacity:0;transform:scale(1.6);}}
+      #title-graph circle{transform-origin:center;transform-box:fill-box;}
+    </style>` + svgHTML;
+    svg.style.opacity = 1;
+  }
+  setTimeout(drawTitleGraph, 400);
+
+  /* ---------------- Slide 1: 숫자 맞히기 게임 ---------------- */
+  let secretNumber = Math.floor(Math.random()*100)+1;
+  let guessCount = 0;
+  const guessInput = document.getElementById('guess-input');
+  const guessFeedback = document.getElementById('guess-feedback');
+  const guessHistory = document.getElementById('guess-history');
+  const guessCountEl = document.getElementById('guess-count');
+  let guessWon = false;
+
+  function submitGuess(){
+    if(guessWon) return;
+    const val = parseInt(guessInput.value, 10);
+    if(isNaN(val) || val < 1 || val > 100){
+      guessFeedback.textContent = '1~100 사이의 숫자를 입력해주세요';
+      guessFeedback.className = 'guess-feedback';
+      return;
+    }
+    guessCount++;
+    guessCountEl.textContent = guessCount;
+    const chip = document.createElement('div');
+    chip.className = 'guess-chip';
+    chip.textContent = val;
+    if(val === secretNumber){
+      guessFeedback.textContent = `🎉 정답! ${guessCount}번 만에 맞혔어요`;
+      guessFeedback.className = 'guess-feedback win';
+      chip.classList.add('win');
+      guessWon = true;
+    } else if(val < secretNumber){
+      guessFeedback.textContent = '더 커요 ↑';
+      guessFeedback.className = 'guess-feedback up';
+      chip.classList.add('up');
+    } else {
+      guessFeedback.textContent = '더 작아요 ↓';
+      guessFeedback.className = 'guess-feedback down';
+      chip.classList.add('down');
+    }
+    guessHistory.appendChild(chip);
+    guessInput.value = '';
+    guessInput.focus();
+  }
+
+  function resetGuess(){
+    secretNumber = Math.floor(Math.random()*100)+1;
+    guessCount = 0;
+    guessWon = false;
+    guessCountEl.textContent = '0';
+    guessFeedback.textContent = '숫자를 입력하고 확인을 눌러보세요';
+    guessFeedback.className = 'guess-feedback';
+    guessHistory.innerHTML = '';
+    guessInput.value = '';
+  }
+
+  document.getElementById('guess-submit').addEventListener('click', submitGuess);
+  document.getElementById('guess-reset').addEventListener('click', resetGuess);
+  guessInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitGuess(); });
+
+  /* ---------------- Slide 5: linear / binary search demo ---------------- */
+  const arrVals = [4,13,22,31,40,52,61,74,88];
+  function buildArray(id){
+    const row = document.getElementById(id);
+    row.innerHTML = '';
+    arrVals.forEach(v => {
+      const c = document.createElement('div');
+      c.className = 'array-cell';
+      c.textContent = v;
+      row.appendChild(c);
+    });
+    return row.children;
+  }
+  let linearCells = buildArray('arr-linear');
+  let binaryCells = buildArray('arr-binary');
+  const target = 61;
+
+  document.getElementById('btn-linear').addEventListener('click', function(){
+    this.disabled = true;
+    linearCells = buildArray('arr-linear');
+    const status = document.getElementById('status-linear');
+    let i = 0;
+    status.textContent = '탐색 시작...';
+    const step = () => {
+      if(i>0) linearCells[i-1].classList.remove('checking');
+      if(i>0) linearCells[i-1].classList.add('checked');
+      if(i >= arrVals.length){ status.textContent = '탐색 종료'; this.disabled=false; return; }
+      linearCells[i].classList.add('checking');
+      status.textContent = `인덱스 ${i} 확인 중... (값 ${arrVals[i]})`;
+      if(arrVals[i] === target){
+        setTimeout(() => {
+          linearCells[i].classList.remove('checking');
+          linearCells[i].classList.add('found');
+          status.textContent = `인덱스 ${i}에서 값 ${target} 발견! (비교 ${i+1}회)`;
+          this.disabled = false;
+        }, 500);
+        return;
+      }
+      i++;
+      setTimeout(step, 480);
+    };
+    step();
+  });
+
+  document.getElementById('btn-binary').addEventListener('click', function(){
+    this.disabled = true;
+    binaryCells = buildArray('arr-binary');
+    const status = document.getElementById('status-binary');
+    let lo = 0, hi = arrVals.length-1, cmp=0;
+    const step = () => {
+      if(lo > hi){ status.textContent = '탐색 종료 (찾지 못함)'; this.disabled=false; return; }
+      const mid = Math.floor((lo+hi)/2);
+      cmp++;
+      for(let k=0;k<arrVals.length;k++){
+        binaryCells[k].classList.remove('checking');
+        if(k<lo || k>hi) binaryCells[k].classList.add('excluded');
+      }
+      binaryCells[mid].classList.add('checking');
+      status.textContent = `범위 [${lo}, ${hi}] 중 인덱스 ${mid} 확인 (값 ${arrVals[mid]})`;
+      if(arrVals[mid] === target){
+        setTimeout(() => {
+          binaryCells[mid].classList.remove('checking');
+          binaryCells[mid].classList.add('found');
+          status.textContent = `인덱스 ${mid}에서 값 ${target} 발견! (비교 ${cmp}회)`;
+          this.disabled = false;
+        }, 550);
+        return;
+      }
+      setTimeout(() => {
+        binaryCells[mid].classList.remove('checking');
+        binaryCells[mid].classList.add('checked');
+        if(arrVals[mid] < target) lo = mid+1; else hi = mid-1;
+        step();
+      }, 550);
+    };
+    step();
+  });
+
+  /* ---------------- Slide 6: hint password (multi-block) ---------------- */
+  document.querySelectorAll('.hint-toggle').forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const t = toggle.dataset.target;
+      document.getElementById('hint-content-'+t).classList.toggle('show');
+    });
+  });
+  document.querySelectorAll('.pw-submit').forEach(btn => {
+    btn.addEventListener('click', () => checkPw(btn.dataset.target));
+  });
+  document.querySelectorAll('.pw-input').forEach(input => {
+    input.addEventListener('keydown', (e) => { if(e.key === 'Enter') checkPw(input.dataset.target); });
+  });
+  function checkPw(t){
+    const val = document.querySelector(`.pw-input[data-target="${t}"]`).value;
+    const answer = document.getElementById('hint-answer-'+t);
+    const wrong = document.getElementById('hint-wrong-'+t);
+    if(val === 'dab'){ answer.style.display = 'block'; wrong.style.display = 'none'; }
+    else { wrong.style.display = 'block'; answer.style.display = 'none'; }
+  }
+
+  /* ---------------- Slide 10: 이분 탐색 애니메이션 ---------------- */
+  const bsArr = [2,4,6,8,10,12,14];
+  const bsTarget = 10;
+
+  function bsBuildSteps(){
+    const steps = [];
+    let low = 0, high = bsArr.length - 1, result = -1;
+    steps.push({low, high, mid:null, line:1, msg:`low=0, high=${high} 로 시작. 탐색 범위는 전체 배열.`});
+    for(let k=0; k<bsArr.length; k++){
+      if(low > high) break;
+      const mid = Math.floor((low+high)/2);
+      steps.push({low, high, mid, line:3, msg:`mid = (${low}+${high})//2 = ${mid}  →  arr[${mid}] = ${bsArr[mid]}`});
+      if(bsArr[mid] === bsTarget){
+        steps.push({low, high, mid, line:5, found:mid, msg:`arr[${mid}] == ${bsTarget}  →  찾았다! result = ${mid}`});
+        result = mid;
+        break;
+      } else if(bsArr[mid] < bsTarget){
+        steps.push({low, high, mid, line:6, msg:`arr[${mid}]=${bsArr[mid]} < ${bsTarget}  →  target은 오른쪽에 있다`});
+        low = mid + 1;
+        steps.push({low, high, mid:null, line:7, msg:`low = ${mid}+1 = ${low}  →  왼쪽 절반을 버린다`});
+      } else {
+        steps.push({low, high, mid, line:8, msg:`arr[${mid}]=${bsArr[mid]} > ${bsTarget}  →  target은 왼쪽에 있다`});
+        high = mid - 1;
+        steps.push({low, high, mid:null, line:9, msg:`high = ${mid}-1 = ${high}  →  오른쪽 절반을 버린다`});
+      }
+    }
+    return steps;
+  }
+  const bsSteps = bsBuildSteps();
+  let bsIdx = -1, bsTimer = null;
+
+  function bsRender(st){
+    const arrRow = document.getElementById('bs-array');
+    const ptrRow = document.getElementById('bs-ptrs');
+    arrRow.innerHTML = ''; ptrRow.innerHTML = '';
+    bsArr.forEach((v,i) => {
+      const c = document.createElement('div');
+      c.className = 'array-cell';
+      c.textContent = v;
+      if(st){
+        if(i < st.low || i > st.high) c.classList.add('bs-out');
+        if(st.found === i) c.classList.add('bs-found');
+        else if(st.mid === i) c.classList.add('bs-mid');
+      }
+      arrRow.appendChild(c);
+
+      const p = document.createElement('div');
+      p.className = 'ptr-cell';
+      if(st){
+        if(st.low === i){ const b=document.createElement('span'); b.className='ptr-badge low'; b.textContent='low'; p.appendChild(b); }
+        if(st.mid === i){ const b=document.createElement('span'); b.className='ptr-badge mid'; b.textContent='mid'; p.appendChild(b); }
+        if(st.high === i){ const b=document.createElement('span'); b.className='ptr-badge high'; b.textContent='high'; p.appendChild(b); }
+      }
+      ptrRow.appendChild(p);
+    });
+    document.querySelectorAll('#bs-code .cl').forEach(el => {
+      el.classList.toggle('hot', !!st && +el.dataset.l === st.line);
+    });
+    document.getElementById('bs-status').textContent = st ? st.msg : '재생 버튼을 눌러보세요';
+  }
+
+  function bsGoto(i){
+    bsIdx = i;
+    bsRender(i >= 0 && i < bsSteps.length ? bsSteps[i] : null);
+  }
+  function bsReset(){
+    clearInterval(bsTimer); bsTimer = null;
+    bsGoto(-1);
+  }
+  bsReset();
+
+  document.getElementById('bs-step').addEventListener('click', () => {
+    clearInterval(bsTimer); bsTimer = null;
+    if(bsIdx < bsSteps.length - 1) bsGoto(bsIdx + 1);
+  });
+  document.getElementById('bs-reset').addEventListener('click', bsReset);
+  document.getElementById('bs-play').addEventListener('click', () => {
+    clearInterval(bsTimer);
+    if(bsIdx >= bsSteps.length - 1) bsIdx = -1;
+    bsTimer = setInterval(() => {
+      if(bsIdx >= bsSteps.length - 1){ clearInterval(bsTimer); bsTimer = null; return; }
+      bsGoto(bsIdx + 1);
+    }, 1400);
+  });
+
+  /* ---------------- Slide 11: 스택 괄호 애니메이션 ---------------- */
+  let stStr = "(()())";
+  let stSteps = [], stIdx = -1, stTimer = null;
+
+  function stBuildSteps(s){
+    const steps = [];
+    const stack = [];
+    let valid = true;
+    steps.push({i:-1, stack:[], msg:`문자열 "${s}" 를 왼쪽부터 한 글자씩 읽는다. 스택은 비어있는 상태로 시작.`});
+    for(let i=0; i<s.length; i++){
+      const ch = s[i];
+      if(ch === '('){
+        stack.push(ch);
+        steps.push({i, stack:[...stack], msg:`'(' 를 만났다  →  스택에 push. 스택 크기: ${stack.length}`});
+      } else if(ch === ')'){
+        if(stack.length === 0){
+          valid = false;
+          steps.push({i, stack:[...stack], bad:true, msg:`')' 를 만났는데 스택이 비어있다  →  짝지을 여는 괄호가 없다. NO`});
+          return {steps, valid};
+        }
+        stack.pop();
+        steps.push({i, stack:[...stack], msg:`')' 를 만났다  →  스택에서 pop. 스택 크기: ${stack.length}`});
+      }
+    }
+    if(stack.length > 0){
+      valid = false;
+      steps.push({i:s.length, stack:[...stack], bad:true, msg:`문자열을 다 읽었지만 스택에 ${stack.length}개가 남았다  →  닫히지 않은 괄호가 있다. NO`});
+    } else {
+      steps.push({i:s.length, stack:[], msg:`문자열을 다 읽었고 스택도 비었다  →  모든 괄호의 짝이 맞다. YES`});
+    }
+    return {steps, valid};
+  }
+
+  function stRender(st){
+    const strRow = document.getElementById('st-string');
+    const stackBox = document.getElementById('st-stack');
+    strRow.innerHTML = ''; stackBox.innerHTML = '';
+    [...stStr].forEach((ch,i) => {
+      const c = document.createElement('div');
+      c.className = 'str-char';
+      c.textContent = ch;
+      if(st){
+        if(i < st.i) c.classList.add('done');
+        if(i === st.i) c.classList.add(st.bad ? 'bad' : 'cur');
+      }
+      strRow.appendChild(c);
+    });
+    if(st){
+      st.stack.forEach(ch => {
+        const it = document.createElement('div');
+        it.className = 'stack-item';
+        it.textContent = ch;
+        stackBox.appendChild(it);
+      });
+    }
+    document.getElementById('st-status').textContent = st ? st.msg : '재생 버튼을 눌러보세요';
+  }
+
+  function stLoad(s){
+    stStr = s;
+    const r = stBuildSteps(s);
+    stSteps = r.steps;
+    stIdx = -1;
+    clearInterval(stTimer); stTimer = null;
+    stRender(null);
+  }
+  function stGoto(i){
+    stIdx = i;
+    stRender(i >= 0 && i < stSteps.length ? stSteps[i] : null);
+  }
+  stLoad(stStr);
+
+  document.getElementById('st-step').addEventListener('click', () => {
+    clearInterval(stTimer); stTimer = null;
+    if(stIdx < stSteps.length - 1) stGoto(stIdx + 1);
+  });
+  document.getElementById('st-reset').addEventListener('click', () => stLoad(stStr));
+  document.getElementById('st-play').addEventListener('click', () => {
+    clearInterval(stTimer);
+    if(stIdx >= stSteps.length - 1) stIdx = -1;
+    stTimer = setInterval(() => {
+      if(stIdx >= stSteps.length - 1){ clearInterval(stTimer); stTimer = null; return; }
+      stGoto(stIdx + 1);
+    }, 1200);
+  });
+  document.querySelectorAll('.str-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.str-opt').forEach(b => b.classList.remove('mode-active'));
+      btn.classList.add('mode-active');
+      stLoad(btn.dataset.s);
+    });
+  });
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3차시 · 비선형 탐색 — 트리에서의 DFS와 BFS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202e;
+  --ink-soft:#4a5a70;
+  --line:#dfe5ee;
+  --paper:#f7f9fc;
+  --white:#ffffff;
+  --sea:#1d5fd0;        /* 주 강조 - 딥블루 */
+  --sea-soft:#e8f0ff;
+  --coral:#e0533d;      /* 현재 위치 / 강조 */
+  --coral-soft:#fdece8;
+  --moss:#137a5e;       /* 방문완료 / 확정 */
+  --moss-soft:#e2f4ee;
+  --amber:#c98a09;      /* 대기열 */
+  --amber-soft:#fdf3dc;
+  --violet:#6b4bc4;
+  --violet-soft:#efeaff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;}
+body{
+  font-family:'IBM Plex Sans KR',sans-serif;
+  background:var(--paper);color:var(--ink);
+  overflow:hidden;
+}
+code,kbd,pre,.mono{font-family:'JetBrains Mono','IBM Plex Sans KR',monospace;}
+
+/* ===== 슬라이드 컨테이너 ===== */
+#deck{position:relative;width:100vw;height:100vh;}
+.slide{
+  position:absolute;inset:0;
+  display:none;
+  flex-direction:column;
+  padding:38px 60px 74px;
+  background:var(--white);
+  overflow-y:auto;overflow-x:hidden;
+}
+.slide.active{display:flex;animation:fade .32s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}}
+
+/* 스크롤바 */
+.slide::-webkit-scrollbar,.scrollbox::-webkit-scrollbar{width:9px;height:9px}
+.slide::-webkit-scrollbar-thumb,.scrollbox::-webkit-scrollbar-thumb{background:#c8d2e0;border-radius:9px}
+.slide::-webkit-scrollbar-track{background:transparent}
+
+/* ===== 헤더 ===== */
+.eyebrow{
+  font-size:13px;font-weight:600;letter-spacing:.14em;
+  color:var(--sea);text-transform:uppercase;margin-bottom:8px;
+  display:flex;align-items:center;gap:10px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
+h1.title{font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px;}
+h1.title small{display:block;font-size:17px;font-weight:400;color:var(--ink-soft);margin-top:8px;letter-spacing:0}
+.sub{font-size:16px;color:var(--ink-soft);margin-bottom:20px;line-height:1.6}
+
+/* ===== 공통 요소 ===== */
+.body{flex:1 0 auto;min-height:0;}
+p{line-height:1.75;font-size:16px;color:var(--ink);}
+.lead{font-size:18px;line-height:1.8}
+ul.clean{list-style:none}
+ul.clean li{position:relative;padding-left:20px;line-height:1.8;font-size:16px;margin-bottom:6px}
+ul.clean li::before{content:"";position:absolute;left:2px;top:.75em;width:7px;height:7px;border-radius:2px;background:var(--sea);}
+ul.clean.moss li::before{background:var(--moss)}
+ul.clean.coral li::before{background:var(--coral)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid-1-2{display:grid;grid-template-columns:1fr 1.6fr;gap:22px}
+.grid-2-1{display:grid;grid-template-columns:1.6fr 1fr;gap:22px}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px 22px;}
+.card h3{font-size:18px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card.sea{background:var(--sea-soft);border-color:#c6dbff}
+.card.moss{background:var(--moss-soft);border-color:#bfe6d8}
+.card.coral{background:var(--coral-soft);border-color:#f7cec4}
+.card.amber{background:var(--amber-soft);border-color:#f0dfae}
+.card.violet{background:var(--violet-soft);border-color:#d8ccff}
+.card.flat{background:var(--paper)}
+
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--sea-soft);color:var(--sea);letter-spacing:.02em}
+.tag.moss{background:var(--moss-soft);color:var(--moss)}
+.tag.coral{background:var(--coral-soft);color:var(--coral)}
+.tag.amber{background:var(--amber-soft);color:#8a5f04}
+.tag.violet{background:var(--violet-soft);color:var(--violet)}
+.tag.gray{background:#eef1f6;color:var(--ink-soft)}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:15px}
+table.tbl th,table.tbl td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top;line-height:1.6}
+table.tbl th{background:var(--paper);font-weight:600;font-size:14px}
+table.tbl td.c,table.tbl th.c{text-align:center}
+table.tbl tr:hover td{background:#fbfcfe}
+
+pre.code{
+  background:#111a26;color:#dbe6f4;border-radius:12px;
+  padding:16px 18px;font-size:14.5px;line-height:1.65;overflow:auto;
+  font-family:'JetBrains Mono',monospace;
+}
+pre.code .kw{color:#ff9d7a}
+pre.code .fn{color:#7fd3ff}
+pre.code .st{color:#9be59b}
+pre.code .cm{color:#7e93ab;font-style:italic}
+pre.code .nm{color:#e2c07d}
+
+.scrollbox{overflow-y:auto;max-height:100%;padding-right:6px}
+/* .body 자체가 scrollbox인 슬라이드는 슬라이드 전체가 스크롤되도록 한다 */
+.body.scrollbox{overflow:visible;max-height:none;padding-right:0}
+
+.callout{border-left:4px solid var(--sea);background:var(--sea-soft);padding:14px 18px;border-radius:0 10px 10px 0;font-size:15.5px;line-height:1.75}
+.callout.coral{border-color:var(--coral);background:var(--coral-soft)}
+.callout.moss{border-color:var(--moss);background:var(--moss-soft)}
+.callout.amber{border-color:var(--amber);background:var(--amber-soft)}
+.callout b{font-weight:700}
+
+.kbdkey{display:inline-block;border:1px solid #c9d3e0;border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:13px;background:#fff;font-family:'JetBrains Mono'}
+
+/* ===== 네비게이션 ===== */
+#nav{
+  position:fixed;left:0;right:0;bottom:0;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 26px;background:rgba(255,255,255,.94);
+  border-top:1px solid var(--line);backdrop-filter:blur(8px);z-index:50;
+}
+#nav .left{display:flex;align-items:center;gap:12px}
+#nav .chip{font-size:13px;color:var(--ink-soft);font-weight:500}
+.navbtn{
+  border:1px solid var(--line);background:#fff;border-radius:9px;
+  padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);
+  font-family:inherit;transition:.15s;
+}
+.navbtn:hover{background:var(--sea);color:#fff;border-color:var(--sea)}
+.navbtn:disabled{opacity:.35;cursor:default}
+.navbtn:disabled:hover{background:#fff;color:var(--ink);border-color:var(--line)}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--sea);z-index:60;transition:width .3s}
+#slidename{font-size:13px;color:var(--ink-soft);max-width:44vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ===== 시각화 공통 ===== */
+.viz{display:grid;grid-template-columns:1.45fr 1fr;gap:20px;align-items:start}
+.vizstage{border:1px solid var(--line);border-radius:14px;background:#fcfdff;padding:6px}
+.vizpanel{display:flex;flex-direction:column;gap:12px}
+.ctrlbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.btn{
+  border:none;border-radius:9px;padding:9px 16px;font-size:14.5px;font-weight:600;
+  cursor:pointer;font-family:inherit;background:var(--sea);color:#fff;transition:.15s;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--paper)}
+.btn.sm{padding:6px 12px;font-size:13px}
+
+.statebox{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.statebox h4{font-size:13px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:8px;text-transform:uppercase}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;min-height:32px;align-items:center}
+.nodechip{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:32px;height:32px;padding:0 9px;border-radius:8px;
+  font-weight:700;font-size:15px;font-family:'JetBrains Mono';
+  background:var(--paper);border:1px solid var(--line);
+}
+.nodechip.top{background:var(--coral);color:#fff;border-color:var(--coral)}
+.nodechip.front{background:var(--coral);color:#fff;border-color:var(--coral)}
+.nodechip.done{background:var(--moss);color:#fff;border-color:var(--moss)}
+.empty{color:#a9b5c6;font-size:14px}
+
+.msg{font-size:15px;line-height:1.65;padding:12px 14px;border-radius:11px;background:var(--sea-soft);border:1px solid #cfe0ff;min-height:66px}
+.msg b{color:var(--sea)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);align-items:center}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:4px;margin-right:5px;vertical-align:-2px;border:1px solid rgba(0,0,0,.12)}
+
+/* SVG 그래프 */
+.gnode circle{transition:fill .25s,stroke .25s}
+.gnode text{font-family:'JetBrains Mono';font-weight:700;font-size:17px;pointer-events:none}
+.gedge{stroke:#c3cedd;stroke-width:2.5;transition:stroke .25s,stroke-width .25s}
+.gedge.act{stroke:var(--coral);stroke-width:4}
+.gedge.tree{stroke:var(--moss);stroke-width:4.5}
+.gedge.dim{stroke:#e4eaf2}
+.wlabel{font-family:'JetBrains Mono';font-size:13px;font-weight:700;fill:#57687e}
+.orderbadge{font-family:'JetBrains Mono';font-size:12px;font-weight:700;fill:#fff}
+
+/* 실행 영역 — 코드·그래프·컨트롤이 한 화면에 들어오도록 압축 */
+.runrow{display:grid;grid-template-columns:1.05fr 1fr;gap:20px;align-items:start}
+.runrow .reccode{font-size:13.5px;line-height:1.62;padding:12px 0}
+.runrow .vizpanel{gap:9px}
+.runrow .vizstage{padding:4px}
+.runrow .vizstage svg{max-height:min(200px,23vh)}
+.runrow .statebox{padding:9px 12px}
+.runrow .statebox h4{margin-bottom:6px;font-size:12px}
+.runrow .chiprow{min-height:28px}
+.runrow .nodechip{min-width:28px;height:28px;font-size:14px}
+.runrow .frames{min-height:min(124px,14vh);gap:5px}
+.runrow .frame{padding:6px 11px}
+.runrow .frame .fnm{font-size:14px}
+.runrow .msg{min-height:54px;font-size:14.2px;padding:10px 13px;line-height:1.6}
+.runrow .ctrlbar{margin-top:2px}
+.runrow .legend{font-size:12.5px;gap:11px}
+.runrow .footnote{margin-top:-2px;font-size:13px}
+@media (max-width:1100px){.runrow{grid-template-columns:1fr}}
+
+/* 실행 영역 아래로 내려둔 설명 묶음 */
+.notes{margin-top:28px;padding-top:22px;border-top:1px dashed var(--line)}
+.notes::before{
+  content:"↓ 아래는 자세한 설명";display:block;
+  font-size:12.5px;font-weight:600;letter-spacing:.1em;color:#a9b5c6;margin-bottom:16px;
+}
+
+/* 재귀 · 호출 스택 시각화 */
+.reccode{background:#111a26;border-radius:12px;padding:14px 0;font-family:'JetBrains Mono',monospace;font-size:14.5px;line-height:1.75}
+.cline{display:flex;gap:12px;padding:2px 16px;color:#dbe6f4;white-space:pre;border-left:3px solid transparent;transition:background .18s}
+.cline .ln{color:#54677e;width:14px;text-align:right;flex:none;user-select:none}
+.cline.on{background:#22374f;border-left-color:var(--coral)}
+.frames{display:flex;flex-direction:column-reverse;gap:6px;min-height:216px;justify-content:flex-end}
+.frame{border:1px solid var(--line);border-radius:9px;padding:8px 12px;background:#fff;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.frame .fnm{font-family:'JetBrains Mono';font-weight:700;font-size:15px}
+.frame .fst{font-size:12.5px;color:var(--ink-soft)}
+.frame.top{background:var(--coral-soft);border-color:var(--coral)}
+.frame.top .fst{color:var(--coral);font-weight:600}
+.frame.waiting{background:var(--amber-soft);border-color:#f0dfae}
+.msg.call{background:var(--sea-soft);border-color:#cfe0ff}
+.msg.back{background:var(--coral-soft);border-color:#f7cec4}
+.msg.back b{color:var(--coral)}
+.msg.ret{background:var(--moss-soft);border-color:#bfe6d8}
+.msg.ret b{color:var(--moss)}
+
+/* 퀴즈 */
+.q{border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin-bottom:14px;background:#fff}
+.q .qh{font-weight:600;font-size:16.5px;margin-bottom:12px;line-height:1.6}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 15px;cursor:pointer;font-size:14.5px;font-family:inherit;transition:.15s;text-align:left}
+.opt:hover{border-color:var(--sea);background:var(--sea-soft)}
+.opt.ok{background:var(--moss);color:#fff;border-color:var(--moss)}
+.opt.no{background:var(--coral);color:#fff;border-color:var(--coral)}
+.fb{margin-top:11px;font-size:14.5px;line-height:1.7;display:none;padding:11px 14px;border-radius:9px;background:var(--paper);border-left:3px solid var(--sea)}
+.fb.show{display:block}
+
+/* 표지 */
+.cover{justify-content:center;align-items:flex-start;background:linear-gradient(140deg,#f7f9fc 0%,#eaf1fe 55%,#f3eefe 100%);}
+.cover .num{font-family:'JetBrains Mono';font-size:15px;font-weight:700;color:var(--sea);letter-spacing:.2em}
+.cover h1{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin:14px 0 18px}
+.cover .kws{display:flex;gap:9px;flex-wrap:wrap;margin-top:26px}
+
+.footnote{font-size:13px;color:#8494a8;margin-top:12px;line-height:1.6}
+.tt{font-family:'JetBrains Mono';font-size:14.5px;background:#eef2f8;padding:1px 6px;border-radius:5px;color:#33445c}
+
+@media (max-width:1100px){
+  .slide{padding:26px 26px 70px}
+  h1.title{font-size:30px}
+  .viz{grid-template-columns:1fr}
+  .grid-1-2,.grid-2-1,.grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+<!-- ============ 1. 표지 ============ -->
+<section class="slide cover" data-name="표지">
+  <div class="num">3차시 · 탐색기반 알고리즘</div>
+  <h1>비선형 탐색<br>깊이 우선 탐색 · 너비 우선 탐색</h1>
+  <p class="lead" style="max-width:720px;color:var(--ink-soft)">
+    한 줄로 늘어선 데이터가 아니라, <b style="color:var(--ink)">여러 갈래로 뻗어 있는 상태 공간</b>을 탐색한다.<br>
+    갈림길에서 <b style="color:var(--ink)">무엇을 먼저 볼 것인가</b> — 이 하나의 선택이 두 알고리즘을 갈라놓는다.
+  </p>
+  <div class="kws">
+    <span class="tag">비선형 구조</span>
+    <span class="tag gray">트리</span>
+    <span class="tag coral">깊이 우선 탐색(DFS)</span>
+    <span class="tag amber">너비 우선 탐색(BFS)</span>
+    <span class="tag">백트랙</span>
+  </div>
+  <p class="footnote" style="margin-top:40px">
+    세종과학고등학교 1학년 정보과학 &nbsp;|&nbsp; 탐색기반 알고리즘<br>
+    <span class="kbdkey">←</span> <span class="kbdkey">→</span> 로 슬라이드를 넘기고, 시각화 화면에서는 <b>[다음 단계]</b> 버튼을 눌러 진행하세요.
+  </p>
+</section>
+
+<!-- ============ 2. 학습 목표 ============ -->
+<section class="slide" data-name="학습 목표">
+  <div class="eyebrow">Learning Goals</div>
+  <h1 class="title">오늘 도착할 지점</h1>
+  <div class="body grid2" style="margin-top:14px">
+    <div class="card sea">
+      <h3>🎯 학습 목표</h3>
+      <ul class="clean">
+        <li>비선형 구조로 구조화된 상태 공간의 특징을 설명할 수 있다.</li>
+        <li>트리를 표현하는 용어(루트·부모·자식·단말·레벨)를 사용해 구조를 설명할 수 있다.</li>
+        <li>깊이 우선 탐색과 너비 우선 탐색의 동작 원리를 <b>스택·큐</b>의 변화로 설명할 수 있다.</li>
+        <li>두 탐색 방법의 방문 순서를 직접 예측하고 코드로 구현할 수 있다.</li>
+        <li><b>백트랙</b>이 무엇이며 왜 필요한지 설명할 수 있다.</li>
+      </ul>
+    </div>
+    <div class="card flat">
+      <h3>📘 성취기준</h3>
+      <p style="font-size:15.5px;line-height:1.8">
+        <b>[12정과03-01]</b> 문제를 해결하기 위한 알고리즘을 설계하고, 그 효율성을 분석한다.<br><br>
+        <b>[12정과03-02]</b> 탐색기반 알고리즘을 이해하고, 문제 해결에 적용한다.
+      </p>
+      <div class="callout" style="margin-top:16px">
+        <b>지난 시간까지:</b> 순차 탐색 · 이분 탐색 → 순서가 하나로 정해진 <b>선형 구조</b><br>
+        <b>오늘:</b> 다음에 갈 곳이 여러 개인 <b>비선형 구조</b> — 그중 <b>트리</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. 선형 vs 비선형 ============ -->
+<section class="slide" data-name="선형 vs 비선형">
+  <div class="eyebrow">복습과 연결</div>
+  <h1 class="title">순서가 하나뿐인가, 여러 개인가</h1>
+  <p class="sub">상태 공간을 어떤 구조로 만들었느냐에 따라, 쓸 수 있는 탐색 알고리즘이 달라진다.</p>
+  <div class="body">
+    <table class="tbl">
+      <tr>
+        <th style="width:130px"></th>
+        <th style="width:37%">선형 구조</th>
+        <th style="width:37%">비선형 구조</th>
+      </tr>
+      <tr>
+        <td><b>정의</b></td>
+        <td>상태 공간을 탐색하는 <b>순서를 유일하게 결정</b>할 수 있는 형태</td>
+        <td>한 원소를 탐색한 뒤, 연결된 <b>여러 원소 중에서 다음을 선택</b>해야 하는 형태</td>
+      </tr>
+      <tr>
+        <td><b>자료 구조</b></td>
+        <td>리스트, 큐, 스택 (2·3차원 배열도 순서를 정할 수 있으므로 선형)</td>
+        <td><b>트리</b>, 그래프 &nbsp;<span class="tag gray">오늘은 트리</span></td>
+      </tr>
+      <tr>
+        <td><b>탐색 알고리즘</b></td>
+        <td>순차 탐색 · 이분 탐색</td>
+        <td><b>깊이 우선 탐색(DFS)</b> · <b>너비 우선 탐색(BFS)</b></td>
+      </tr>
+      <tr>
+        <td><b>다음 위치</b></td>
+        <td class="c">언제나 1개 (i → i+1)</td>
+        <td class="c">여러 개 → <b>선택과 되돌아오기(백트랙)</b>가 필요</td>
+      </tr>
+    </table>
+
+    <div class="grid2" style="margin-top:22px">
+      <div class="card coral">
+        <h3>왜 갑자기 어려워지는가</h3>
+        <p>선형 구조에서는 "다음"이 정해져 있으니 <span class="tt">for i in range(n)</span> 한 줄이면 끝났다.
+        비선형 구조에서는 <b>갈림길마다 선택</b>을 해야 하고, 막다른 길이면 <b>돌아 나와서</b> 다른 길을 시도해야 한다.
+        그래서 "어디까지 가봤는지"를 기억하는 <b>보조 자료 구조(스택/큐)</b>가 반드시 필요하다.</p>
+      </div>
+      <div class="card">
+        <h3>💡 우리 주변의 비선형 상태 공간</h3>
+        <ul class="clean coral">
+          <li><b>폴더 구조</b> — 폴더 안에 폴더가 여러 개 <span class="footnote">(대표적인 트리)</span></li>
+          <li><b>조직도 · 가계도</b> — 위에서 아래로 갈라진다</li>
+          <li><b>가능한 경우의 수</b> — 동전 조합처럼 “다음에 무엇을 고를까”가 매번 갈라진다</li>
+          <li><b>미로</b> — 갈림길에서 하나를 고르고, 막히면 되돌아옴</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. 2차시와의 연결 ============ -->
+<section class="slide" data-name="다섯 요소로 다시 보기">
+  <div class="eyebrow">2차시와의 연결</div>
+  <h1 class="title">다섯 요소는 그대로다 <small>달라지는 것은 “상태 전이 규칙이 몇 개인가” 하나뿐이다</small></h1>
+  <p class="sub">2차시에서 상태 공간을 <b>초기 상태 · 목표 상태 · 상태 전이 · 경로 · 탐색 깊이</b> 다섯 가지로 정의했다.
+  트리에서도 이 다섯은 <b>그대로</b> 쓰인다. 오른쪽 그림에서 각각이 무엇인지 확인하자.</p>
+  <div class="body grid-2-1">
+    <div>
+      <table class="tbl">
+        <tr>
+          <th style="width:26%">상태 공간의 요소</th>
+          <th style="width:35%">2차시 — 선형 (순차 탐색)</th>
+          <th>오늘 — 비선형 (트리)</th>
+        </tr>
+        <tr>
+          <td><b><span style="color:var(--amber)">①</span> 초기 상태</b><br><span class="footnote">Initial State</span></td>
+          <td>배열의 첫 인덱스 <span class="tt">i = 0</span></td>
+          <td><b>루트 노드 a</b><br>탐색은 언제나 여기서 시작한다</td>
+        </tr>
+        <tr>
+          <td><b><span style="color:var(--moss)">②</span> 목표 상태</b><br><span class="footnote">Goal State</span></td>
+          <td><span class="tt">arr[i] == 25</span> 가 되는 인덱스 <span class="tt">i=4</span></td>
+          <td>찾는 조건을 만족하는 <b>노드</b> — 여기서는 <b>j</b></td>
+        </tr>
+        <tr style="background:var(--coral-soft)">
+          <td><b><span style="color:var(--coral)">③</span> 상태 전이</b><br><span class="footnote">State Transition</span></td>
+          <td><span class="tt">i → i+1</span><br><b>규칙이 하나뿐</b>이라 다음 상태가 항상 하나로 정해진다</td>
+          <td><span class="tt">부모 → 자식</span> (간선을 따라 한 칸)<br><b>자식이 여러 개</b>여서 다음 상태를 <b>골라야</b> 한다</td>
+        </tr>
+        <tr>
+          <td><b><span style="color:var(--sea)">④</span> 경로</b><br><span class="footnote">Path</span></td>
+          <td><span class="tt">0→1→2→3→4</span><br>갈림길이 없어 경로가 <b>단 하나</b></td>
+          <td><span class="tt">a→b→e→j</span> — 루트에서 내려온 길<br><b>갈림길이 있다</b> → 선택이 필요하고, 막히면 <b>백트랙</b></td>
+        </tr>
+        <tr>
+          <td><b><span style="color:var(--violet)">⑤</span> 탐색 깊이</b><br><span class="footnote">Search Depth</span></td>
+          <td>목표까지의 전이 횟수 = <b>4</b><br>그대로 <b>비교 횟수</b>가 된다</td>
+          <td>그 노드의 <b>레벨</b> = <b>3</b><br>루트에서 <b>몇 칸 내려왔는가</b>가 곧 깊이다</td>
+        </tr>
+      </table>
+
+      <div style="margin-top:18px">
+        <div class="card coral">
+          <h3>🔀 바뀐 것은 ③ 한 줄뿐인데</h3>
+          <p style="font-size:15px">전이 규칙이 <b>1개 → 여러 개</b>가 되었을 뿐이다. 그런데 그 결과로</p>
+          <ul class="clean coral" style="font-size:14.5px;margin-top:8px">
+            <li>경로가 <b>갈라지고</b> → 어느 쪽을 먼저 볼지 <b>선택</b>해야 하고</li>
+            <li>막다른 길이 생기고 → <b>백트랙</b>이 필요해지고</li>
+            <li>어디까지 가봤는지 기억할 <b>스택·큐</b>가 필요해진다</li>
+          </ul>
+          <p style="font-size:14.5px;margin-top:10px">상태 공간이 <b>선에서 트리로 부풀어 오른다</b> — 오늘 배울 모든 어려움의 출처다.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="vizstage" style="padding:10px">
+        <svg viewBox="0 0 400 350" style="width:100%;height:auto">
+          <defs>
+            <marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.2" orient="auto">
+              <path d="M0,0 L7,3.2 L0,6.4 z" fill="#e0533d"/>
+            </marker>
+          </defs>
+
+          <!-- ⑤ 깊이 눈금 -->
+          <line x1="46" y1="20" x2="46" y2="330" stroke="#efeaff" stroke-width="16"/>
+          <text x="46" y="46"  text-anchor="middle" font-size="12" font-weight="700" fill="#6b4bc4">0</text>
+          <text x="46" y="136" text-anchor="middle" font-size="12" font-weight="700" fill="#6b4bc4">1</text>
+          <text x="46" y="226" text-anchor="middle" font-size="12" font-weight="700" fill="#6b4bc4">2</text>
+          <text x="46" y="316" text-anchor="middle" font-size="12" font-weight="700" fill="#6b4bc4">3</text>
+          <text x="46" y="14"  text-anchor="middle" font-size="10.5" font-weight="700" fill="#6b4bc4">⑤ 깊이</text>
+
+          <!-- 간선 (④ 경로는 굵은 파랑) -->
+          <line x1="196" y1="42"  x2="130" y2="132" stroke="#1d5fd0" stroke-width="4.5"/>
+          <line x1="196" y1="42"  x2="300" y2="132" stroke="#dfe5ee" stroke-width="2.5"/>
+          <line x1="130" y1="132" x2="96"  y2="222" stroke="#dfe5ee" stroke-width="2.5"/>
+          <line x1="130" y1="132" x2="182" y2="222" stroke="#1d5fd0" stroke-width="4.5"/>
+          <line x1="300" y1="132" x2="268" y2="222" stroke="#dfe5ee" stroke-width="2.5"/>
+          <line x1="300" y1="132" x2="352" y2="222" stroke="#dfe5ee" stroke-width="2.5"/>
+          <line x1="96"  y1="222" x2="84"  y2="312" stroke="#dfe5ee" stroke-width="2.5"/>
+          <line x1="182" y1="222" x2="146" y2="312" stroke="#dfe5ee" stroke-width="2.5"/>
+          <line x1="182" y1="222" x2="212" y2="312" stroke="#1d5fd0" stroke-width="4.5"/>
+          <line x1="268" y1="222" x2="268" y2="312" stroke="#dfe5ee" stroke-width="2.5"/>
+
+          <!-- ③ 상태 전이 화살표 -->
+          <path d="M 232,60 Q 268,84 306,110" stroke="#e0533d" stroke-width="2.4" fill="none" marker-end="url(#ah)" stroke-dasharray="5 4"/>
+          <text x="286" y="60" font-size="11.5" font-weight="700" fill="#e0533d">③ 상태 전이</text>
+          <text x="286" y="76" font-size="10.5" fill="#e0533d">부모 → 자식 한 칸</text>
+
+          <!-- 노드 -->
+          <g><circle cx="196" cy="42"  r="18" fill="#fdf3dc" stroke="#c98a09" stroke-width="3"/><text x="196" y="48"  text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#8a5f04">a</text></g>
+          <g><circle cx="130" cy="132" r="18" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2.6"/><text x="130" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#1d5fd0">b</text></g>
+          <g><circle cx="300" cy="132" r="18" fill="#fff" stroke="#b9c5d4" stroke-width="2"/><text x="300" y="138" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#57687e">c</text></g>
+          <g><circle cx="96"  cy="222" r="18" fill="#fff" stroke="#b9c5d4" stroke-width="2"/><text x="96"  y="228" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#57687e">d</text></g>
+          <g><circle cx="182" cy="222" r="18" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2.6"/><text x="182" y="228" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#1d5fd0">e</text></g>
+          <g><circle cx="268" cy="222" r="18" fill="#fff" stroke="#b9c5d4" stroke-width="2"/><text x="268" y="228" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#57687e">f</text></g>
+          <g><circle cx="352" cy="222" r="18" fill="#fff" stroke="#b9c5d4" stroke-width="2"/><text x="352" y="228" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#57687e">g</text></g>
+          <g><circle cx="84"  cy="312" r="18" fill="#fff" stroke="#b9c5d4" stroke-width="2"/><text x="84"  y="318" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#57687e">h</text></g>
+          <g><circle cx="146" cy="312" r="18" fill="#fff" stroke="#b9c5d4" stroke-width="2"/><text x="146" y="318" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#57687e">i</text></g>
+          <g><circle cx="212" cy="312" r="18" fill="#e2f4ee" stroke="#137a5e" stroke-width="3"/><text x="212" y="318" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#137a5e">j</text></g>
+          <g><circle cx="268" cy="312" r="18" fill="#fff" stroke="#b9c5d4" stroke-width="2"/><text x="268" y="318" text-anchor="middle" font-family="JetBrains Mono" font-size="14" font-weight="700" fill="#57687e">k</text></g>
+
+          <!-- ① ② ④ 라벨 -->
+          <text x="196" y="16" text-anchor="middle" font-size="11.5" font-weight="700" fill="#8a5f04">① 초기 상태 (루트)</text>
+          <text x="238" y="344" font-size="11.5" font-weight="700" fill="#137a5e">② 목표 상태</text>
+          <text x="86"  y="180" font-size="11.5" font-weight="700" fill="#1d5fd0">④ 경로</text>
+          <text x="86"  y="195" font-size="10.5" fill="#1d5fd0">a→b→e→j</text>
+        </svg>
+      </div>
+      <div class="callout" style="margin-top:12px;font-size:14.5px">
+        <b>이 트리에서 다섯 요소는</b><br>
+        <span style="color:var(--amber)">①</span> 초기 상태 = <b>a</b> &nbsp;·&nbsp;
+        <span style="color:var(--moss)">②</span> 목표 상태 = <b>j</b> &nbsp;·&nbsp;
+        <span style="color:var(--coral)">③</span> 상태 전이 = <b>부모→자식 한 칸</b><br>
+        <span style="color:var(--sea)">④</span> 경로 = <b>a→b→e→j</b> &nbsp;·&nbsp;
+        <span style="color:var(--violet)">⑤</span> 탐색 깊이 = <b>3</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. 트리 용어 ============ -->
+<section class="slide" data-name="트리 용어">
+  <div class="eyebrow">개념 정리</div>
+  <h1 class="title">트리를 말하기 위한 최소한의 용어</h1>
+  <p class="sub">오늘 내내 아래 트리를 쓴다.</p>
+  <div class="body grid-2-1">
+    <div>
+      <svg viewBox="0 0 660 400" style="width:100%;height:auto;max-height:400px">
+        <!-- 레벨 안내선 -->
+        <line x1="30" y1="46"  x2="640" y2="46"  stroke="#eef2f8" stroke-width="1"/>
+        <line x1="30" y1="146" x2="640" y2="146" stroke="#eef2f8" stroke-width="1"/>
+        <line x1="30" y1="246" x2="640" y2="246" stroke="#eef2f8" stroke-width="1"/>
+        <line x1="30" y1="346" x2="640" y2="346" stroke="#eef2f8" stroke-width="1"/>
+        <text x="34" y="26"  font-size="12" fill="#a9b5c6">레벨 0</text>
+        <text x="34" y="126" font-size="12" fill="#a9b5c6">레벨 1</text>
+        <text x="34" y="226" font-size="12" fill="#a9b5c6">레벨 2</text>
+        <text x="34" y="326" font-size="12" fill="#a9b5c6">레벨 3</text>
+        <!-- 간선 -->
+        <line x1="330" y1="46"  x2="200" y2="146" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="330" y1="46"  x2="480" y2="146" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="200" y1="146" x2="130" y2="246" stroke="#e0533d" stroke-width="3.5"/>
+        <line x1="200" y1="146" x2="270" y2="246" stroke="#e0533d" stroke-width="3.5"/>
+        <line x1="480" y1="146" x2="420" y2="246" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="480" y1="146" x2="560" y2="246" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="130" y1="246" x2="100" y2="346" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="270" y1="246" x2="215" y2="346" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="270" y1="246" x2="320" y2="346" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="420" y1="246" x2="420" y2="346" stroke="#c3cedd" stroke-width="2.5"/>
+        <!-- 노드 -->
+        <g><circle cx="330" cy="46"  r="23" fill="#fdece8" stroke="#e0533d" stroke-width="2.6"/><text x="330" y="53"  text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#e0533d">a</text></g>
+        <g><circle cx="200" cy="146" r="23" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2.4"/><text x="200" y="153" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#1d5fd0">b</text></g>
+        <g><circle cx="480" cy="146" r="23" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2.4"/><text x="480" y="153" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#1d5fd0">c</text></g>
+        <g><circle cx="130" cy="246" r="23" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2.4"/><text x="130" y="253" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#1d5fd0">d</text></g>
+        <g><circle cx="270" cy="246" r="23" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2.4"/><text x="270" y="253" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#1d5fd0">e</text></g>
+        <g><circle cx="420" cy="246" r="23" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2.4"/><text x="420" y="253" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#1d5fd0">f</text></g>
+        <g><circle cx="560" cy="246" r="23" fill="#e2f4ee" stroke="#137a5e" stroke-width="2.4"/><text x="560" y="253" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#137a5e">g</text></g>
+        <g><circle cx="100" cy="346" r="23" fill="#e2f4ee" stroke="#137a5e" stroke-width="2.4"/><text x="100" y="353" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#137a5e">h</text></g>
+        <g><circle cx="215" cy="346" r="23" fill="#e2f4ee" stroke="#137a5e" stroke-width="2.4"/><text x="215" y="353" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#137a5e">i</text></g>
+        <g><circle cx="320" cy="346" r="23" fill="#e2f4ee" stroke="#137a5e" stroke-width="2.4"/><text x="320" y="353" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#137a5e">j</text></g>
+        <g><circle cx="420" cy="346" r="23" fill="#e2f4ee" stroke="#137a5e" stroke-width="2.4"/><text x="420" y="353" text-anchor="middle" font-family="JetBrains Mono" font-weight="700" font-size="17" fill="#137a5e">k</text></g>
+        <!-- 라벨 -->
+        <text x="330" y="18" text-anchor="middle" font-size="13.5" fill="#e0533d" font-weight="700">루트 노드</text>
+        <text x="235" y="200" font-size="13" fill="#e0533d">b의 자식: d, e</text>
+        <text x="596" y="252" font-size="13" fill="#137a5e">단말 노드</text>
+      </svg>
+      <p class="footnote" style="text-align:center">
+        노드 11개 · 간선 10개 &nbsp;|&nbsp; <span style="color:var(--coral)">■</span> 루트 &nbsp;
+        <span style="color:var(--moss)">■</span> 단말(리프) &nbsp; 트리의 <b>높이 = 3</b>
+      </p>
+    </div>
+    <div class="scrollbox">
+      <table class="tbl">
+        <tr><th style="width:36%">용어</th><th>뜻</th></tr>
+        <tr><td><b>노드</b><br><span class="footnote">node, 정점</span></td><td>상태 하나. 위 그림의 a~k</td></tr>
+        <tr><td><b>간선</b><br><span class="footnote">edge</span></td><td>부모와 자식을 잇는 연결</td></tr>
+        <tr><td><b>루트 노드</b></td><td>부모가 없는 맨 위 노드 — <b>a</b>. 탐색은 여기서 시작</td></tr>
+        <tr><td><b>부모 / 자식</b></td><td>b의 부모는 a, b의 자식은 d와 e</td></tr>
+        <tr><td><b>형제</b></td><td>부모가 같은 노드 — d와 e</td></tr>
+        <tr><td><b>단말 노드</b><br><span class="footnote">leaf, 리프</span></td><td>자식이 없는 노드 — g, h, i, j, k</td></tr>
+        <tr><td><b>차수</b></td><td>자식의 수. b는 2, d는 1, g는 0</td></tr>
+        <tr><td><b>레벨 / 깊이</b></td><td>루트에서 몇 칸 내려왔는가. a는 0, h는 3</td></tr>
+        <tr><td><b>높이</b></td><td>가장 깊은 레벨 — 이 트리는 3</td></tr>
+        <tr><td><b>서브트리</b></td><td>어떤 노드와 그 아래 전부. b의 서브트리 = {b,d,e,h,i,j}</td></tr>
+      </table>
+      <div class="callout amber" style="margin-top:16px">
+        <b>트리의 결정적 성질 두 가지</b><br>
+        ① 노드가 <b>n개</b>면 간선은 반드시 <b>n − 1개</b>다.<br>
+        ② <b>사이클이 없다</b> — 아래로만 내려가면 같은 노드를 두 번 만날 일이 없다.<br>
+        <span style="font-size:14px">그래서 DFS·BFS는 각 노드를 정확히 한 번씩 방문하고, 시간 복잡도는 <b>O(n)</b>이 된다.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. 트리의 표현 ============ -->
+<section class="slide" data-name="트리의 표현">
+  <div class="eyebrow">구현 준비</div>
+  <h1 class="title">트리를 코드로 옮기기</h1>
+  <p class="sub">그림을 그대로 코드로 바꾼다. 세 표현 모두 <b>같은 트리</b>를 나타낸다.</p>
+  <div class="body grid3">
+    <div class="card flat">
+      <h3><span class="tag gray">그림</span></h3>
+      <svg viewBox="0 0 320 250" style="width:100%">
+        <line x1="160" y1="30" x2="95"  y2="90"  stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="160" y1="30" x2="230" y2="90"  stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="95"  y1="90" x2="60"  y2="152" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="95"  y1="90" x2="132" y2="152" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="230" y1="90" x2="203" y2="152" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="230" y1="90" x2="270" y2="152" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="60"  y1="152" x2="42"  y2="214" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="132" y1="152" x2="105" y2="214" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="132" y1="152" x2="160" y2="214" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="203" y1="152" x2="203" y2="214" stroke="#c3cedd" stroke-width="2.5"/>
+        <g><circle cx="160" cy="30"  r="17" fill="#fdece8" stroke="#e0533d" stroke-width="2"/><text x="160" y="36"  text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#e0533d">a</text></g>
+        <g><circle cx="95"  cy="90"  r="17" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="95"  y="96"  text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#1d5fd0">b</text></g>
+        <g><circle cx="230" cy="90"  r="17" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="230" y="96"  text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#1d5fd0">c</text></g>
+        <g><circle cx="60"  cy="152" r="17" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="60"  y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#1d5fd0">d</text></g>
+        <g><circle cx="132" cy="152" r="17" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="132" y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#1d5fd0">e</text></g>
+        <g><circle cx="203" cy="152" r="17" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="203" y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#1d5fd0">f</text></g>
+        <g><circle cx="270" cy="152" r="17" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="270" y="158" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#137a5e">g</text></g>
+        <g><circle cx="42"  cy="214" r="17" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="42"  y="220" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#137a5e">h</text></g>
+        <g><circle cx="105" cy="214" r="17" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="105" y="220" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#137a5e">i</text></g>
+        <g><circle cx="160" cy="214" r="17" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="160" y="220" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#137a5e">j</text></g>
+        <g><circle cx="203" cy="214" r="17" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="203" y="220" text-anchor="middle" font-family="JetBrains Mono" font-size="13" font-weight="700" fill="#137a5e">k</text></g>
+      </svg>
+      <p class="footnote">노드 11개 · 간선 10개 · 높이 3</p>
+    </div>
+    <div class="card">
+      <h3><span class="tag">자식 리스트</span> 딕셔너리</h3>
+      <pre class="code" style="font-size:13px"><span class="cm"># 각 노드의 '자식'만 적는다</span>
+tree = {
+  <span class="st">'a'</span>: [<span class="st">'b'</span>,<span class="st">'c'</span>],
+  <span class="st">'b'</span>: [<span class="st">'d'</span>,<span class="st">'e'</span>],
+  <span class="st">'c'</span>: [<span class="st">'f'</span>,<span class="st">'g'</span>],
+  <span class="st">'d'</span>: [<span class="st">'h'</span>],
+  <span class="st">'e'</span>: [<span class="st">'i'</span>,<span class="st">'j'</span>],
+  <span class="st">'f'</span>: [<span class="st">'k'</span>],
+  <span class="st">'g'</span>: [], <span class="st">'h'</span>: [], <span class="st">'i'</span>: [],
+  <span class="st">'j'</span>: [], <span class="st">'k'</span>: []
+}</pre>
+      <ul class="clean" style="margin-top:12px;font-size:14.5px">
+        <li>리스트의 <b>순서</b>가 곧 방문 순서</li>
+        <li>단말 노드는 <b>빈 리스트</b></li>
+        <li>오늘 실습에서 쓸 표현 → <b>이것</b></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="tag gray">부모 배열</span></h3>
+      <pre class="code" style="font-size:12.5px"><span class="cm"># 각 노드의 '부모'만 적는다</span>
+parent = {
+  <span class="st">'a'</span>: <span class="kw">None</span>,           <span class="cm"># 루트</span>
+  <span class="st">'b'</span>: <span class="st">'a'</span>, <span class="st">'c'</span>: <span class="st">'a'</span>,
+  <span class="st">'d'</span>: <span class="st">'b'</span>, <span class="st">'e'</span>: <span class="st">'b'</span>,
+  <span class="st">'f'</span>: <span class="st">'c'</span>, <span class="st">'g'</span>: <span class="st">'c'</span>,
+  <span class="st">'h'</span>: <span class="st">'d'</span>,
+  <span class="st">'i'</span>: <span class="st">'e'</span>, <span class="st">'j'</span>: <span class="st">'e'</span>,
+  <span class="st">'k'</span>: <span class="st">'f'</span>
+}</pre>
+      <ul class="clean" style="margin-top:12px;font-size:14.5px">
+        <li>메모리가 가장 적다 (노드당 값 1개)</li>
+        <li><b>위로 거슬러 올라가기</b>에 유리</li>
+        <li>아래로 내려가는 탐색에는 불편</li>
+      </ul>
+      <div class="callout amber" style="margin-top:12px;font-size:14px">
+        비선형 구조가 <b>트리가 아니라 그래프</b>가 되면 표현 방법도 달라진다
+        (인접 리스트 · 인접 행렬).
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. DFS 개념 ============ -->
+<section class="slide" data-name="DFS 개념">
+  <div class="eyebrow">Depth-First Search</div>
+  <h1 class="title">깊이 우선 탐색 <small>일단 끝까지 내려가 본다, 막히면 돌아 나온다</small></h1>
+  <div class="body grid-1-2">
+    <div class="card coral">
+      <h3>🔍 정의</h3>
+      <p style="font-size:15.5px">루트 노드에서 출발해 <b>최대한 깊이 내려간 후</b>, 더 이상 내려갈 수 없으면 다시 되돌아가며 다른 경로를 탐색하는 방법.
+      <b>스택</b>을 이용해 현재 방문 중인 경로를 저장하며 탐색한다.</p>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #f0b8ab">
+        <p style="font-size:15px"><b>백트랙(backtrack)</b><br>
+        더 갈 곳이 없어 <b>부모 노드로 되돌아가는 과정</b>. 되돌아가야만 아직 가보지 않은 다른 갈래를 탐색할 수 있다.</p>
+      </div>
+    </div>
+    <div>
+      <div class="grid2">
+        <div class="card moss">
+          <h3>👍 장점</h3>
+          <ul class="clean moss" style="font-size:15px">
+            <li>메모리 사용량이 적다 — <b>현재 경로만</b> 저장</li>
+            <li>트리의 깊이를 미리 알 수 없을 때 유용</li>
+            <li>구현이 간단하다 (재귀 함수 3~4줄)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>👎 단점</h3>
+          <ul class="clean coral" style="font-size:15px">
+            <li><b>최단 경로를 보장하지 못한다</b></li>
+            <li>깊이가 깊으면 잘못된 가지를 오래 탐색</li>
+            <li>재귀 깊이 제한에 걸릴 수 있다</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:16px">
+        <b>시간 복잡도 O(n)</b> <span style="font-size:14px">(n = 노드 수 — 모든 노드를 한 번씩 방문)</span> &nbsp;·&nbsp;
+        <b>공간 복잡도 O(h)</b> <span style="font-size:14px">(h = 트리의 높이)</span><br>
+        <b>활용:</b> 미로 찾기, 조합·순열 생성, <b>백트래킹 알고리즘의 뼈대</b> (→ 4차시)
+      </div>
+      <div class="card amber" style="margin-top:14px">
+        <h3>🧠 한 문장으로</h3>
+        <p style="font-size:16px">“갈림길에서 <b>하나만 골라 끝까지</b> 내려간다. 막다른 곳에서는 <b>부모로 되돌아와</b> 다음 갈래를 고른다.”</p>
+      </div>
+      <div class="card flat" style="margin-top:14px">
+        <p style="font-size:15px">실제로는 <b>구현이 간단한 깊이 우선 탐색을 더 많이 사용한다.</b>
+        그 이유는 다음 두 차시에 드러난다 — <b>4차시의 백트래킹</b>과 <b>5차시의 분기 한정법</b>이 모두 DFS 위에 세워지기 때문이다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. DFS 시각화 ============ -->
+<section class="slide" data-name="DFS 시각화">
+  <div class="eyebrow">단계별 시각화</div>
+  <h1 class="title">DFS를 한 걸음씩 따라가기</h1>
+  <p class="sub">루트 <b>a</b>에서 출발한다. 자식은 <b>왼쪽부터</b> 방문한다. <b>[다음 단계]</b>를 누르며 스택이 어떻게 변하는지 관찰하자.</p>
+  <div class="body viz">
+    <div class="vizstage">
+      <svg id="dfsSvg" viewBox="0 0 760 430" style="width:100%;height:auto"></svg>
+    </div>
+    <div class="vizpanel">
+      <div class="msg" id="dfsMsg">루트 a에서 탐색을 시작한다.</div>
+      <div class="statebox">
+        <h4>스택 (현재 경로) <span style="font-weight:400;text-transform:none;letter-spacing:0">— 오른쪽이 top</span></h4>
+        <div class="chiprow" id="dfsStack"><span class="empty">비어 있음</span></div>
+      </div>
+      <div class="statebox">
+        <h4>방문 순서</h4>
+        <div class="chiprow" id="dfsOrder"><span class="empty">아직 없음</span></div>
+      </div>
+      <div class="ctrlbar">
+        <button class="btn" id="dfsNext">다음 단계 ▶</button>
+        <button class="btn ghost" id="dfsPrevBtn">◀ 이전</button>
+        <button class="btn ghost" id="dfsReset">처음으로</button>
+        <span class="chip" id="dfsStep" style="font-size:13px;color:var(--ink-soft)">0 / 0</span>
+      </div>
+      <div class="legend">
+        <span><i style="background:#fff"></i>미방문</span>
+        <span><i style="background:var(--coral)"></i>현재 위치</span>
+        <span><i style="background:var(--amber-soft)"></i>스택에 있음(경로)</span>
+        <span><i style="background:var(--moss)"></i>탐색 완료</span>
+      </div>
+      <p class="footnote">스택에 남아 있는 노드들이 곧 <b>루트에서 현재까지의 경로</b>다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. DFS 코드 ============ -->
+<section class="slide" data-name="DFS 코드">
+  <div class="eyebrow">구현</div>
+  <h1 class="title">DFS 코드 — 재귀와 스택, 두 얼굴</h1>
+  <div class="body grid2 scrollbox">
+    <div>
+      <div class="card sea" style="margin-bottom:14px">
+        <h3>① 재귀 함수 (가장 많이 쓰는 형태)</h3>
+        <p style="font-size:14.5px">함수 호출 스택이 곧 "현재 경로"다. 되돌아오는 동작(<b>백트랙</b>)이 함수가 <b>끝나는 것</b>만으로 자동 처리된다.</p>
+      </div>
+      <pre class="code">tree = {
+  <span class="st">'a'</span>:[<span class="st">'b'</span>,<span class="st">'c'</span>], <span class="st">'b'</span>:[<span class="st">'d'</span>,<span class="st">'e'</span>], <span class="st">'c'</span>:[<span class="st">'f'</span>,<span class="st">'g'</span>],
+  <span class="st">'d'</span>:[<span class="st">'h'</span>],     <span class="st">'e'</span>:[<span class="st">'i'</span>,<span class="st">'j'</span>], <span class="st">'f'</span>:[<span class="st">'k'</span>],
+  <span class="st">'g'</span>:[], <span class="st">'h'</span>:[], <span class="st">'i'</span>:[], <span class="st">'j'</span>:[], <span class="st">'k'</span>:[]
+}
+visited = []          <span class="cm"># 방문 순서를 기록</span>
+
+<span class="kw">def</span> <span class="fn">dfs</span>(node):
+    visited.append(node)           <span class="cm"># ① 방문</span>
+    <span class="kw">for</span> child <span class="kw">in</span> tree[node]:    <span class="cm"># ② 자식을 순서대로</span>
+        <span class="fn">dfs</span>(child)               <span class="cm">#    더 깊이 내려간다</span>
+    <span class="cm"># ③ for가 끝나면 = 갈 곳이 없음 → 백트랙</span>
+
+<span class="fn">dfs</span>(<span class="st">'a'</span>)
+<span class="fn">print</span>(<span class="st">' -> '</span>.join(visited))</pre>
+      <div class="callout moss" style="margin-top:12px">
+        실행 결과 &nbsp;<span class="tt">a -&gt; b -&gt; d -&gt; h -&gt; e -&gt; i -&gt; j -&gt; c -&gt; f -&gt; k -&gt; g</span>
+      </div>
+      <div class="callout amber" style="margin-top:12px">
+        <b>백트랙은 어디에 있는가?</b><br>
+        코드에 백트랙을 위한 문장은 <b>한 줄도 없다</b>. <span class="tt">dfs(child)</span> 가 끝나고 <span class="tt">for</span>문의 다음 반복으로 넘어가는 순간이 곧 백트랙이다.
+        되돌아오는 일을 <b>호출 스택이 대신해 준다</b>.
+      </div>
+    </div>
+    <div>
+      <div class="card flat" style="margin-bottom:14px">
+        <h3>② 명시적 스택 (반복문)</h3>
+        <p style="font-size:14.5px">재귀 깊이 제한(파이썬 기본 1000)을 피하고 싶을 때 사용한다. 자식을 <b>역순으로 push</b>해야 재귀와 같은 순서가 나온다.</p>
+      </div>
+      <pre class="code">visited = []
+stack = [<span class="st">'a'</span>]          <span class="cm"># 루트를 넣고 시작</span>
+
+<span class="kw">while</span> stack:
+    node = stack.pop()      <span class="cm"># top을 꺼낸다 (LIFO)</span>
+    visited.append(node)
+    <span class="cm"># 역순 push → 왼쪽 자식이 먼저 pop된다</span>
+    <span class="kw">for</span> child <span class="kw">in</span> <span class="fn">reversed</span>(tree[node]):
+        stack.append(child)
+
+<span class="fn">print</span>(visited)
+<span class="cm"># ['a','b','d','h','e','i','j','c','f','k','g']</span></pre>
+      <div class="callout" style="margin-top:12px">
+        <b>왜 <span class="tt">reversed</span> 인가?</b><br>
+        스택은 <b>나중에 넣은 것이 먼저</b> 나온다(LIFO). b, c 순으로 넣으면 c가 먼저 꺼내진다.
+        c, b 순으로 넣어야 <b>b가 먼저</b> 꺼내져 그림과 같은 순서가 된다.
+      </div>
+      <div class="callout coral" style="margin-top:12px">
+        <b>“방문 표시”가 없는데 괜찮은가?</b><br>
+        <b>트리이기 때문에</b> 괜찮다. 트리에는 <b>사이클이 없고</b>, 자식 쪽으로만 내려가므로 같은 노드를 두 번 만날 수 없다.<br>
+        <span style="font-size:14px">비선형 구조가 <b>그래프</b>가 되면 사정이 달라진다 — 사이클을 따라 영원히 돌 수 있어
+        <span class="tt">visited</span> 검사가 <b>필수</b>가 된다.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. 재귀와 호출 스택 ============ -->
+<section class="slide" data-name="재귀와 호출 스택">
+  <div class="eyebrow">깊이 이해하기</div>
+  <h1 class="title">백트랙은 어디에 있는가 <small>재귀 함수가 되돌아오는 일을 대신해 주는 원리</small></h1>
+  <p class="sub">DFS 코드에는 <b>되돌아가라는 문장이 한 줄도 없다.</b> 그런데도 백트랙은 정확히 일어난다.
+  그 일을 대신해 주는 것이 <b>호출 스택</b>이다.</p>
+
+  <div class="body scrollbox">
+    <div class="runrow">
+      <div>
+        <div class="reccode" id="recCode">
+          <div class="cline" data-l="1"><span class="ln">1</span><span><span style="color:#ff9d7a">def</span> <span style="color:#7fd3ff">dfs</span>(node):</span></div>
+          <div class="cline" data-l="2"><span class="ln">2</span><span>    visited.append(node)</span></div>
+          <div class="cline" data-l="3"><span class="ln">3</span><span>    <span style="color:#ff9d7a">for</span> child <span style="color:#ff9d7a">in</span> tree[node]:</span></div>
+          <div class="cline" data-l="4"><span class="ln">4</span><span>        <span style="color:#7fd3ff">dfs</span>(child)</span></div>
+          <div class="cline" data-l="5"><span class="ln">5</span><span>    <span style="color:#7e93ab;font-style:italic"># for문 끝 = 함수 끝 = return</span></span></div>
+        </div>
+      </div>
+
+      <div class="vizpanel">
+        <div class="vizstage" style="padding:6px">
+          <svg id="recSvg" viewBox="0 0 350 245" style="width:100%;height:auto"></svg>
+        </div>
+        <p class="footnote" style="margin-top:-4px">전체 트리에서 <b>b 아래쪽만</b> 떼어 왔다. <span class="tt">dfs('b')</span> 를 한 걸음씩 실행해 본다.</p>
+
+        <div class="statebox">
+          <h4>호출 스택 &nbsp;·&nbsp; 깊이 <span id="recDepth" class="tt">0</span></h4>
+          <div class="frames" id="recFrames"></div>
+        </div>
+        <div class="statebox">
+          <h4>방문 순서</h4>
+          <div class="chiprow" id="recOrder"></div>
+        </div>
+
+        <div class="msg" id="recMsg"></div>
+        <div class="ctrlbar">
+          <button class="btn" id="recNext">다음 단계</button>
+          <button class="btn ghost sm" id="recPrevBtn">이전</button>
+          <button class="btn ghost sm" id="recReset">처음으로</button>
+          <span class="chip tt" id="recStep" style="font-size:13px;color:var(--ink-soft)"></span>
+        </div>
+        <div class="legend">
+          <span><i style="background:#e0533d"></i>실행 중</span>
+          <span><i style="background:#fdf3dc;border-color:#c98a09"></i>스택에서 대기 중</span>
+          <span><i style="background:#137a5e"></i>반환 완료</span>
+          <span><i style="background:#fff"></i>아직 호출 안 됨</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+    <div class="grid3">
+      <div class="card sea">
+        <h3>① 호출 = 나를 멈추고 맡긴다</h3>
+        <p style="font-size:14.5px"><span class="tt">dfs(b)</span> 안에서 <span class="tt">dfs(d)</span>를 부르면,
+        b의 실행은 <b>그 줄에서 멈춘다</b>. d가 자기 일을 <b>완전히 끝내야</b> b가 다시 움직인다.</p>
+        <p class="footnote" style="margin-top:8px">부른 쪽은 사라지지 않는다. <b>기다릴 뿐이다.</b></p>
+      </div>
+      <div class="card amber">
+        <h3>② 호출 스택 = 멈춘 나들의 더미</h3>
+        <p style="font-size:14.5px">파이썬은 멈춰 있는 함수들을 <b>부른 순서대로 쌓아 둔다</b>.
+        맨 위 하나만 <b>실제로 실행 중</b>이고, 그 아래는 전부 <b>자식을 기다리는 중</b>이다.</p>
+        <p class="footnote" style="margin-top:8px">쌓인 것을 아래→위로 읽으면 그게 <b>루트에서 현재까지의 경로</b>다.</p>
+      </div>
+      <div class="card moss">
+        <h3>③ 반환 = 더미가 하나 줄어든다</h3>
+        <p style="font-size:14.5px">함수가 <b>마지막 줄을 지나면</b> 그 층이 스택에서 사라지고,
+        바로 아래 층이 <b>멈췄던 자리에서</b> 다시 이어진다.</p>
+        <p class="footnote" style="margin-top:8px">이 자동 복귀가 곧 <b>백트랙</b>이다.</p>
+      </div>
+    </div>
+
+    <div class="callout coral" style="margin-top:16px">
+      <b>정리하면 — 방향이 반대다.</b>
+      <span class="tt">dfs(child)</span> 는 <b>내려가는</b> 동작(호출)이고, 백트랙은 그 호출이 <b>끝나서 돌아오는</b> 동작(반환)이다.
+      그래서 코드에는 내려가는 줄만 보이고, 올라오는 줄은 보이지 않는다.
+    </div>
+
+    
+      <table class="tbl" style="margin-top:14px;font-size:14.5px">
+        <tr><th style="width:44%">코드에서 일어나는 일</th><th>실제로 일어나는 일</th></tr>
+        <tr><td><span class="tt">dfs(child)</span> 줄을 만난다</td><td><b>내려간다</b> — 스택에 층이 하나 쌓인다</td></tr>
+        <tr style="background:var(--coral-soft)"><td>그 호출이 끝난다</td><td><b>백트랙</b> — 층이 사라지고 부모로 자동 복귀</td></tr>
+        <tr><td><span class="tt">for</span>문의 다음 반복</td><td>부모가 <b>다음 갈래</b>를 고른다</td></tr>
+        <tr><td>5번 줄에 도달</td><td>더 갈 곳 없음 → <b>내가 반환될 차례</b></td></tr>
+      </table>
+
+      <div class="callout amber" style="margin-top:14px;font-size:14.5px">
+        <b>❓ 그런데 왜 h까지 내려갔다가 e로 갈 수 있지?</b><br>
+        b의 <span class="tt">for</span>문이 <b>d에서 멈춘 채 스택에 남아 있기 때문</b>이다.
+        d가 반환되면 b는 <b>멈췄던 그 자리</b>에서 다음 반복(e)으로 이어간다. 기억해 두는 일은 아무도 시키지 않았다 — 스택이 하고 있었다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. 스택 DFS 한 줄씩 ============ -->
+<section class="slide" data-name="스택 DFS 한 줄씩">
+  <div class="eyebrow">깊이 이해하기</div>
+  <h1 class="title">같은 탐색, 스택으로 다시 보기 <small>재귀가 숨겨 두었던 것을 직접 꺼내 본다</small></h1>
+  <p class="sub">앞 장의 재귀는 스택을 <b>파이썬이 몰래</b> 관리했다. 이번에는 <b>내가 직접</b> 관리한다.
+  같은 트리, 같은 방문 순서 — 그런데 <b>백트랙이 눈에 보인다</b>.</p>
+
+  <div class="body scrollbox">
+    <div class="runrow">
+      <div>
+        <div class="reccode" id="stkCode">
+          <div class="cline" data-l="1"><span class="ln">1</span><span>stack = [root]</span></div>
+          <div class="cline" data-l="2"><span class="ln">2</span><span><span style="color:#ff9d7a">while</span> stack:</span></div>
+          <div class="cline" data-l="3"><span class="ln">3</span><span>    node = stack.pop()</span></div>
+          <div class="cline" data-l="4"><span class="ln">4</span><span>    visited.append(node)</span></div>
+          <div class="cline" data-l="5"><span class="ln">5</span><span>    <span style="color:#ff9d7a">for</span> child <span style="color:#ff9d7a">in</span> <span style="color:#7fd3ff">reversed</span>(tree[node]):</span></div>
+          <div class="cline" data-l="6"><span class="ln">6</span><span>        stack.append(child)</span></div>
+        </div>
+      </div>
+
+      <div class="vizpanel">
+        <div class="vizstage" style="padding:6px">
+          <svg id="stkSvg" viewBox="0 0 350 245" style="width:100%;height:auto"></svg>
+        </div>
+        <p class="footnote" style="margin-top:-4px">10페이지와 <b>똑같은 트리</b>다. 순서를 그대로 비교할 수 있다.</p>
+
+        <div class="statebox">
+          <h4>스택 <span style="font-weight:400;text-transform:none;letter-spacing:0">— 맨 뒤에서 꺼낸다 (LIFO)</span></h4>
+          <div class="chiprow" id="stkBox"></div>
+        </div>
+        <div class="statebox">
+          <h4>방문 순서</h4>
+          <div class="chiprow" id="stkOrder"></div>
+        </div>
+
+        <div class="msg" id="stkMsg"></div>
+        <div class="ctrlbar">
+          <button class="btn" id="stkNext">다음 단계</button>
+          <button class="btn ghost sm" id="stkPrevBtn">이전</button>
+          <button class="btn ghost sm" id="stkReset">처음으로</button>
+          <span class="chip tt" id="stkStep" style="font-size:13px;color:var(--ink-soft)"></span>
+        </div>
+        <div class="legend">
+          <span><i style="background:#e0533d"></i>방금 꺼낸 노드</span>
+          <span><i style="background:#fdf3dc;border-color:#c98a09"></i>스택에서 대기 중</span>
+          <span><i style="background:#137a5e"></i>처리 완료</span>
+          <span><i style="background:#fff"></i>아직 발견 안 됨</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="callout coral" style="margin-top:14px">
+        <b>🔎 백트랙을 눈으로 찾는 법</b><br>
+        <span class="tt">pop</span> 한 노드가 <b>방금 처리한 노드의 자식이면</b> → 한 칸 내려간 것이다.<br>
+        <b>자식이 아니면</b> → 그 사이에 <b>백트랙</b>이 일어난 것이다. 재귀에서 함수가 반환되던 자리가 바로 여기다.
+      </div>
+
+      <table class="tbl" style="margin-top:14px;font-size:14.5px">
+        <tr><th style="width:30%"></th><th>재귀 (10페이지)</th><th>명시적 스택 (지금)</th></tr>
+        <tr><td><b>스택의 정체</b></td><td>파이썬의 <b>호출 스택</b></td><td>내가 만든 <b>리스트</b></td></tr>
+        <tr><td><b>쌓이는 것</b></td><td>함수 <b>층</b> (실행 위치까지 기억)</td><td>노드 <b>이름</b>만</td></tr>
+        <tr style="background:var(--coral-soft)"><td><b>백트랙</b></td><td>함수가 <b>반환</b> — 코드에 안 보임</td><td><b>pop</b> — 코드에 보임</td></tr>
+        <tr><td><b>깊이 제한</b></td><td>있음 (기본 1000)</td><td><b>없음</b></td></tr>
+        <tr><td><b>방문 순서</b></td><td colspan="2" class="c"><b>b → d → h → e → i → j</b> — 완전히 같다</td></tr>
+      </table>
+
+      <div class="callout amber" style="margin-top:14px;font-size:14.5px">
+        <b>❓ 왜 <span class="tt">reversed</span> 가 필요한가?</b><br>
+        d, e 순으로 push하면 스택 맨 뒤는 <b>e</b>가 되어 e가 먼저 꺼내진다.
+        <b>왼쪽 자식부터</b> 가려면 e, d 순으로 넣어야 한다. 재귀는 for문이 순서대로 도니까 이 뒤집기가 필요 없었다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12. BFS 개념 ============ -->
+<section class="slide" data-name="BFS 개념">
+  <div class="eyebrow">Breadth-First Search</div>
+  <h1 class="title">너비 우선 탐색 <small>가까운 곳부터 차례차례, 물결이 퍼지듯</small></h1>
+  <div class="body grid-1-2">
+    <div class="card amber">
+      <h3>🔍 정의</h3>
+      <p style="font-size:15.5px">루트 노드에서 <b>인접한 노드(자식)들을 모두 탐색한 후</b>, 그다음 깊이로 넘어가는 방식.
+      깊이가 얕은 순서대로 탐색하므로 <b>최단 경로를 찾는 데 적합</b>하다.
+      <b>큐</b>를 이용하여 각 레벨에 해당하는 노드를 저장하면서 탐색을 진행한다.</p>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #e6cf92">
+        <p style="font-size:15px"><b>왜 최단 경로가 보장되는가?</b><br>
+        레벨 1을 <b>전부</b> 본 뒤에야 레벨 2로 넘어간다. 그러므로 어떤 노드를 <b>처음 만나는 순간</b>이 곧 루트로부터의 최소 이동 횟수(= 그 노드의 레벨)다.
+        <span style="color:var(--coral)">단, 모든 간선의 비용이 같을 때만!</span></p>
+      </div>
+    </div>
+    <div>
+      <div class="grid2">
+        <div class="card moss">
+          <h3>👍 장점</h3>
+          <ul class="clean moss" style="font-size:15px">
+            <li><b>최소 이동 횟수를 보장</b>한다</li>
+            <li>방문 순서가 예측 가능하다 (레벨 순)</li>
+            <li>레벨(깊이) 정보를 자연스럽게 얻는다</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>👎 단점</h3>
+          <ul class="clean coral" style="font-size:15px">
+            <li>DFS보다 <b>메모리를 많이 쓴다</b> — 한 레벨 전체를 큐에 담음</li>
+            <li>자식이 많은 트리에서는 큐가 급격히 커진다</li>
+            <li>구현이 DFS보다 조금 길다</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout amber" style="margin-top:16px">
+        <b>시간 복잡도 O(n)</b> — DFS와 <b>같다</b>. 차이는 <b>방문 순서</b>이지 총 작업량이 아니다.<br>
+        <b>공간 복잡도</b>는 <b>한 레벨의 최대 노드 수</b>에 비례한다 → 넓은 트리일수록 불리<br>
+        <b>활용:</b> 미로 최단 경로, 네트워크 최소 홉 수, 촌수 계산, 레벨별 처리
+      </div>
+      <div class="card sea" style="margin-top:14px">
+        <h3>🧠 한 문장으로</h3>
+        <p style="font-size:16px">“물에 돌을 던지듯, <b>가까운 원부터 한 겹씩</b> 넓혀 나간다.”</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13. BFS 시각화 ============ -->
+<section class="slide" data-name="BFS 시각화">
+  <div class="eyebrow">단계별 시각화</div>
+  <h1 class="title">BFS를 한 걸음씩 따라가기</h1>
+  <p class="sub"><b>DFS와 똑같은 트리, 똑같은 출발점</b>이다. 순서가 어떻게 달라지는지 비교하며 보자. 노드 아래 작은 숫자는 <b>레벨</b>이다.</p>
+  <div class="body viz">
+    <div class="vizstage">
+      <svg id="bfsSvg" viewBox="0 0 760 430" style="width:100%;height:auto"></svg>
+    </div>
+    <div class="vizpanel">
+      <div class="msg" id="bfsMsg">루트 a를 큐에 넣고 시작한다.</div>
+      <div class="statebox">
+        <h4>큐 <span style="font-weight:400;text-transform:none;letter-spacing:0">— 왼쪽이 front</span></h4>
+        <div class="chiprow" id="bfsQueue"><span class="empty">비어 있음</span></div>
+      </div>
+      <div class="statebox">
+        <h4>방문 순서 <span style="font-weight:400;text-transform:none;letter-spacing:0">— 아래 첨자는 레벨</span></h4>
+        <div class="chiprow" id="bfsOrder"><span class="empty">아직 없음</span></div>
+      </div>
+      <div class="ctrlbar">
+        <button class="btn" id="bfsNext">다음 단계 ▶</button>
+        <button class="btn ghost" id="bfsPrevBtn">◀ 이전</button>
+        <button class="btn ghost" id="bfsReset">처음으로</button>
+        <span class="chip" id="bfsStep" style="font-size:13px;color:var(--ink-soft)">0 / 0</span>
+      </div>
+      <div class="legend">
+        <span><i style="background:#fff"></i>미발견</span>
+        <span><i style="background:var(--coral)"></i>현재 처리 중</span>
+        <span><i style="background:var(--amber-soft)"></i>큐에서 대기</span>
+        <span><i style="background:var(--moss)"></i>처리 완료</span>
+      </div>
+      <p class="footnote">큐에 들어 있는 노드들은 <b>거의 같은 레벨</b>이다. 이것이 “한 겹씩 퍼진다”의 정체다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14. BFS 코드 ============ -->
+<section class="slide" data-name="BFS 코드">
+  <div class="eyebrow">구현</div>
+  <h1 class="title">BFS 코드 — 큐 하나로 끝난다</h1>
+  <div class="body grid2 scrollbox">
+    <div>
+      <pre class="code"><span class="kw">from</span> collections <span class="kw">import</span> deque
+
+<span class="kw">def</span> <span class="fn">bfs</span>(root):
+    visited = []
+    q = deque([root])          <span class="cm"># 큐에 루트 넣기</span>
+
+    <span class="kw">while</span> q:
+        node = q.popleft()     <span class="cm"># ① front를 꺼낸다 (FIFO)</span>
+        visited.append(node)   <span class="cm"># ② 방문 기록</span>
+        <span class="kw">for</span> child <span class="kw">in</span> tree[node]:
+            q.append(child)    <span class="cm"># ③ 큐 뒤에 넣는다</span>
+    <span class="kw">return</span> visited
+
+<span class="fn">print</span>(<span class="fn">bfs</span>(<span class="st">'a'</span>))
+<span class="cm"># ['a','b','c','d','e','f','g','h','i','j','k']</span></pre>
+    </div>
+    <div>
+      <div class="callout">
+        <b>DFS 스택 코드와 딱 두 군데가 다르다</b><br>
+        ① <span class="tt">stack.pop()</span> → <span class="tt">q.popleft()</span> &nbsp;<span style="font-size:14px">(맨 뒤 → 맨 앞)</span><br>
+        ② <span class="tt">reversed(...)</span> 를 <b>뺀다</b><br>
+        <span style="font-size:14px">나머지는 <b>줄 순서까지 그대로</b>다. 꺼내서 기록하고, 자식을 넣는다.
+        <b>꺼내는 쪽만</b> 바꿨는데 탐색 순서가 완전히 달라진다.</span>
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        <b>흔한 실수:</b> <span class="tt">list.pop(0)</span> 은 뒤의 원소를 전부 한 칸씩 당기므로 O(n)이다.
+        이걸 큐로 쓰면 전체가 <b>O(n²)</b>이 된다. 반드시 <span class="tt">deque</span> 의 <span class="tt">popleft()</span> 를 쓰자. (O(1))
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b>방문 기록을 언제 하는가</b><br>
+        <span class="tt">visited.append(node)</span> 가 <b>꺼내는 줄 바로 아래</b>에 있다. 넣을 때가 아니라 <b>꺼낼 때</b> 기록한다 — DFS 스택 코드와 같은 자리다.<br>
+        <span style="font-size:14px">BFS는 FIFO라서 <b>넣은 순서 = 꺼낸 순서</b>다. 그래서 넣을 때 기록해도 결과는 같다.
+        다만 <b>트리에서만</b> 그렇다. 이 차이는 다음 장에서 다시 다룬다.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 15. BFS 한 줄씩 ============ -->
+<section class="slide" data-name="BFS 한 줄씩">
+  <div class="eyebrow">깊이 이해하기</div>
+  <h1 class="title">BFS도 한 줄씩 따라가 보기 <small>큐 하나가 층 순서를 만들어 낸다</small></h1>
+  <p class="sub">앞의 두 장과 <b>같은 트리</b>다. 스택 코드와 <b>줄 번호까지 똑같이</b> 놓았다 —
+  바뀐 곳은 <b>3번 줄의 꺼내는 위치</b>와 <b>5번 줄의 <span class="tt">reversed</span> 제거</b>뿐이다.
+  그것만으로 방문 순서가 어떻게 달라지는지 직접 확인해 보자.</p>
+
+  <div class="body scrollbox">
+    <div class="runrow">
+      <div>
+        <div class="reccode" id="bwCode">
+          <div class="cline" data-l="1"><span class="ln">1</span><span>q = <span style="color:#7fd3ff">deque</span>([root])</span></div>
+          <div class="cline" data-l="2"><span class="ln">2</span><span><span style="color:#ff9d7a">while</span> q:</span></div>
+          <div class="cline" data-l="3"><span class="ln">3</span><span>    node = q.popleft()</span></div>
+          <div class="cline" data-l="4"><span class="ln">4</span><span>    visited.append(node)</span></div>
+          <div class="cline" data-l="5"><span class="ln">5</span><span>    <span style="color:#ff9d7a">for</span> child <span style="color:#ff9d7a">in</span> tree[node]:</span></div>
+          <div class="cline" data-l="6"><span class="ln">6</span><span>        q.append(child)</span></div>
+        </div>
+      </div>
+
+      <div class="vizpanel">
+        <div class="vizstage" style="padding:6px">
+          <svg id="bwSvg" viewBox="0 0 350 245" style="width:100%;height:auto"></svg>
+        </div>
+        <p class="footnote" style="margin-top:-4px">10페이지와 <b>똑같은 트리</b>다. 순서를 그대로 비교할 수 있다.</p>
+
+        <div class="statebox">
+          <h4>큐 <span style="font-weight:400;text-transform:none;letter-spacing:0">— 맨 앞에서 꺼낸다 (FIFO)</span></h4>
+          <div class="chiprow" id="bwBox"></div>
+        </div>
+        <div class="statebox">
+          <h4>방문 순서</h4>
+          <div class="chiprow" id="bwOrder"></div>
+        </div>
+
+        <div class="msg" id="bwMsg"></div>
+        <div class="ctrlbar">
+          <button class="btn" id="bwNext">다음 단계</button>
+          <button class="btn ghost sm" id="bwPrevBtn">이전</button>
+          <button class="btn ghost sm" id="bwReset">처음으로</button>
+          <span class="chip tt" id="bwStep" style="font-size:13px;color:var(--ink-soft)"></span>
+        </div>
+        <div class="legend">
+          <span><i style="background:#e0533d"></i>방금 꺼낸 노드</span>
+          <span><i style="background:#fdf3dc;border-color:#c98a09"></i>큐에서 대기 중</span>
+          <span><i style="background:#137a5e"></i>처리 완료</span>
+          <span><i style="background:#fff"></i>아직 발견 안 됨</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <div class="callout" style="margin-top:14px">
+        <b>DFS와 다른 곳은 4번 줄 하나뿐이다</b><br>
+        <span class="tt">stack.pop()</span> — <b>맨 뒤</b>에서 꺼낸다 → 방금 넣은 것부터 → <b>깊이</b><br>
+        <span class="tt">q.popleft()</span> — <b>맨 앞</b>에서 꺼낸다 → 먼저 넣은 것부터 → <b>너비</b><br>
+        <span style="font-size:14px">넣는 코드는 완전히 같다. <b>꺼내는 쪽만</b> 바꿨을 뿐이다.</span>
+      </div>
+
+      <table class="tbl" style="margin-top:14px;font-size:14.5px">
+        <tr><th style="width:26%">같은 트리, 다른 순서</th><th>방문 순서</th><th>왜</th></tr>
+        <tr><td><b>DFS</b> (스택)</td><td class="tt">b → d → h → e → i → j</td><td>d로 내려가면 <b>h까지 끝까지</b> 간 뒤에야 e를 본다</td></tr>
+        <tr style="background:var(--amber-soft)"><td><b>BFS</b> (큐)</td><td class="tt">b → d → e → h → i → j</td><td><b>d, e를 먼저</b> 다 본 뒤에야 아래층으로 내려간다</td></tr>
+      </table>
+
+      <div class="callout moss" style="margin-top:14px;font-size:14.5px">
+        <b>👀 큐의 모양을 눈여겨보자</b><br>
+        큐 안에 들어 있는 노드들은 항상 <b>같은 층이거나 이웃한 두 층</b>뿐이다.
+        층이 순서대로 채워지므로, <b>목표를 처음 만나는 순간</b>이 곧 <b>최소 이동 횟수</b>가 된다.
+      </div>
+
+      <div class="callout amber" style="margin-top:12px;font-size:14.5px">
+        <b>❗ 방문 기록은 꺼낼 때, 다만 트리에서만</b><br>
+        여기서는 <b>꺼낼 때</b>(4번 줄) 기록한다. BFS는 FIFO라 <b>넣은 순서 = 꺼낸 순서</b>이므로,
+        넣을 때 기록해도 <b>결과는 똑같다</b>. 코드가 DFS 스택 버전과 나란히 서는 쪽을 택했을 뿐이다.<br>
+        <b>그래프라면 이야기가 달라진다.</b> 두 갈래가 같은 노드로 모일 수 있어서, <b>넣을 때</b> 표시하지 않으면
+        같은 노드가 큐에 <b>여러 번</b> 들어간다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 16. DFS vs BFS ============ -->
+<section class="slide" data-name="DFS vs BFS 비교">
+  <div class="eyebrow">정리</div>
+  <h1 class="title">DFS와 BFS, 무엇을 언제 쓰는가</h1>
+  <div class="body scrollbox">
+    <table class="tbl">
+      <tr><th style="width:150px"></th><th style="width:calc(50% - 75px)">깊이 우선 탐색 (DFS)</th><th>너비 우선 탐색 (BFS)</th></tr>
+      <tr><td><b>보조 자료구조</b></td><td>스택 (재귀 = 호출 스택)</td><td>큐 (deque)</td></tr>
+      <tr><td><b>꺼내는 위치</b></td><td class="c"><span class="tt">pop()</span> — 맨 뒤 (LIFO)</td><td class="c"><span class="tt">popleft()</span> — 맨 앞 (FIFO)</td></tr>
+      <tr><td><b>방문 순서</b></td><td class="mono">a b d h e i j c f k g</td><td class="mono">a b c d e f g h i j k</td></tr>
+      <tr><td><b>탐색 모양</b></td><td>한 갈래로 깊게 내려갔다가 되돌아옴</td><td>루트 주위로 레벨별로 퍼짐</td></tr>
+      <tr><td><b>최단 경로</b></td><td style="color:var(--coral)"><b>보장하지 않음</b></td><td style="color:var(--moss)"><b>보장 (간선 비용이 모두 같을 때)</b></td></tr>
+      <tr><td><b>메모리</b></td><td>O(트리의 <b>높이</b>) — 적음</td><td>O(한 <b>레벨</b>의 최대 노드 수) — 많음</td></tr>
+      <tr><td><b>시간 복잡도</b></td><td class="c">O(n)</td><td class="c">O(n)</td></tr>
+      <tr><td><b>이럴 때 쓴다</b></td>
+        <td><ul class="clean coral" style="font-size:14px;margin:0">
+          <li>모든 경우의 수를 <b>빠짐없이</b> 만들 때 (조합·순열·부분집합)</li>
+          <li>경로가 <b>있는지 없는지</b>만 확인하면 될 때</li>
+          <li>조건을 만족하는 답 <b>하나</b>만 찾으면 될 때</li>
+          <li>사이클이 있는지 확인할 때</li>
+        </ul></td>
+        <td><ul class="clean moss" style="font-size:14px;margin:0">
+          <li><b>최소 이동 횟수</b>를 구할 때</li>
+          <li>거리(레벨)별로 나눠서 처리해야 할 때</li>
+          <li>출발점에서 <b>가장 가까운</b> 답을 찾을 때</li>
+          <li>“n초 후”처럼 <b>한 겹씩 퍼지는</b> 상황일 때</li>
+        </ul></td></tr>
+    </table>
+    <div class="grid2" style="margin-top:22px">
+      <div class="card coral">
+        <h3>🧩 DFS가 맞는 문제 — 예시로 보기</h3>
+        <table class="tbl" style="font-size:14px">
+          <tr><th style="width:38%">문제</th><th>왜 DFS인가</th></tr>
+          <tr><td><b>미로에 출구가 있는가?</b></td>
+            <td>있는지 <b>여부만</b> 알면 된다. 한 갈래를 끝까지 파보고, 막히면 되돌아와 다음 갈래. 찾는 즉시 종료할 수 있다.</td></tr>
+          <tr><td><b>1~9 중 3개를 골라 합이 15인 조합은?</b></td>
+            <td>모든 조합을 <b>빠짐없이</b> 만들어야 한다. 각 수마다 “고른다 / 안 고른다”를 정하며 끝까지 내려가는 것이 곧 DFS다.</td></tr>
+          <tr><td><b>스도쿠 · N-Queens</b></td>
+            <td>답을 <b>만들어 가다</b> 모순이 생기면 되돌아온다. 이 “되돌아옴”이 백트랙 그 자체다.</td></tr>
+        </table>
+        <div class="callout coral" style="margin-top:12px;background:#fff;font-size:14.5px">
+          <b>공통점:</b> 한 번에 <b>완성된 후보 하나</b>를 손에 들고 있다.
+          스택에는 <b>지금 내려온 경로만</b> 들어 있으므로, 그 경로가 곧 “현재 만들고 있는 답”이 된다. 메모리도 적게 든다.
+        </div>
+      </div>
+
+      <div class="card moss">
+        <h3>🎯 BFS가 맞는 문제 — 예시로 보기</h3>
+        <table class="tbl" style="font-size:14px">
+          <tr><th style="width:38%">문제</th><th>왜 BFS인가</th></tr>
+          <tr><td><b>미로를 최소 몇 칸 움직여 탈출?</b></td>
+            <td>가까운 곳부터 한 겹씩 넓혀 가므로, 출구를 <b>처음 만나는 순간</b>이 곧 최솟값이다. 더 볼 필요가 없다.</td></tr>
+          <tr><td><b>나와 이 사람은 몇 다리 건너인가?</b></td>
+            <td>친구의 친구… 로 <b>한 겹씩</b> 넓히면 레벨이 곧 답이다. 깊이 파고들면 몇 다리인지 알 수 없다.</td></tr>
+          <tr><td><b>1초마다 한 칸씩 번지는 불 · 전염</b></td>
+            <td>“1초 = 한 레벨”이 정확히 맞아떨어진다. 같은 층을 다 처리한 뒤 다음 층으로 넘어가는 순서가 시간의 흐름과 같다.</td></tr>
+        </table>
+        <div class="callout moss" style="margin-top:12px;background:#fff;font-size:14.5px">
+          <b>공통점:</b> 답이 <b>“몇 번 만에”</b>라는 숫자다.
+          큐에는 <b>한 레벨 전체</b>가 들어가므로 메모리는 더 쓰지만, 그 대가로 <b>최소</b>를 보장받는다.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2-1" style="margin-top:20px">
+      <div class="card flat">
+        <h3>🔍 문제에 이런 말이 나오면</h3>
+        <table class="tbl" style="font-size:14.5px">
+          <tr><th style="width:52%">문제 속 표현</th><th>고른다</th></tr>
+          <tr><td>“최소 몇 번”, “최단 거리”, “가장 가까운”, “몇 단계 만에”</td><td style="color:var(--moss)"><b>BFS</b></td></tr>
+          <tr><td>“모든 경우”, “몇 가지 방법”, “가능한가?”</td><td style="color:var(--coral)"><b>DFS</b></td></tr>
+          <tr><td>“조합”, “순열”, “부분집합”, “골라서 만들기”</td><td style="color:var(--coral)"><b>DFS</b></td></tr>
+          <tr><td>“n초 후”, “동시에 퍼진다”, “레벨별로”</td><td style="color:var(--moss)"><b>BFS</b></td></tr>
+          <tr><td>“사이클이 있는가”, “되돌아오는 길이 있는가”</td><td style="color:var(--coral)"><b>DFS</b></td></tr>
+        </table>
+        <p class="footnote" style="margin-top:10px">※ 물론 절대 규칙은 아니다. 다만 <b>“최소”라는 말이 보이면 일단 BFS를 의심하는</b> 습관은 대체로 맞는다.</p>
+      </div>
+      <div class="callout coral" style="align-self:start">
+        <b>💬 판단 기준 한 줄</b><br>
+        “<b>몇 번 만에</b> 갈 수 있나?” → <b>BFS</b><br>
+        “<b>갈 수 있는 방법이 몇 가지</b>인가? / 조건에 맞는 조합이 있나?” → <b>DFS</b>
+        <div style="margin-top:12px;font-size:14.5px;padding-top:12px;border-top:1px dashed #f0b8ab">
+          <b>⚠️ 자주 하는 착각</b><br>
+          DFS로 먼저 찾은 경로를 <b>최단이라고 믿는 것</b>. DFS는 <b>먼저 눈에 띈</b> 경로일 뿐이다.
+          한 갈래를 끝까지 파고든 결과라서, 훨씬 짧은 길이 옆에 있어도 그냥 지나친다.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:20px">
+      <div class="card flat">
+        <h3>🤔 실제로는 DFS를 더 자주 쓴다</h3>
+        <p style="font-size:15px"><b>구현이 간단한 깊이 우선 탐색</b>이 실제로 더 많이 쓰인다.
+        재귀 함수로 3~4줄이면 되고, <b>4차시의 백트래킹</b>과 <b>5차시의 분기 한정법</b>이 모두 DFS 위에 세워지기 때문이다.</p>
+      </div>
+      <div class="card amber">
+        <h3>⚖️ 총 작업량은 같다</h3>
+        <p style="font-size:15px">둘 다 <b>모든 노드를 정확히 한 번씩</b> 방문한다. 그래서 시간 복잡도가 <b>똑같이 O(n)</b>이다.<br>
+        달라지는 것은 <b>순서</b>와 <b>메모리</b>, 그리고 <b>답을 언제 만나는가</b>뿐이다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 17. 예측 활동 ============ -->
+<section class="slide" data-name="확인 활동">
+  <div class="eyebrow">확인 활동</div>
+  <h1 class="title">직접 예측해 보기</h1>
+  <p class="sub">아래는 <b>다른 트리</b>다. 루트 <b>1</b>에서 출발하고, 자식은 번호가 작은 것부터 방문한다.</p>
+  <div class="body grid-1-2">
+    <div class="vizstage" style="padding:14px">
+      <svg viewBox="0 0 340 300" style="width:100%">
+        <line x1="170" y1="35"  x2="95"  y2="115" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="170" y1="35"  x2="255" y2="115" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="95"  y1="115" x2="55"  y2="195" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="95"  y1="115" x2="140" y2="195" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="255" y1="115" x2="235" y2="195" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="55"  y1="195" x2="30"  y2="270" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="55"  y1="195" x2="105" y2="270" stroke="#c3cedd" stroke-width="2.5"/>
+        <line x1="235" y1="195" x2="235" y2="270" stroke="#c3cedd" stroke-width="2.5"/>
+        <g><circle cx="170" cy="35"  r="20" fill="#fdece8" stroke="#e0533d" stroke-width="2.5"/><text x="170" y="42"  text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#e0533d">1</text></g>
+        <g><circle cx="95"  cy="115" r="20" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="95"  y="122" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#1d5fd0">2</text></g>
+        <g><circle cx="255" cy="115" r="20" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="255" y="122" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#1d5fd0">3</text></g>
+        <g><circle cx="55"  cy="195" r="20" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="55"  y="202" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#1d5fd0">4</text></g>
+        <g><circle cx="140" cy="195" r="20" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="140" y="202" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#137a5e">5</text></g>
+        <g><circle cx="235" cy="195" r="20" fill="#e8f0ff" stroke="#1d5fd0" stroke-width="2"/><text x="235" y="202" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#1d5fd0">6</text></g>
+        <g><circle cx="30"  cy="270" r="20" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="30"  y="277" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#137a5e">7</text></g>
+        <g><circle cx="105" cy="270" r="20" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="105" y="277" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#137a5e">8</text></g>
+        <g><circle cx="235" cy="270" r="20" fill="#e2f4ee" stroke="#137a5e" stroke-width="2"/><text x="235" y="277" text-anchor="middle" font-family="JetBrains Mono" font-size="15" font-weight="700" fill="#137a5e">9</text></g>
+      </svg>
+      <p class="footnote" style="text-align:center">
+        1의 자식: 2, 3 &nbsp;/&nbsp; 2의 자식: 4, 5 &nbsp;/&nbsp; 3의 자식: 6<br>
+        4의 자식: 7, 8 &nbsp;/&nbsp; 6의 자식: 9
+      </p>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qh">Q1. DFS(1)의 방문 순서는?</div>
+        <div class="opts" data-a="1">
+          <button class="opt">1 2 3 4 5 6 7 8 9</button>
+          <button class="opt">1 2 4 7 8 5 3 6 9</button>
+          <button class="opt">1 2 4 5 7 8 3 6 9</button>
+        </div>
+        <div class="fb">1→2→4→7 로 <b>끝까지 내려간다</b>. 7은 단말이므로 백트랙해서 8, 다시 백트랙해서 5, 또 백트랙해서 3 → 6 → 9. <b>깊게 파고들었다가 되돌아온다</b>는 성질이 그대로 보인다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">Q2. BFS(1)의 방문 순서는?</div>
+        <div class="opts" data-a="2">
+          <button class="opt">1 2 4 7 8 5 3 6 9</button>
+          <button class="opt">1 2 3 5 4 6 7 8 9</button>
+          <button class="opt">1 2 3 4 5 6 7 8 9</button>
+        </div>
+        <div class="fb">레벨 0: {1} → 레벨 1: {2, 3} → 레벨 2: {4, 5, 6} → 레벨 3: {7, 8, 9}. 큐에 들어간 순서대로 나오므로 번호 순과 똑같아진다. <b>레벨을 하나씩 완전히 끝내고</b> 다음으로 넘어간다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">Q3. 루트 1에서 노드 <b>9</b>까지의 <b>최소 이동 횟수</b>는?</div>
+        <div class="opts" data-a="2">
+          <button class="opt">1</button>
+          <button class="opt">2</button>
+          <button class="opt">3</button>
+        </div>
+        <div class="fb">1→3→6→9 로 간선 3개, 즉 노드 9의 <b>레벨이 3</b>이다. 트리에서는 두 노드를 잇는 경로가 <b>하나뿐</b>이므로 답도 하나다. BFS의 레벨 배열에서 <span class="tt">level[9] = 3</span> 으로 바로 읽어낼 수 있다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">Q4. 이 트리의 <b>간선 수</b>는?</div>
+        <div class="opts" data-a="0">
+          <button class="opt">8개</button>
+          <button class="opt">9개</button>
+          <button class="opt">세어 봐야 안다</button>
+        </div>
+        <div class="fb">노드가 n개인 트리의 간선은 <b>항상 n − 1개</b>다. 루트를 뺀 모든 노드가 부모와 이어지는 간선을 정확히 하나씩 갖기 때문이다. 노드 9개 → 간선 8개.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 18. 전체 정리 ============ -->
+<section class="slide" data-name="전체 정리">
+  <div class="eyebrow">Wrap-up</div>
+  <h1 class="title">오늘 배운 것, 한 장 정리</h1>
+  <div class="body">
+    <table class="tbl">
+      <tr>
+        <th style="width:110px">알고리즘</th><th style="width:22%">푸는 문제</th><th style="width:16%">보조 자료 구조</th>
+        <th style="width:16%">다음에 꺼낼 것</th><th style="width:13%">시간 복잡도</th><th>한 줄 요약</th>
+      </tr>
+      <tr>
+        <td><b>DFS</b><br><span class="footnote">깊이 우선 탐색</span></td>
+        <td>모든 노드 순회, 모든 경우의 수</td><td>스택 / 재귀</td>
+        <td>가장 <b>최근에</b> 발견한 것</td><td class="c">O(n)</td><td>끝까지 내려갔다가 되돌아온다(백트랙)</td>
+      </tr>
+      <tr>
+        <td><b>BFS</b><br><span class="footnote">너비 우선 탐색</span></td>
+        <td>최소 <b>이동 횟수</b>, 레벨별 처리</td><td>큐 (deque)</td>
+        <td>가장 <b>먼저</b> 발견한 것</td><td class="c">O(n)</td><td>가까운 레벨부터 한 겹씩</td>
+      </tr>
+    </table>
+
+    <div class="grid2" style="margin-top:22px">
+      <div class="card sea">
+        <h3>🔑 오늘의 핵심 하나</h3>
+        <p style="font-size:15.5px">두 알고리즘의 뼈대는 완전히 같다.<br>
+        <b>“대기열에서 하나 꺼내 → 자식을 확인 → 다시 넣는다”</b><br>
+        달라지는 것은 <b>어느 쪽에서 꺼내는가</b>뿐이다. 뒤에서 꺼내면 DFS, 앞에서 꺼내면 BFS다.</p>
+      </div>
+      <div class="card amber">
+        <h3>⚠️ 자주 하는 실수</h3>
+        <ul class="clean" style="font-size:14.5px">
+          <li>명시적 스택에서 <b><span class="tt">reversed</span>를 빠뜨림</b> → 순서가 거꾸로</li>
+          <li>DFS로 찾은 경로를 <b>최단 경로로 착각</b></li>
+          <li>큐를 <span class="tt">list.pop(0)</span>으로 구현 → O(n²)</li>
+          <li>단말 노드를 딕셔너리에 <b>빠뜨림</b> → KeyError</li>
+          <li>재귀 깊이 제한을 잊음 (기본 1000)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 19. 형성평가 ============ -->
+<section class="slide" data-name="형성평가">
+  <div class="eyebrow">형성평가</div>
+  <h1 class="title">스스로 확인하기</h1>
+  <p class="sub">선택지를 눌러 답을 확인하세요.</p>
+  <div class="body grid2 scrollbox">
+    <div>
+      <div class="q">
+        <div class="qh">1. 다음 중 <b>비선형 구조</b>를 탐색하는 알고리즘끼리 묶인 것은?</div>
+        <div class="opts" data-a="1">
+          <button class="opt">순차 탐색, 이분 탐색</button>
+          <button class="opt">깊이 우선 탐색, 너비 우선 탐색</button>
+          <button class="opt">이분 탐색, 너비 우선 탐색</button>
+        </div>
+        <div class="fb">선형 구조(리스트·큐·스택)는 순차 탐색·이분 탐색으로, 비선형 구조(트리·그래프)는 깊이 우선 탐색·너비 우선 탐색으로 탐색한다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">2. DFS에서 더 갈 곳이 없어 부모 노드로 되돌아가는 과정을 무엇이라 하는가?</div>
+        <div class="opts" data-a="2">
+          <button class="opt">순회(traversal)</button>
+          <button class="opt">분기(branching)</button>
+          <button class="opt">백트랙(backtrack)</button>
+        </div>
+        <div class="fb">백트랙이다. 이 원리를 이용해 조건에 맞지 않는 가지를 잘라내며 탐색하는 기법이 <b>백트래킹</b>이며, 다음 차시의 주제다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">3. 트리에서 루트로부터 어떤 노드까지의 <b>최소 이동 횟수</b>를 구할 때 가장 적절한 것은?</div>
+        <div class="opts" data-a="1">
+          <button class="opt">DFS</button>
+          <button class="opt">BFS</button>
+          <button class="opt">순차 탐색</button>
+        </div>
+        <div class="fb">BFS는 레벨이 얕은 순서로 탐색하므로 어떤 노드를 <b>처음 만나는 순간</b>이 곧 그 노드의 레벨이다. DFS는 먼저 찾은 경로가 최단이라는 보장이 없다.</div>
+      </div>
+    </div>
+    <div>
+      <div class="q">
+        <div class="qh">4. 노드가 <b>n개</b>인 트리에 대한 설명으로 옳은 것은?</div>
+        <div class="opts" data-a="0">
+          <button class="opt">간선은 항상 n − 1개이고, DFS·BFS의 시간 복잡도는 O(n)이다</button>
+          <button class="opt">간선 수는 트리 모양에 따라 달라진다</button>
+          <button class="opt">DFS는 O(n), BFS는 O(n²)이다</button>
+        </div>
+        <div class="fb">루트를 뺀 모든 노드가 부모와 이어지는 간선을 정확히 하나씩 가지므로 간선은 <b>n − 1개</b>다. 두 알고리즘 모두 모든 노드를 한 번씩만 방문하므로 시간 복잡도는 <b>똑같이 O(n)</b>이다. 달라지는 것은 순서와 메모리뿐이다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">5. 같은 트리에서 BFS가 DFS보다 <b>메모리를 많이 쓰는</b> 이유는?</div>
+        <div class="opts" data-a="1">
+          <button class="opt">노드를 두 번씩 방문하기 때문</button>
+          <button class="opt">한 레벨의 노드를 <b>전부</b> 큐에 담아 두기 때문</button>
+          <button class="opt">큐가 스택보다 원래 무거운 자료 구조이기 때문</button>
+        </div>
+        <div class="fb">DFS의 스택에는 <b>루트에서 현재까지의 경로</b>만 들어 있어 크기가 트리의 높이만큼이다. BFS의 큐에는 <b>한 레벨 전체</b>가 들어가므로, 넓은 트리일수록 급격히 커진다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">6. 트리 DFS 코드에는 <span class="tt">visited</span> 검사가 없어도 되지만, <b>그래프</b>에서는 반드시 필요하다. 왜인가?</div>
+        <div class="opts" data-a="2">
+          <button class="opt">그래프는 노드 수가 더 많기 때문</button>
+          <button class="opt">그래프에는 루트가 없기 때문</button>
+          <button class="opt">그래프에는 <b>사이클</b>이 있어 같은 노드를 무한히 반복할 수 있기 때문</button>
+        </div>
+        <div class="fb">트리는 사이클이 없고 자식 쪽으로만 내려가므로 같은 노드를 두 번 만날 수 없다. 반면 그래프에서는 A → B → A → B … 로 영원히 돌 수 있어 방문 표시가 <b>필수</b>다. 이때 시간 복잡도 표기도 O(n)에서 <b>O(V + E)</b>로 바뀐다.</div>
+      </div>
+      <div class="q">
+        <div class="qh">7. <b>완전 이진 트리</b>의 모든 노드를 DFS로 순회할 때 시간 복잡도는?</div>
+        <div class="opts" data-a="1">
+          <button class="opt">O(log n) — 매 단계 반씩 갈라지므로</button>
+          <button class="opt">O(n) — 모든 노드를 한 번씩 방문하므로</button>
+          <button class="opt">O(n log n)</button>
+        </div>
+        <div class="fb">이진 트리라도 <b>순회</b>는 모든 노드를 봐야 하므로 <b>O(n)</b>이다. O(log n)은 <b>이진 탐색 트리에서 값을 찾을 때</b>처럼 정렬 조건 덕에 <b>절반을 버릴 수 있을 때</b> 나온다. <b>갈라지는 것과 버리는 것은 다르다.</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+<div id="nav">
+  <div class="left">
+    <span class="chip" id="counter">1 / 1</span>
+    <span id="slidename"></span>
+  </div>
+  <div class="left">
+    <span class="chip" style="opacity:.7"><span class="kbdkey">←</span> <span class="kbdkey">→</span> 이동</span>
+    <button class="navbtn" id="prev">이전</button>
+    <button class="navbtn" id="next">다음</button>
+  </div>
+</div>
+<script>
+/* ================= 공통 트리 렌더러 ================= */
+const NS='http://www.w3.org/2000/svg';
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+/* 오늘 사용하는 트리
+        a
+    b       c
+  d   e   f   g
+  h  i j  k          d→h, e→i,e→j, f→k          */
+const NODES={
+  a:[380, 55],
+  b:[210,165], c:[550,165],
+  d:[110,278], e:[300,278], f:[470,278], g:[655,278],
+  h:[ 70,388], i:[240,388], j:[350,388], k:[470,388]
+};
+const CHILD={a:['b','c'],b:['d','e'],c:['f','g'],d:['h'],e:['i','j'],f:['k'],g:[],h:[],i:[],j:[],k:[]};
+const EDGES=[];
+Object.keys(CHILD).forEach(p=>CHILD[p].forEach(c=>EDGES.push([p,c])));
+
+function drawTree(svg,st){
+  svg.innerHTML='';
+  const R=25;
+  EDGES.forEach(([u,v])=>{
+    const [x1,y1]=NODES[u],[x2,y2]=NODES[v];
+    let cls='gedge';
+    if(st.activeEdge&&st.activeEdge[0]===u&&st.activeEdge[1]===v)cls+=' act';
+    else if(st.pathEdges&&st.pathEdges.some(e=>e[0]===u&&e[1]===v))cls+=' tree';
+    svg.appendChild(el('line',{x1,y1,x2,y2,class:cls}));
+  });
+  Object.keys(NODES).forEach(n=>{
+    const [x,y]=NODES[n];
+    let fill='#ffffff',stroke='#b9c5d4',tcol='#57687e';
+    if(st.pending&&st.pending.includes(n)){fill='#fdf3dc';stroke='#c98a09';tcol='#8a5f04';}
+    if(st.finished&&st.finished.includes(n)){fill='#137a5e';stroke='#137a5e';tcol='#ffffff';}
+    if(st.cur===n){fill='#e0533d';stroke='#e0533d';tcol='#ffffff';}
+    const g=el('g',{class:'gnode'});
+    g.appendChild(el('circle',{cx:x,cy:y,r:R,fill,stroke,'stroke-width':2.6}));
+    const t=el('text',{x,y:y+6,'text-anchor':'middle',fill:tcol});t.textContent=n;
+    g.appendChild(t);
+    if(st.order){
+      const i=st.order.indexOf(n);
+      if(i>=0){
+        g.appendChild(el('circle',{cx:x+21,cy:y-20,r:11,fill:'#1d5fd0',stroke:'#fff','stroke-width':2}));
+        const b=el('text',{x:x+21,y:y-16,'text-anchor':'middle',class:'orderbadge'});b.textContent=i+1;
+        g.appendChild(b);
+      }
+    }
+    if(st.level&&st.level[n]!==undefined){
+      const r=el('rect',{x:x-13,y:y+R+3,width:26,height:17,rx:5,fill:'#16202e',opacity:.85});
+      const b=el('text',{x,y:y+R+16,'text-anchor':'middle',fill:'#fff','font-family':'JetBrains Mono','font-size':11,'font-weight':700});
+      b.textContent=st.level[n];
+      g.appendChild(r);g.appendChild(b);
+    }
+    svg.appendChild(g);
+  });
+}
+function chips(box,arr,cls,dist){
+  box.innerHTML='';
+  if(!arr||!arr.length){box.innerHTML='<span class="empty">비어 있음</span>';return;}
+  arr.forEach((n,i)=>{
+    const d=document.createElement('span');
+    d.className='nodechip'+(cls&&cls(i,arr.length)?' '+cls(i,arr.length):'');
+    d.textContent=n;
+    if(dist&&dist[n]!==undefined){
+      const s=document.createElement('sub');s.style.fontSize='10px';s.style.marginLeft='2px';s.textContent=dist[n];
+      d.appendChild(s);
+    }
+    box.appendChild(d);
+  });
+}
+
+/* ================= DFS ================= */
+function genDFS(){
+  const steps=[],visited=[],stack=[],path=[];
+  function rec(node,from){
+    stack.push(node);visited.push(node);
+    if(from)path.push([from,node]);
+    const kids=CHILD[node];
+    steps.push({visited:[...visited],stack:[...stack],cur:node,order:[...visited],
+      pathEdges:path.slice(0,-1),activeEdge:from?[from,node]:null,
+      msg:from?`<b>${node}</b> 방문. ${from}의 자식 <b>${node}</b>(으)로 한 칸 더 깊이 내려갔다. 스택에 push.`
+              :`루트 <b>a</b> 방문. 스택에 a를 push하고 탐색을 시작한다.`});
+    if(kids.length){
+      steps.push({visited:[...visited],stack:[...stack],cur:node,order:[...visited],pathEdges:[...path],
+        msg:`<b>${node}</b>의 자식은 <b>${kids.join(', ')}</b> 이다. 왼쪽부터, 즉 <b>${kids[0]}</b> 로 내려간다.`});
+    }else{
+      steps.push({visited:[...visited],stack:[...stack],cur:node,order:[...visited],pathEdges:[...path],
+        msg:`<b>${node}</b>는 자식이 없는 <b>단말 노드</b>다. 더 내려갈 곳이 없다.`});
+    }
+    for(const nx of kids)rec(nx,node);
+    stack.pop();
+    if(from)path.pop();
+    const back=stack.length?stack[stack.length-1]:null;
+    steps.push({visited:[...visited],stack:[...stack],cur:back,order:[...visited],pathEdges:[...path],
+      msg:back?`<b>${node}</b>의 자식을 모두 끝냈다 → <b>백트랙</b>. 스택에서 ${node}를 pop하고 부모 <b>${back}</b>(으)로 되돌아간다.`
+              :`스택이 비었다. <b>탐색 종료.</b><br>방문 순서: <b>${visited.join(' → ')}</b>`});
+  }
+  rec('a',null);
+  return steps;
+}
+
+/* ================= BFS ================= */
+function genBFS(){
+  const steps=[],level={a:0},order=[],q=['a'],done=[];
+  steps.push({q:[...q],order:[...order],done:[],cur:null,level:{...level},
+    msg:`루트 <b>a</b>를 큐에 넣고 시작한다. (레벨 0)`});
+  while(q.length){
+    const node=q.shift();done.push(node);order.push(node);
+    steps.push({q:[...q],order:[...order],done:[...done],cur:node,level:{...level},
+      msg:`큐 front에서 <b>${node}</b>를 꺼내(dequeue) <b>방문 기록</b>에 넣는다. 이제 ${node}의 자식을 살펴본다.`});
+    const added=[];
+    for(const nx of CHILD[node]){level[nx]=level[node]+1;q.push(nx);added.push(nx);}
+    steps.push({q:[...q],order:[...order],done:[...done],cur:node,level:{...level},
+      msg:added.length?`${node}의 자식 <b>${added.join(', ')}</b> 을(를) 큐 뒤에 넣는다. (레벨 ${level[added[0]]})`
+                      :`<b>${node}</b>는 <b>단말 노드</b>다. 큐에 추가할 것이 없다.`});
+  }
+  steps.push({q:[],order:[...order],done:[...done],cur:null,level:{...level},
+    msg:`큐가 비었다. <b>탐색 종료.</b><br>방문 순서: <b>${order.join(' → ')}</b><br>레벨 3의 노드는 <b>h, i, j, k</b> 이다.`});
+  return steps;
+}
+
+/* ================= 재귀 · 호출 스택 ================= */
+const MN={b:[172,40],d:[82,126],e:[266,126],h:[82,210],i:[214,210],j:[312,210]};
+const ME=[['b','d'],['b','e'],['d','h'],['e','i'],['e','j']];
+
+const MPAR={d:'b',e:'b',h:'d',i:'e',j:'e'};
+
+/* frames(재귀) 방식과 box(스택·큐) 방식을 모두 그린다 */
+function drawMini(svg,st){
+  svg.innerHTML='';
+  const held=st.frames?st.frames.map(f=>f.node):(st.box||[]);
+  ME.forEach(([u,v])=>{
+    const [x1,y1]=MN[u],[x2,y2]=MN[v];
+    let cls='gedge';
+    if(st.frames){
+      if(held.includes(u)&&held.includes(v))cls+=' act';
+      else if(st.done.includes(v))cls+=' tree';
+    }else{
+      if(st.cur===v&&MPAR[v]===u)cls+=' act';
+      else if(st.visited.includes(v))cls+=' tree';
+    }
+    svg.appendChild(el('line',{x1,y1,x2,y2,class:cls}));
+  });
+  Object.keys(MN).forEach(n=>{
+    const [x,y]=MN[n];
+    let fill='#ffffff',stroke='#b9c5d4',tcol='#57687e';
+    if(st.done.includes(n)){fill='#137a5e';stroke='#137a5e';tcol='#ffffff';}
+    else if(held.includes(n)){fill='#fdf3dc';stroke='#c98a09';tcol='#8a5f04';}
+    if(st.cur===n){fill='#e0533d';stroke='#e0533d';tcol='#ffffff';}
+    const g=el('g',{class:'gnode'});
+    g.appendChild(el('circle',{cx:x,cy:y,r:24,fill,stroke,'stroke-width':2.6}));
+    const t=el('text',{x,y:y+6,'text-anchor':'middle',fill:tcol});t.textContent=n;
+    g.appendChild(t);
+    const k=st.visited.indexOf(n);
+    if(k>=0){
+      g.appendChild(el('circle',{cx:x+20,cy:y-19,r:10.5,fill:'#1d5fd0',stroke:'#fff','stroke-width':2}));
+      const b=el('text',{x:x+20,y:y-15,'text-anchor':'middle',class:'orderbadge'});b.textContent=k+1;
+      g.appendChild(b);
+    }
+    svg.appendChild(g);
+  });
+}
+
+function genRec(){
+  const steps=[],stack=[],visited=[],done=[];
+  const snap=(line,msg,kind)=>steps.push({
+    frames:stack.map(f=>({node:f.node,kids:f.kids,idx:f.idx})),
+    visited:[...visited],done:[...done],
+    cur:stack.length?stack[stack.length-1].node:null,
+    line,msg,kind});
+
+  function rec(node,parent){
+    stack.push({node,kids:CHILD[node],idx:-1});
+    snap(1,parent
+      ? `<b>dfs('${node}')</b> 가 호출되었다. 스택에 <b>${node}</b> 층이 새로 쌓인다.<br>부모 <b>${parent}</b> 는 사라진 것이 아니라 <b>4번 줄에서 멈춘 채</b> 아래에 남아 있다.`
+      : `<b>dfs('b')</b> 호출. 첫 층이 쌓이며 탐색이 시작된다.`,'call');
+    visited.push(node);
+    snap(2,`2번 줄 — <b>${node}</b> 를 방문 기록에 넣는다. 지금까지: <b>${visited.join(' → ')}</b>`,'call');
+
+    const f=stack[stack.length-1];
+    if(!f.kids.length){
+      snap(3,`3번 줄 — <b>${node}</b> 의 자식 목록이 <b>비어 있다</b>. for문은 <b>한 번도 돌지 않고</b> 그냥 지나간다.`,'');
+    }else{
+      for(let k=0;k<f.kids.length;k++){
+        f.idx=k;
+        snap(3,`3번 줄 — for문 <b>${k+1}번째</b> 반복. child = <b>${f.kids[k]}</b>.
+          다음 줄에서 <b>dfs('${f.kids[k]}')</b> 를 부르고, <b>${node}</b> 는 여기서 멈춘다.`,'');
+        rec(f.kids[k],node);
+        f.idx=k;
+        const more=k<f.kids.length-1;
+        snap(4,`<b>dfs('${f.kids[k]}')</b> 가 끝나서 <b>${node}</b> 의 4번 줄로 <b>되돌아왔다</b> — 이것이 <b>백트랙</b>이다.<br>`
+          +(more?`멈춰 있던 for문이 다시 움직여 다음 자식 <b>${f.kids[k+1]}</b> 로 넘어간다.`
+                :`남은 자식이 없다 → for문이 끝난다.`),'back');
+      }
+    }
+    snap(5,`5번 줄 — <b>${node}</b> 의 for문이 끝났다 = <b>더 내려갈 곳이 없다</b>.
+      함수의 마지막이므로 <b>dfs('${node}')</b> 는 여기서 <b>반환</b>된다. <span style="color:var(--ink-soft)">(return을 적지 않아도 반환된다.)</span>`,'ret');
+    stack.pop();done.push(node);
+    snap(5,stack.length
+      ? `<b>${node}</b> 층이 스택에서 <b>사라졌다</b>. 제어권이 아래층 <b>${stack[stack.length-1].node}</b> 에게 <b>저절로</b> 돌아간다.<br><b>되돌아가라고 시킨 코드는 어디에도 없다.</b>`
+      : `마지막 층까지 사라져 <b>스택이 비었다</b> → 탐색 종료.<br>방문 순서: <b>${visited.join(' → ')}</b>`,'ret');
+  }
+  rec('b',null);
+  return steps;
+}
+
+
+/* ---- 명시적 스택 DFS 한 줄씩 ---- */
+function genStackWalk(){
+  const steps=[],stack=['b'],visited=[],done=[];
+  let cur=null,prev=null;
+  const snap=(line,msg,kind)=>steps.push({line,msg,kind,cur,
+    visited:[...visited],box:[...stack],done:[...done]});
+
+  snap(1,`1번 줄 — 스택에 루트 <b>b</b> 를 넣고 시작한다.<br>재귀에서는 <b>보이지 않던</b> 스택이 여기서는 <b>눈에 보인다</b>.`,'call');
+  while(stack.length){
+    cur=null;
+    snap(2,`2번 줄 — 스택이 비어 있지 않다 → 반복을 계속한다. <span style="color:var(--ink-soft)">(스택 안 ${stack.length}개)</span>`,'');
+    const node=stack.pop();
+    const isBack=prev!==null&&!CHILD[prev].includes(node);
+    cur=node;
+    snap(3,`3번 줄 — 스택 <b>맨 뒤</b>에서 <b>${node}</b> 를 꺼낸다(pop).`+(prev===null?'':(isBack
+      ? `<br>${node} 는 방금 처리한 <b>${prev}</b> 의 자식이 <b>아니다</b> → 그 사이에 <b>백트랙</b>이 일어났다.<br>재귀에서는 함수가 <b>반환되던</b> 바로 그 자리다.`
+      : `<br>${node} 는 <b>${prev}</b> 의 자식이다 → <b>한 칸 더 깊이</b> 내려갔다.`)),isBack?'back':'call');
+    visited.push(node);
+    snap(4,`4번 줄 — 방문 기록에 넣는다. 지금까지: <b>${visited.join(' → ')}</b>`,'');
+    const kids=CHILD[node];
+    if(!kids.length){
+      snap(5,`5번 줄 — <b>${node}</b> 는 자식이 없다. push할 것이 없어 for문이 <b>그냥 지나간다</b>.<br>스택에 남은 것은 <b>아직 안 가 본 다른 갈래</b>뿐이다 → 다음 pop이 곧 백트랙이 된다.`,'ret');
+    }else{
+      const rev=[...kids].reverse();
+      rev.forEach((c,k)=>{
+        snap(5,`5번 줄 — for문 <b>${k+1}/${rev.length}</b>번째 반복. child = <b>${c}</b>.`
+          +(k===0&&rev.length>1?`<br><span style="color:var(--ink-soft)">자식 순서 (${kids.join(', ')}) 를 <span class="tt">reversed</span> 로 뒤집어 <b>${rev.join(', ')}</b> 순으로 돈다.</span>`:''),'');
+        stack.push(c);
+        snap(6,`6번 줄 — <b>${c}</b> <b>하나만</b> 스택 맨 뒤에 push한다. &nbsp;스택 = [${stack.join(', ')}]`
+          +(k<rev.length-1?`<br>아직 <b>${rev[k+1]}</b> 이(가) 남았다 → for문의 다음 반복으로.`
+             :(rev.length>1?`<br>마지막에 넣은 <b>${c}</b> 가 맨 뒤에 있으므로 <b>다음에 꺼내진다</b> — 원래 자식 중 <b>맨 왼쪽</b>이다.`
+                           :`<br>자식이 하나뿐이라 뒤집을 것도 없다. 다음에 꺼내지는 것은 <b>${c}</b> 이다.`)),'');
+      });
+    }
+    done.push(node);prev=node;
+  }
+  cur=null;
+  snap(2,`스택이 비었다 → while문 종료. <b>탐색 끝.</b><br>방문 순서: <b>${visited.join(' → ')}</b> — 재귀 버전과 <b>완전히 같다</b>.`,'ret');
+  return steps;
+}
+
+/* ---- BFS 한 줄씩 ---- */
+function genBFSWalk(){
+  const steps=[],q=['b'],visited=[],done=[];
+  let cur=null;
+  const snap=(line,msg,kind)=>steps.push({line,msg,kind,cur,
+    visited:[...visited],box:[...q],done:[...done]});
+
+  snap(1,`1번 줄 — 큐에 루트 <b>b</b> 를 넣고 시작한다.<br>스택 버전의 <span class="tt">stack = [root]</span> 과 <b>완전히 같은 시작</b>이다. 자료 구조 이름만 다르다.`,'call');
+  while(q.length){
+    cur=null;
+    snap(2,`2번 줄 — 큐가 비어 있지 않다 → 반복을 계속한다. <span style="color:var(--ink-soft)">(대기 중 ${q.length}개)</span>`,'');
+    const node=q.shift();cur=node;
+    snap(3,`3번 줄 — 큐 <b>맨 앞</b>에서 <b>${node}</b> 를 꺼낸다(popleft).<br>스택 버전의 <span class="tt">stack.pop()</span> 과 <b>꺼내는 위치</b>만 다르다.`,'call');
+    visited.push(node);
+    snap(4,`4번 줄 — 방문 기록에 넣는다. 지금까지: <b>${visited.join(' → ')}</b><br><span style="color:var(--ink-soft)">스택 버전의 4번 줄과 <b>똑같은 자리, 똑같은 코드</b>다.</span>`,'');
+    const kids=CHILD[node];
+    if(!kids.length){
+      snap(5,`5번 줄 — <b>${node}</b> 는 자식이 없다. 큐에 넣을 것이 없어 for문이 <b>그냥 지나간다</b>.`,'ret');
+    }else{
+      kids.forEach((c,k)=>{
+        snap(5,`5번 줄 — for문 <b>${k+1}/${kids.length}</b>번째 반복. child = <b>${c}</b>.`
+          +(k===0?`<br><span style="color:var(--ink-soft)">DFS와 달리 <b>뒤집지 않는다</b>. 자식 순서 (${kids.join(', ')}) 그대로 돈다.</span>`:''),'');
+        q.push(c);
+        snap(6,`6번 줄 — <b>${c}</b> <b>하나만</b> 큐 맨 뒤에 넣는다. &nbsp;큐 = [${q.join(', ')}]`
+          +(k<kids.length-1?`<br>아직 <b>${kids[k+1]}</b> 이(가) 남았다 → for문의 다음 반복으로.`
+                           :`<br><b>${node}</b> 의 자식을 모두 넣었다. 그런데 다음에 꺼내지는 것은 <b>맨 앞</b>의 <b>${q[0]}</b> 이다 — <b>방금 넣은 것이 아니다</b>.`),'');
+      });
+    }
+    done.push(node);
+  }
+  cur=null;
+  snap(2,`큐가 비었다 → 종료. 방문 순서: <b>${visited.join(' → ')}</b><br><b>층 순서</b> 그대로 나왔다: b(0층) → d, e(1층) → h, i, j(2층).`,'ret');
+  return steps;
+}
+
+/* ================= 퀴즈 ================= */
+function initQuiz(){
+  document.querySelectorAll('.opts').forEach(box=>{
+    const ans=+box.dataset.a;
+    const fb=box.parentElement.querySelector('.fb');
+    [...box.children].forEach((b,i)=>{
+      b.onclick=()=>{
+        [...box.children].forEach((x,j)=>{
+          x.classList.remove('ok','no');
+          if(j===ans)x.classList.add('ok');
+        });
+        if(i!==ans)b.classList.add('no');
+        fb.classList.add('show');
+      };
+    });
+  });
+}
+
+/* ================= 컨트롤러 연결 ================= */
+function bindPlayer(o){
+  let i=0;const steps=o.steps;
+  const upd=()=>{o.render(steps[i],i);
+    o.stepLabel.textContent=(i+1)+' / '+steps.length;
+    o.nextBtn.disabled=(i>=steps.length-1);
+    o.prevBtn.disabled=(i<=0);};
+  o.nextBtn.onclick=()=>{if(i<steps.length-1){i++;upd();}};
+  o.prevBtn.onclick=()=>{if(i>0){i--;upd();}};
+  o.resetBtn.onclick=()=>{i=0;upd();};
+  upd();
+}
+
+function initAll(){
+  initQuiz();
+
+  /* --- DFS --- */
+  bindPlayer({steps:genDFS(),
+    nextBtn:document.getElementById('dfsNext'),prevBtn:document.getElementById('dfsPrevBtn'),
+    resetBtn:document.getElementById('dfsReset'),stepLabel:document.getElementById('dfsStep'),
+    render:s=>{
+      drawTree(document.getElementById('dfsSvg'),{
+        cur:s.cur,pending:s.stack,finished:s.visited.filter(v=>!s.stack.includes(v)),
+        order:s.order,activeEdge:s.activeEdge,pathEdges:s.pathEdges});
+      chips(document.getElementById('dfsStack'),s.stack,(i,n)=>i===n-1?'top':'');
+      const ob=document.getElementById('dfsOrder');
+      if(!s.order.length)ob.innerHTML='<span class="empty">아직 없음</span>';
+      else chips(ob,s.order,()=>'done');
+      document.getElementById('dfsMsg').innerHTML=s.msg;
+    }});
+
+  /* --- 재귀 호출 스택 --- */
+  bindPlayer({steps:genRec(),
+    nextBtn:document.getElementById('recNext'),prevBtn:document.getElementById('recPrevBtn'),
+    resetBtn:document.getElementById('recReset'),stepLabel:document.getElementById('recStep'),
+    render:s=>{
+      drawMini(document.getElementById('recSvg'),s);
+      const fb=document.getElementById('recFrames');
+      fb.innerHTML='';
+      if(!s.frames.length){fb.innerHTML='<span class="empty">호출 스택이 비어 있다</span>';}
+      s.frames.forEach((f,i)=>{
+        const top=(i===s.frames.length-1);
+        const st=!f.kids.length?'자식 없음'
+          :(f.idx<0?'for문 시작 전':`for문 ${f.idx+1}/${f.kids.length} — child = ${f.kids[f.idx]}`);
+        const d=document.createElement('div');
+        d.className='frame'+(top?' top':' waiting');
+        d.innerHTML=`<span class="fnm">dfs('${f.node}')</span>`+
+                    `<span class="fst">${top?'▶ 실행 중':'⏸ 기다리는 중'} · ${st}</span>`;
+        fb.appendChild(d);
+      });
+      const ob=document.getElementById('recOrder');
+      if(!s.visited.length)ob.innerHTML='<span class="empty">아직 없음</span>';
+      else chips(ob,s.visited,()=>'done');
+      document.querySelectorAll('#recCode .cline').forEach(l=>l.classList.toggle('on',+l.dataset.l===s.line));
+      const m=document.getElementById('recMsg');
+      m.className='msg '+(s.kind||'');
+      m.innerHTML=s.msg;
+      document.getElementById('recDepth').textContent=s.frames.length;
+    }});
+
+  /* --- 스택 DFS 한 줄씩 / BFS 한 줄씩 (공통 렌더러) --- */
+  const walkRender=(pfx,boxCls)=>s=>{
+    drawMini(document.getElementById(pfx+'Svg'),s);
+    chips(document.getElementById(pfx+'Box'),s.box,(i,n)=>boxCls(i,n));
+    const ob=document.getElementById(pfx+'Order');
+    if(!s.visited.length)ob.innerHTML='<span class="empty">아직 없음</span>';
+    else chips(ob,s.visited,()=>'done');
+    document.querySelectorAll('#'+pfx+'Code .cline')
+      .forEach(l=>l.classList.toggle('on',+l.dataset.l===s.line));
+    const m=document.getElementById(pfx+'Msg');
+    m.className='msg '+(s.kind||'');
+    m.innerHTML=s.msg;
+  };
+
+  bindPlayer({steps:genStackWalk(),
+    nextBtn:document.getElementById('stkNext'),prevBtn:document.getElementById('stkPrevBtn'),
+    resetBtn:document.getElementById('stkReset'),stepLabel:document.getElementById('stkStep'),
+    render:walkRender('stk',(i,n)=>i===n-1?'top':'')});
+
+  bindPlayer({steps:genBFSWalk(),
+    nextBtn:document.getElementById('bwNext'),prevBtn:document.getElementById('bwPrevBtn'),
+    resetBtn:document.getElementById('bwReset'),stepLabel:document.getElementById('bwStep'),
+    render:walkRender('bw',i=>i===0?'front':'')});
+
+  /* --- BFS --- */
+  bindPlayer({steps:genBFS(),
+    nextBtn:document.getElementById('bfsNext'),prevBtn:document.getElementById('bfsPrevBtn'),
+    resetBtn:document.getElementById('bfsReset'),stepLabel:document.getElementById('bfsStep'),
+    render:s=>{
+      drawTree(document.getElementById('bfsSvg'),{
+        cur:s.cur,pending:s.q,finished:s.done,order:s.order,level:s.level});
+      chips(document.getElementById('bfsQueue'),s.q,i=>i===0?'front':'');
+      const ob=document.getElementById('bfsOrder');
+      if(!s.order.length)ob.innerHTML='<span class="empty">아직 없음</span>';
+      else chips(ob,s.order,()=>'done',s.level);
+      document.getElementById('bfsMsg').innerHTML=s.msg;
+    }});
+}
+</script>
+<script>
+/* 슬라이드 엔진 */
+let SLIDES=[],idx=0;
+function mount(){
+  const deck=document.getElementById('deck');
+  SLIDES=[...deck.querySelectorAll('.slide')];
+  show(0);
+}
+function show(i){
+  if(i<0||i>=SLIDES.length)return;
+  SLIDES.forEach(s=>s.classList.remove('active'));
+  SLIDES[i].classList.add('active');
+  SLIDES[i].scrollTop=0;
+  idx=i;
+  document.getElementById('counter').textContent=(i+1)+' / '+SLIDES.length;
+  document.getElementById('slidename').textContent=SLIDES[i].dataset.name||'';
+  document.getElementById('progress').style.width=((i+1)/SLIDES.length*100)+'%';
+  document.getElementById('prev').disabled=(i===0);
+  document.getElementById('next').disabled=(i===SLIDES.length-1);
+}
+document.addEventListener('keydown',e=>{
+  const t=e.target.tagName;
+  if(t==='INPUT'||t==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){show(idx+1);e.preventDefault();}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){show(idx-1);e.preventDefault();}
+  if(e.key==='Home'){show(0);e.preventDefault();}
+  if(e.key==='End'){show(SLIDES.length-1);e.preventDefault();}
+});
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('prev').onclick=()=>show(idx-1);
+  document.getElementById('next').onclick=()=>show(idx+1);
+  mount();
+  initAll();
+});
+</script>
+</body>
