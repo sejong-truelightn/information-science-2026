@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4차시 · 교과서 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202e; --ink-soft:#4a5a70; --line:#dfe5ee; --paper:#f7f9fc; --white:#fff;
+  --sea:#1d5fd0; --sea-soft:#e8f0ff;
+  --coral:#e0533d; --coral-soft:#fdece8;
+  --moss:#137a5e; --moss-soft:#e2f4ee;
+  --amber:#c98a09; --amber-soft:#fdf3dc;
+  --violet:#6b4bc4; --violet-soft:#efeaff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden}
+code,kbd,pre,.mono{font-family:'JetBrains Mono','IBM Plex Sans KR',monospace}
+
+#deck{position:relative;width:100vw;height:100vh}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:34px 56px 72px;background:var(--white);overflow-y:auto;overflow-x:hidden}
+.slide.active{display:flex;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}}
+.slide::-webkit-scrollbar{width:9px}
+.slide::-webkit-scrollbar-thumb{background:#c8d2e0;border-radius:9px}
+
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--sea);margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line)}
+h1.title{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.25;margin-bottom:14px}
+.sub{font-size:16px;color:var(--ink-soft);margin-bottom:18px;line-height:1.65}
+p{line-height:1.75;font-size:16px}
+.body{flex:1 0 auto;min-height:0}
+
+ul.clean{list-style:none}
+ul.clean li{position:relative;padding-left:20px;line-height:1.8;font-size:15.5px;margin-bottom:5px}
+ul.clean li::before{content:"";position:absolute;left:2px;top:.75em;width:7px;height:7px;border-radius:2px;background:var(--sea)}
+ul.clean.moss li::before{background:var(--moss)}
+ul.clean.coral li::before{background:var(--coral)}
+ol.num{padding-left:22px}
+ol.num li{line-height:1.8;font-size:15.5px;margin-bottom:5px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-1-2{display:grid;grid-template-columns:1fr 1.35fr;gap:20px}
+.grid-2-1{display:grid;grid-template-columns:1.35fr 1fr;gap:20px}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.card h3{font-size:17px;font-weight:700;margin-bottom:10px}
+.card h4{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--ink-soft);letter-spacing:.04em}
+.card.sea{background:var(--sea-soft);border-color:#c6dbff}
+.card.moss{background:var(--moss-soft);border-color:#bfe6d8}
+.card.coral{background:var(--coral-soft);border-color:#f7cec4}
+.card.amber{background:var(--amber-soft);border-color:#f0dfae}
+.card.violet{background:var(--violet-soft);border-color:#d8ccff}
+.card.flat{background:var(--paper)}
+
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--sea-soft);color:var(--sea)}
+.tag.moss{background:var(--moss-soft);color:var(--moss)}
+.tag.coral{background:var(--coral-soft);color:var(--coral)}
+.tag.amber{background:var(--amber-soft);color:#8a5f04}
+.tag.violet{background:var(--violet-soft);color:var(--violet)}
+.tag.gray{background:#eef1f6;color:var(--ink-soft)}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:15px}
+table.tbl th,table.tbl td{border:1px solid var(--line);padding:8px 11px;text-align:left;line-height:1.55;vertical-align:top}
+table.tbl th{background:var(--paper);font-weight:600;font-size:14px}
+table.tbl td.c,table.tbl th.c{text-align:center}
+table.tbl.sm{font-size:13.5px}
+table.tbl.sm th,table.tbl.sm td{padding:5px 8px}
+table.tbl .mono{font-family:'JetBrains Mono'}
+
+pre.code{background:#111a26;color:#dbe6f4;border-radius:12px;padding:15px 17px;font-size:14px;line-height:1.62;overflow:auto;font-family:'JetBrains Mono',monospace}
+pre.code.sm{font-size:12.8px;line-height:1.58;padding:12px 14px}
+pre.code .kw{color:#ff9d7a}
+pre.code .fn{color:#7fd3ff}
+pre.code .st{color:#9be59b}
+pre.code .cm{color:#7e93ab;font-style:italic}
+pre.code .nm{color:#e2c07d}
+pre.code .hl{background:#2a3346;display:inline-block;width:100%;margin-left:-17px;padding-left:14px;border-left:3px solid var(--amber)}
+
+.codebox{border:1px dashed #c9d3e0;border-radius:12px;padding:12px;background:var(--paper)}
+.codebox.open{border-style:solid;border-color:var(--line);background:transparent;padding:0}
+.codebox .codewrap{display:none}
+.codebox.open .codewrap{display:block}
+.codebox .revealbtn{display:flex;align-items:center;gap:8px}
+.codebox.open .hint{display:none}
+.codebox .hint{font-size:13.5px;color:var(--ink-soft)}
+.codebox .toggle{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 15px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink)}
+.codebox .toggle:hover{background:var(--sea);color:#fff;border-color:var(--sea)}
+.codebox.open .toggle{margin-bottom:10px}
+.callout{border-left:4px solid var(--sea);background:var(--sea-soft);padding:12px 16px;border-radius:0 10px 10px 0;font-size:15px;line-height:1.7}
+.callout.coral{border-color:var(--coral);background:var(--coral-soft)}
+.callout.moss{border-color:var(--moss);background:var(--moss-soft)}
+.callout.amber{border-color:var(--amber);background:var(--amber-soft)}
+.callout b{font-weight:700}
+
+.io{display:grid;grid-template-columns:auto 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-family:'JetBrains Mono';font-size:14px}
+.io div{padding:8px 12px;border-bottom:1px solid var(--line)}
+.io div:nth-child(2n+1){background:var(--paper);font-weight:600;color:var(--ink-soft);border-right:1px solid var(--line)}
+.io div:nth-last-child(-n+2){border-bottom:none}
+
+.ctrlbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.btn{border:none;border-radius:9px;padding:8px 15px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--sea);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.coral{background:var(--coral)}
+.btn.moss{background:var(--moss)}
+input[type=number],input[type=text]{font-family:'JetBrains Mono';font-size:15px;padding:7px 11px;border:1px solid var(--line);border-radius:9px;width:110px;background:#fff;color:var(--ink)}
+input[type=range]{width:230px}
+
+.msg{font-size:15px;line-height:1.65;padding:11px 14px;border-radius:11px;background:var(--sea-soft);border:1px solid #cfe0ff;min-height:56px}
+.msg b{color:var(--sea)}
+.msg.ok{background:var(--moss-soft);border-color:#bfe6d8}
+.msg.ok b{color:var(--moss)}
+.msg.warn{background:var(--amber-soft);border-color:#f0dfae}
+.msg.warn b{color:#8a5f04}
+
+.numgrid{display:flex;flex-wrap:wrap;gap:5px}
+.numgrid span{width:34px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-family:'JetBrains Mono';font-size:13.5px;background:var(--paper);border:1px solid var(--line);color:#93a1b3;cursor:default}
+.numgrid span.on{background:var(--moss);color:#fff;border-color:var(--moss);font-weight:700}
+.numgrid.click span{cursor:pointer}
+.numgrid.click span:hover{outline:2px solid var(--sea)}
+.bignum{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--sea);line-height:1.25}
+.bignum small{display:block;font-family:'IBM Plex Sans KR';font-size:13px;font-weight:500;color:var(--ink-soft)}
+
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;min-height:34px;align-items:center}
+.chip{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;padding:0 10px;border-radius:8px;font-weight:700;font-size:14px;font-family:'JetBrains Mono';background:var(--paper);border:1px solid var(--line)}
+.chip.on{background:var(--moss);color:#fff;border-color:var(--moss)}
+.chip.cur{background:var(--coral);color:#fff;border-color:var(--coral)}
+.empty{color:#a9b5c6;font-size:14px}
+
+.vizstage{border:1px solid var(--line);border-radius:14px;background:#fcfdff;padding:6px}
+.vizstage svg{width:100%;display:block}
+.gnode text{font-family:'JetBrains Mono';font-weight:700;pointer-events:none}
+.gedge{stroke:#c3cedd;stroke-width:2.5}
+.gedge.path{stroke:var(--moss);stroke-width:4}
+.gedge.dim{stroke:#e9eef4}
+.elabel{font-family:'JetBrains Mono';font-size:12px;font-weight:700;fill:#57687e}
+
+.cover{justify-content:center;background:linear-gradient(160deg,#fff 0%,#f2f6fd 100%)}
+.cover .num{font-size:14px;font-weight:600;letter-spacing:.16em;color:var(--sea);margin-bottom:14px}
+.cover h1{font-size:46px;font-weight:700;line-height:1.22;letter-spacing:-.025em;margin-bottom:18px}
+.cover .kws{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.footnote{font-size:13.5px;color:var(--ink-soft);line-height:1.8}
+
+.qnum{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:var(--sea);color:#fff;font-weight:700;font-size:15px;margin-right:9px;font-family:'JetBrains Mono'}
+
+#nav{position:fixed;left:0;right:0;bottom:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(255,255,255,.95);border-top:1px solid var(--line);z-index:50}
+#nav .left{display:flex;align-items:center;gap:12px}
+#nav .chip2{font-size:13px;color:var(--ink-soft);font-weight:500}
+.navbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit}
+.navbtn:hover{background:var(--sea);color:#fff;border-color:var(--sea)}
+.navbtn:disabled{opacity:.35;cursor:default}
+.navbtn:disabled:hover{background:#fff;color:var(--ink);border-color:var(--line)}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--sea);z-index:60;transition:width .3s}
+#slidename{font-size:13px;color:var(--ink-soft);max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kbdkey{display:inline-block;border:1px solid #c9d3e0;border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:13px;background:#fff;font-family:'JetBrains Mono'}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+
+<!-- 1 표지 -->
+<section class="slide cover" data-name="표지">
+  <div class="num">4차시 · 탐색기반 알고리즘</div>
+  <h1>교과서 문제 풀이<br>다섯 문제, 다섯 가지 탐색</h1>
+  <p class="sub" style="max-width:760px;font-size:17px">
+    문제를 읽고 <b style="color:var(--ink)">상태 공간</b>을 그린다. 그 공간을 <b style="color:var(--ink)">빠짐없이, 겹치지 않게</b> 훑는다.<br>
+    오늘 다루는 다섯 문제는 모두 이 두 문장으로 풀린다.
+  </p>
+  <div class="kws">
+    <span class="tag">완전 탐색</span>
+    <span class="tag violet">재귀</span>
+    <span class="tag coral">상태 공간 트리</span>
+    <span class="tag moss">유클리드 호제법</span>
+    <span class="tag amber">조합</span>
+  </div>
+  <p class="footnote" style="margin-top:36px">
+    세종과학고등학교 1학년 정보과학 &nbsp;|&nbsp; Ⅲ. 알고리즘 &gt; 02. 탐색기반 알고리즘 (교과서 pp.175~184)<br>
+    <span class="kbdkey">←</span> <span class="kbdkey">→</span> 로 슬라이드를 넘기세요. 파란 버튼이 있는 화면은 직접 눌러 볼 수 있습니다.
+  </p>
+</section>
+
+<!-- 개념 점검 1 : 파이썬 -->
+<section class="slide" data-name="풀기 전에 · 파이썬 개념">
+  <div class="eyebrow">CHECKPOINT 1</div>
+  <h1 class="title">풀기 전에 — 알아야 할 파이썬</h1>
+  <p class="sub">다섯 문제 <b>전부</b>에 쓰이는 것들이다. 하나라도 흔들리면 답이 아니라 <span class="mono">None</span> 이나 <span class="mono">0</span> 이 나온다.</p>
+  <div class="body grid-2-1">
+    <div>
+      <table class="tbl">
+        <tr><th style="width:190px">개념</th><th>이 노트북에서 걸리는 지점</th></tr>
+        <tr><td><b><span class="mono">return</span> 과 <span class="mono">print</span> 의 차이</b></td>
+            <td>뼈대가 <span class="mono">print('...', count(n))</span> 형태다. 함수는 <b>값을 돌려줘야</b> 한다. 함수 안에서 출력하면 <span class="mono">None</span> 이 같이 찍힌다</td></tr>
+        <tr><td><b>함수 정의 · 매개변수</b></td>
+            <td>매개변수가 곧 <b>상태</b>다. &ldquo;무엇만 알면 나머지가 정해지는가&rdquo;를 매개변수로 적는다</td></tr>
+        <tr><td><b><span class="mono">%</span> 나머지 연산</b></td>
+            <td><span class="mono">a % b == 0</span> 이면 나누어떨어진다. 문제 3·4·5의 판정이 전부 이것이다</td></tr>
+        <tr><td><b><span class="mono">range(a, b)</span> 는 b를 포함하지 않는다</b></td>
+            <td><span class="mono">range(1, n+1)</span> 에서 <b>+1</b> 을 빠뜨리는 실수가 가장 흔하다</td></tr>
+        <tr><td><b>누적 변수</b></td>
+            <td><span class="mono">count = count + 1</span> — 세는 문제는 전부 이 꼴이다</td></tr>
+        <tr><td><b>불리언 반환</b></td>
+            <td><span class="mono">is_prime(x)</span> 는 <span class="mono">True</span>/<span class="mono">False</span> 를 돌려준다. 그래야 <span class="mono">if is_prime(x):</span> 로 쓸 수 있다</td></tr>
+        <tr><td><b><span class="mono">global</span></b></td>
+            <td>함수 <b>안에서 바깥 변수를 바꾸려면</b> 필요하다 (문제 2·5)</td></tr>
+        <tr><td><b>재귀 — 종료 조건 + 자기 호출</b></td>
+            <td>종료 조건이 없으면 <b>영원히</b> 내려간다 (문제 1·2·5)</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card coral">
+        <h4>가장 많이 나오는 실수</h4>
+        <pre class="code sm"><span class="cm"># ✗ 함수가 값을 안 돌려준다</span>
+<span class="kw">def</span> <span class="fn">count</span>(rest):
+    <span class="fn">print</span>(rest)      <span class="cm"># 출력만 하고 끝</span>
+
+<span class="fn">print</span>(<span class="fn">count</span>(<span class="nm">3</span>))
+<span class="cm"># -&gt; 3
+#    None  &lt;- 돌려준 값이 없다</span>
+
+<span class="cm"># ✓ 값을 돌려준다</span>
+<span class="kw">def</span> <span class="fn">count</span>(rest):
+    <span class="kw">return</span> <span class="nm">4</span>
+
+<span class="fn">print</span>(<span class="fn">count</span>(<span class="nm">3</span>))   <span class="cm"># -&gt; 4</span></pre>
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        <b><span class="mono">pass</span> 는 &ldquo;아무것도 하지 않는다&rdquo;</b>는 뜻이다.<br>
+        뼈대를 그대로 실행하면 <span class="mono">None</span> 이나 <span class="mono">0</span> 이 나온다. <b>오류가 아니다.</b> 왜 그 값이 나왔는지부터 설명할 수 있어야 한다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 개념 점검 2 : 수학 · 오류 -->
+<section class="slide" data-name="풀기 전에 · 수학 개념과 오류">
+  <div class="eyebrow">CHECKPOINT 2</div>
+  <h1 class="title">풀기 전에 — 수학 용어와 만나게 될 오류</h1>
+  <div class="body">
+    <div class="grid2">
+      <div class="card sea">
+        <h3>수학 용어 여섯 개</h3>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><td style="width:96px"><b>약수</b></td><td>나누어떨어지게 하는 수. <span class="mono">n % d == 0</span></td></tr>
+          <tr><td><b>배수</b></td><td>약수의 반대편. 3의 배수 &rarr; <span class="mono">s % 3 == 0</span> <span class="tag gray">문제 5</span></td></tr>
+          <tr><td><b>소수</b></td><td>1과 자기 자신 외에 약수가 없는, <b>1보다 큰</b> 수 <span class="tag gray">문제 3</span></td></tr>
+          <tr><td><b>최대공약수</b></td><td>두 수의 공통 약수 중 가장 큰 것 <span class="tag gray">문제 4</span></td></tr>
+          <tr><td><b>서로소</b></td><td>최대공약수가 <b>1</b>인 두 수 <span class="tag gray">문제 4</span></td></tr>
+          <tr><td><b>순열 · 조합</b></td><td>순서를 <b>따지면</b> 순열, <b>안 따지면</b> 조합 <span class="tag gray">문제 1 · 5</span></td></tr>
+        </table>
+      </div>
+      <div class="card amber">
+        <h3>순열과 조합이 한 노트북에 같이 있다</h3>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th style="width:110px"></th><th class="c">문제 1 <span class="tag violet">순열</span></th><th class="c">문제 5 <span class="tag moss">조합</span></th></tr>
+          <tr><td><b>다르게 세나?</b></td><td class="c"><span class="mono">1+2</span> 와 <span class="mono">2+1</span><br><b>다르다</b></td><td class="c"><span class="mono">(1,3,6)</span> 과 <span class="mono">(3,1,6)</span><br><b>같다</b></td></tr>
+          <tr><td><b>코드의 차이</b></td><td class="c">매번 <b>1부터</b> 다시<br><span class="mono">range(1, rest+1)</span></td><td class="c"><b>다음 것부터</b><br><span class="mono">range(start, N)</span> + <span class="mono">i+1</span></td></tr>
+        </table>
+        <p style="font-size:14.5px;margin-top:10px">이 한 글자 차이가 답을 바꾼다. <b>문제를 읽고 어느 쪽인지 먼저 정하는 것</b>이 코드보다 앞선다.</p>
+      </div>
+    </div>
+
+    <h3 style="margin:22px 0 10px;font-size:19px">만나게 될 오류 세 가지</h3>
+    <table class="tbl">
+      <tr><th style="width:210px">화면에 나오는 것</th><th>원인</th><th style="width:150px">어느 문제</th></tr>
+      <tr><td class="mono" style="color:var(--coral)"><b>RecursionError</b></td>
+          <td>재귀에 <b>종료 조건이 없다</b>. 계단 문제에서 <span class="mono">c &gt; n</span> 검사를 빠뜨리면 계단을 넘어서도 계속 올라간다</td>
+          <td>문제 1 · 2 · 5</td></tr>
+      <tr><td class="mono" style="color:var(--coral)"><b>UnboundLocalError</b></td>
+          <td><span class="mono">global</span> 없이 함수 안에서 바깥 변수를 바꾸려 했다</td>
+          <td>문제 5</td></tr>
+      <tr><td class="mono"><b>None</b> &nbsp;또는&nbsp; <b>0</b></td>
+          <td>오류는 아니다. <span class="mono">return</span> 을 안 썼거나, <b>1부터 n까지 훑는 반복문을 안 썼다</b></td>
+          <td>전부</td></tr>
+    </table>
+
+    <div class="callout coral" style="margin-top:18px">
+      <b>문제 3 · 4의 뼈대에는 <span class="mono">for</span> 문이 아예 없다.</b> <span class="mono">count = 0</span> 만 있고, 1부터 n까지 훑는 반복문은 직접 써야 한다.<br>
+      함수만 채우고 끝내면 계속 <b>0</b> 이 나온다.
+    </div>
+  </div>
+</section>
+
+<!-- 2 문제 목록 -->
+<section class="slide" data-name="오늘의 다섯 문제">
+  <div class="eyebrow">OVERVIEW</div>
+  <h1 class="title">오늘 푸는 다섯 문제</h1>
+  <p class="sub">교과서 175~184쪽. 앞의 두 문제는 <b>재귀</b>, 가운데 두 문제는 <b>반복문</b>, 마지막은 <b>재귀로 조합</b>을 만든다.</p>
+  <div class="body">
+    <table class="tbl">
+      <tr><th class="c" style="width:52px">번호</th><th>문제</th><th style="width:150px">상태 공간</th><th style="width:110px">방법</th><th class="c" style="width:120px">입력 → 답</th><th class="c" style="width:70px">쪽</th></tr>
+      <tr><td class="c"><b>1</b></td><td>자연수의 합으로 <b>n</b>을 나타내는 <b>순열</b>의 개수</td><td>합을 만들어 가는 트리</td><td><span class="tag violet">재귀</span></td><td class="c mono">3 → 4</td><td class="c">175</td></tr>
+      <tr><td class="c"><b>2</b></td><td>강인이가 <b>n칸 계단</b>을 1칸·2칸씩 오르는 방법의 수</td><td>지금 서 있는 칸</td><td><span class="tag violet">재귀</span></td><td class="c mono">5 → 8</td><td class="c">176</td></tr>
+      <tr><td class="c"><b>3</b></td><td>1부터 n까지 중 <b>소수</b>의 개수</td><td>1 ~ n 의 각 수</td><td><span class="tag">반복문</span></td><td class="c mono">10 → 4</td><td class="c">181</td></tr>
+      <tr><td class="c"><b>4</b></td><td>1부터 n까지 중 <b>k와 서로소</b>인 수의 개수</td><td>1 ~ n 의 각 수</td><td><span class="tag">반복문</span></td><td class="c mono">10 3 → 7</td><td class="c">182</td></tr>
+      <tr><td class="c"><b>5</b></td><td>7개 중 <b>3개를 골라</b> 더한 값이 3의 배수인 개수</td><td>고른 세 수의 조합</td><td><span class="tag violet">재귀</span></td><td class="c mono">→ 12</td><td class="c">183</td></tr>
+    </table>
+    <div class="grid2" style="margin-top:20px">
+      <div class="card sea">
+        <h3>선형 탐색 &nbsp;<span class="tag gray">문제 3 · 4</span></h3>
+        <p style="font-size:15px">다음에 볼 것이 <b>하나뿐</b>이다. 1, 2, 3, … 순서대로 훑으면 끝난다. <code>for</code> 문 하나면 된다.</p>
+      </div>
+      <div class="card violet">
+        <h3>비선형 탐색 &nbsp;<span class="tag gray">문제 1 · 2 · 5</span></h3>
+        <p style="font-size:15px">다음에 볼 것이 <b>여러 개</b>다. 갈래가 갈라지므로 트리가 된다. 이때 쓰는 것이 <b>재귀</b>다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 문제1 상태공간 -->
+<section class="slide" data-name="문제 1 · 상태 공간">
+  <div class="eyebrow">문제 1 · 교과서 175쪽</div>
+  <h1 class="title"><span class="qnum">1</span>자연수의 합으로 3을 나타내는 순열</h1>
+  <p class="sub">자연수의 합으로 <b>n</b>을 나타낼 수 있는 <b>모든 순열</b>의 개수를 구하시오.</p>
+  <div class="body grid-2-1">
+    <div>
+      <div class="vizstage"><svg id="p1Svg" viewBox="0 0 560 300"></svg></div>
+      <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
+        노드의 수는 <b>아직 만들어야 할 남은 값</b>. 가지에 적힌 것은 <b>이번에 더한 수</b>. 0에 닿으면 한 가지가 완성된다.
+      </p>
+    </div>
+    <div>
+      <div class="card flat" style="margin-bottom:14px">
+        <h4>3을 만드는 네 가지</h4>
+        <ul class="clean moss" style="font-family:'JetBrains Mono';font-size:15px">
+          <li>1 + 1 + 1</li><li>1 + 2</li><li>2 + 1</li><li>3</li>
+        </ul>
+      </div>
+      <div class="callout amber">
+        <b>순열</b>이므로 <b>1+2</b> 와 <b>2+1</b> 은 <b>다른 것</b>으로 센다.<br>
+        그래서 매번 <b>1부터 다시</b> 고른다. 조합이었다면 이렇게 하면 안 된다.
+      </div>
+      <div class="card sea" style="margin-top:14px">
+        <h4>재귀로 옮기면</h4>
+        <p style="font-size:15px">남은 값이 <b>0</b> → 한 가지 완성, <b>1</b>을 돌려준다.<br>
+        아니면 1부터 남은 값까지 <b>x</b>를 골라, <b>남은 값 − x</b> 를 다시 센다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 문제1 코드 -->
+<section class="slide" data-name="문제 1 · 코드">
+  <div class="eyebrow">문제 1 · 풀이</div>
+  <h1 class="title">교과서 코드 — <span class="mono">f(n)</span></h1>
+  <div class="body grid2">
+    <div>
+            <div class="codebox">
+              <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
+              <div class="codewrap"><pre class="code"><span class="kw">def</span> <span class="fn">f</span>(n):
+    <span class="kw">if</span> n==<span class="nm">0</span>:
+      <span class="kw">return</span> <span class="nm">1</span>
+    cnt = <span class="nm">0</span>
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
+       cnt = cnt+<span class="fn">f</span>(i)
+    <span class="kw">return</span> cnt
+
+n = <span class="fn">int</span>(<span class="fn">input</span>())
+<span class="fn">print</span>(<span class="fn">f</span>(n))</pre></div>
+            </div>
+      <div class="io" style="margin-top:14px">
+        <div>입력</div><div>3</div>
+        <div>실행 결과</div><div>4</div>
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b>f(i) 를 더하는 이유</b> — 마지막에 <b>n−i</b> 를 더해 n이 되었다면, 그 앞은 <b>i를 만드는 모든 방법</b>이다.<br>
+        i는 0부터 n−1까지 가능하므로 <b>f(0)+f(1)+…+f(n−1)</b> 이 답이 된다.
+      </div>
+    </div>
+    <div>
+      <div class="card flat">
+        <h4>직접 확인해 보기</h4>
+        <div class="ctrlbar">
+          <span style="font-size:15px">n =</span>
+          <input type="range" id="p1N" min="1" max="8" value="3">
+          <span class="mono" id="p1Nv" style="font-weight:700;font-size:17px;color:var(--sea)">3</span>
+        </div>
+        <div class="bignum" id="p1Ans">4<small>순열의 개수</small></div>
+        <div class="chiprow" id="p1List" style="margin-top:12px"></div>
+      </div>
+      <div class="msg" id="p1Msg" style="margin-top:14px"></div>
+      <table class="tbl sm" style="margin-top:14px">
+        <tr><th class="c">n</th><th class="c">1</th><th class="c">2</th><th class="c">3</th><th class="c">4</th><th class="c">5</th><th class="c">6</th><th class="c">7</th></tr>
+        <tr><th class="c">f(n)</th><td class="c mono">1</td><td class="c mono">2</td><td class="c mono">4</td><td class="c mono">8</td><td class="c mono">16</td><td class="c mono">32</td><td class="c mono">64</td></tr>
+      </table>
+      <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">n이 1 늘 때마다 <b>두 배</b>가 된다. 곧 <b>2<sup>n-1</sup></b> 이다. n=1000이면 손으로는 불가능하다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 문제2 상태공간 -->
+<section class="slide" data-name="문제 2 · 상태 공간">
+  <div class="eyebrow">문제 2 · 교과서 176쪽</div>
+  <h1 class="title"><span class="qnum">2</span>강인이의 계단 오르기</h1>
+  <p class="sub">계단은 모두 <b>n칸</b>. 한 번에 <b>1칸 또는 2칸</b>을 오른다. 0번째 칸에서 <b>n번째 칸</b>까지 가는 서로 다른 방법의 수는?</p>
+  <div class="body grid-2-1">
+    <div>
+      <div class="vizstage"><svg id="p2Svg" viewBox="0 0 560 290"></svg></div>
+      <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
+        노드는 <b>지금 서 있는 칸 번호</b>. 각 칸에서 <b>+1</b> 과 <b>+2</b>, 두 갈래로 갈라진다. n=4일 때 도착(초록)은 <b>5가지</b>.
+      </p>
+    </div>
+    <div>
+      <div class="card violet">
+        <h4>상태를 무엇으로 잡는가</h4>
+        <p style="font-size:15px">지금까지 <b>어떻게 왔는지</b>는 중요하지 않다.<br><b>지금 몇 번째 칸에 서 있는가</b>만 알면 남은 방법의 수가 정해진다.</p>
+      </div>
+      <div class="card coral" style="margin-top:14px">
+        <h4>멈추는 조건이 <u>두 개</u>다</h4>
+        <ul class="clean coral" style="font-size:15px">
+          <li><b>c == n</b> → 정확히 도착. 성공 <b>1가지</b></li>
+          <li><b>c &gt; n</b> → 지나쳤다. <b>0가지</b></li>
+        </ul>
+        <p style="font-size:14.5px;margin-top:8px">두 번째를 빠뜨리면 계단을 넘어서도 계속 올라가 <b>무한 재귀</b>가 된다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 문제2 코드 -->
+<section class="slide" data-name="문제 2 · 코드">
+  <div class="eyebrow">문제 2 · 풀이</div>
+  <h1 class="title">교과서 코드 — <span class="mono">f(c)</span></h1>
+  <div class="body grid2">
+    <div>
+            <div class="codebox">
+              <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
+              <div class="codewrap"><pre class="code">ans = <span class="nm">0</span>
+<span class="kw">def</span> <span class="fn">f</span>(c):
+  <span class="kw">if</span> c==n:
+    <span class="kw">global</span> ans
+    ans = ans+<span class="nm">1</span>
+    <span class="kw">return</span>
+  <span class="kw">if</span> c&gt;n:
+    <span class="kw">return</span>
+  <span class="fn">f</span>(c+<span class="nm">1</span>)
+  <span class="fn">f</span>(c+<span class="nm">2</span>)
+
+n = <span class="fn">int</span>(<span class="fn">input</span>())
+<span class="fn">f</span>(<span class="nm">0</span>)
+<span class="fn">print</span>(ans)</pre></div>
+            </div>
+      <div class="io" style="margin-top:14px">
+        <div>입력</div><div>5</div>
+        <div>실행 결과</div><div>8</div>
+      </div>
+      <div class="callout" style="margin-top:14px">
+        도착할 때마다 전역 변수 <b>ans</b> 를 1씩 늘린다.<br>
+        <b>반환값으로 더하는 방식</b>(<span class="mono">return f(c+1)+f(c+2)</span>)으로 써도 결과는 같다. 두 방식을 비교해 보자.
+      </div>
+    </div>
+    <div>
+      <div class="card flat">
+        <h4>계단 수를 바꿔 보기</h4>
+        <div class="ctrlbar">
+          <span style="font-size:15px">n =</span>
+          <input type="range" id="p2N" min="1" max="12" value="5">
+          <span class="mono" id="p2Nv" style="font-weight:700;font-size:17px;color:var(--sea)">5</span>
+        </div>
+        <div class="bignum" id="p2Ans">8<small>올라가는 방법의 수</small></div>
+        <table class="tbl sm" id="p2Tbl" style="margin-top:14px"></table>
+      </div>
+      <div class="msg ok" id="p2Msg" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 문제3 -->
+<section class="slide" data-name="문제 3 · 소수의 개수">
+  <div class="eyebrow">문제 3 · 교과서 180~181쪽</div>
+  <h1 class="title"><span class="qnum">3</span>소수의 개수</h1>
+  <p class="sub">100 이하의 자연수 <b>n</b>이 주어질 때, 1부터 n까지 자연수 중 <b>소수의 개수</b>를 출력하시오.</p>
+  <div class="body grid2">
+    <div>
+            <div class="codebox">
+              <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
+              <div class="codewrap"><pre class="code">ans = <span class="nm">0</span>
+n = <span class="fn">int</span>(<span class="fn">input</span>())
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2</span>, n+<span class="nm">1</span>):
+  cnt = <span class="nm">0</span>
+  <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2</span>, i):
+     <span class="kw">if</span> (i%j)==<span class="nm">0</span>:
+       cnt = <span class="nm">1</span>
+  <span class="kw">if</span> cnt==<span class="nm">0</span>:
+     ans = ans+<span class="nm">1</span>
+
+<span class="fn">print</span>(ans)</pre></div>
+            </div>
+      <div class="io" style="margin-top:12px">
+        <div>입력</div><div>10</div>
+        <div>실행 결과</div><div>4</div>
+      </div>
+      <div class="callout coral" style="margin-top:12px">
+        <b>바깥 반복이 2부터 시작</b>한다. 1을 아예 보지 않으므로 &ldquo;1은 소수가 아니다&rdquo;가 자동으로 처리된다.<br>
+        직접 <span class="mono">is_prime</span> 함수를 만들 때는 <b>n &lt; 2 검사를 반드시</b> 넣어야 한다.
+      </div>
+    </div>
+    <div>
+      <div class="card flat">
+        <h4>1부터 n까지 소수 찾기</h4>
+        <div class="ctrlbar">
+          <span style="font-size:15px">n =</span>
+          <input type="range" id="p3N" min="10" max="100" step="1" value="10">
+          <span class="mono" id="p3Nv" style="font-weight:700;font-size:17px;color:var(--sea)">10</span>
+        </div>
+        <div class="numgrid" id="p3Grid" style="max-height:210px;overflow:auto"></div>
+        <div class="bignum" id="p3Ans" style="margin-top:12px">4<small>소수의 개수</small></div>
+      </div>
+      <div class="msg" id="p3Msg" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 문제3 성능 -->
+<section class="slide" data-name="문제 3 · 나눗셈 횟수">
+  <div class="eyebrow">문제 3 · 한 걸음 더</div>
+  <h1 class="title">몇 번이나 나눠 보았을까</h1>
+  <p class="sub">교과서 코드는 <b>약수를 찾은 뒤에도 끝까지</b> 돈다. 두 곳만 고치면 확인 횟수가 크게 줄어든다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card coral">
+        <h3>① 찾으면 바로 멈추기</h3>
+        <p style="font-size:15px">약수를 <b>하나만</b> 찾으면 이미 소수가 아니다. 남은 것은 볼 필요가 없다 → <span class="mono">break</span> 또는 <span class="mono">return False</span></p>
+      </div>
+      <div class="card moss" style="margin-top:14px">
+        <h3>② √n 까지만 보기</h3>
+        <p style="font-size:15px">n = a × b 라면 a와 b가 <b>둘 다</b> √n 보다 클 수는 없다. 약수가 있다면 <b>√n 이하에 반드시 하나</b> 있다.</p>
+        <pre class="code sm" style="margin-top:10px"><span class="kw">while</span> d*d &lt;= n:      <span class="cm"># n ** 0.5 보다 안전</span>
+    <span class="kw">if</span> n % d == <span class="nm">0</span>:
+        <span class="kw">return</span> <span class="kw">False</span>
+    d = d + <span class="nm">1</span></pre>
+      </div>
+    </div>
+    <div>
+      <div class="card flat">
+        <h4>나눗셈 횟수 비교</h4>
+        <div class="ctrlbar">
+          <span style="font-size:15px">n =</span>
+          <input type="range" id="p3bN" min="10" max="2000" step="10" value="100">
+          <span class="mono" id="p3bNv" style="font-weight:700;font-size:17px;color:var(--sea)">100</span>
+        </div>
+        <table class="tbl sm" id="p3bTbl"></table>
+      </div>
+      <div class="msg warn" id="p3bMsg" style="margin-top:14px"></div>
+      <div class="callout" style="margin-top:14px">
+        <b>답은 셋 다 같다.</b> 다른 것은 거기에 이르기까지의 <b>연산 횟수</b>다. 1차시에서 배운 성능 분석이 여기서 쓰인다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 문제4 -->
+<section class="slide" data-name="문제 4 · 서로소">
+  <div class="eyebrow">문제 4 · 교과서 182쪽</div>
+  <h1 class="title"><span class="qnum">4</span>k와 서로소인 수의 개수</h1>
+  <p class="sub">100 이하의 자연수 <b>n</b>과 <b>k</b>가 주어질 때, 1부터 n까지 중 <b>k와 서로소</b>인 수의 개수를 구하시오. (서로소 = 최대공약수가 1)</p>
+  <div class="body grid2">
+    <div>
+            <div class="codebox">
+              <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
+              <div class="codewrap"><pre class="code"><span class="kw">import</span> math
+n, k = <span class="fn">map</span>(<span class="fn">int</span>, <span class="fn">input</span>().<span class="fn">split</span>())
+ans = <span class="nm">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, n+<span class="nm">1</span>):
+  <span class="kw">if</span> math.<span class="fn">gcd</span>(i, k)==<span class="nm">1</span>:
+    ans = ans+<span class="nm">1</span>
+
+<span class="fn">print</span>(ans)</pre></div>
+            </div>
+      <div class="io" style="margin-top:12px">
+        <div>입력</div><div>10 3</div>
+        <div>실행 결과</div><div>7</div>
+      </div>
+      <div class="card violet" style="margin-top:14px">
+        <h4>math.gcd 를 직접 만들면 — 유클리드 호제법</h4>
+        <pre class="code sm"><span class="kw">def</span> <span class="fn">gcd</span>(a, b):
+    <span class="kw">while</span> b != <span class="nm">0</span>:
+        a, b = b, a % b     <span class="cm"># 반드시 동시에</span>
+    <span class="kw">return</span> a</pre>
+        <p style="font-size:14.5px;margin-top:8px"><b>a = b</b> 를 먼저 쓰면 다음 줄의 <span class="mono">a % b</span> 가 바뀐 a를 써서 <b>무한 반복</b>에 빠진다.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card flat">
+        <h4>직접 세어 보기 &nbsp;<span style="font-weight:400;color:var(--ink-soft);font-size:13px">— 숫자를 클릭하면 gcd 계산 과정이 보입니다</span></h4>
+        <div class="ctrlbar">
+          <span style="font-size:15px">n</span><input type="number" id="p4N" value="10" min="1" max="100">
+          <span style="font-size:15px">k</span><input type="number" id="p4K" value="3" min="1" max="100">
+          <button class="btn sm" id="p4Run">계산</button>
+        </div>
+        <div class="numgrid click" id="p4Grid" style="max-height:190px;overflow:auto"></div>
+        <div class="bignum" id="p4Ans" style="margin-top:12px">7<small>서로소인 수의 개수</small></div>
+      </div>
+      <div class="msg" id="p4Msg" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 문제5 상태공간 -->
+<section class="slide" data-name="문제 5 · 상태 공간">
+  <div class="eyebrow">문제 5 · 교과서 183쪽</div>
+  <h1 class="title"><span class="qnum">5</span>3개를 골라 더하기</h1>
+  <p class="sub">주어진 7개의 수 <span class="mono">1 3 6 7 11 15 18</span> 에서 <b>3개를 선택</b>하여 더할 때, 얻을 수 있는 수 중 <b>3의 배수</b>인 수의 개수는?</p>
+  <div class="body grid-2-1">
+    <div>
+      <div class="vizstage"><svg id="p5Svg" viewBox="0 0 620 250"></svg></div>
+      <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
+        첫 수를 고르고, 그 <b>다음 수부터</b> 두 번째를 고르고, 또 그 다음부터 세 번째를 고른다. 이렇게 하면 <b>겹치지 않게</b> 35가지가 만들어진다.
+      </p>
+    </div>
+    <div>
+      <div class="card sea">
+        <h4>경우의 수</h4>
+        <p style="font-size:15px">순서를 <b>고려하면</b> 7 × 6 × 5 = <b>210</b>가지<br>
+        순서를 <b>고려하지 않으면</b> <sub>7</sub>C<sub>3</sub> = <b>35</b>가지</p>
+        <p style="font-size:14.5px;margin-top:8px;color:var(--ink-soft)">고른 세 수를 <b>더하기만</b> 하므로 순서는 의미가 없다. 35가지만 보면 된다.</p>
+      </div>
+      <div class="card coral" style="margin-top:14px">
+        <h4>중복을 막는 장치</h4>
+        <p style="font-size:15px">다음 호출에 <b>i + 1</b> 을 넘긴다.<br>
+        <span class="mono">i</span> 를 그대로 넘기면 <b>같은 수를 또</b> 고르고,<br>
+        <span class="mono">0</span> 부터 다시 돌리면 <b>순서만 다른 중복</b>까지 섞인다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 문제5 표 -->
+<section class="slide" data-name="문제 5 · 35가지">
+  <div class="eyebrow">문제 5 · 모든 경우의 수</div>
+  <h1 class="title">35가지를 전부 적어 보면</h1>
+  <div class="body">
+    <div class="ctrlbar">
+      <button class="btn" id="p5Only">3의 배수만 보기</button>
+      <button class="btn ghost" id="p5All">전부 보기</button>
+      <span class="mono" id="p5Cnt" style="font-size:15px;font-weight:700;margin-left:8px"></span>
+    </div>
+    <div id="p5Tbl" style="font-size:13px"></div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="callout moss">
+        <b>답은 12다.</b> 35가지 중 합이 3의 배수인 경우가 12가지.
+      </div>
+      <div class="callout amber">
+        그 12가지의 <b>합의 값</b>은 15, 18, 21, 24, 27, 30, 33, 36, 39 로 <b>9종류</b>다.<br>
+        <span class="mono">1+11+15</span> 와 <span class="mono">3+6+18</span> 이 둘 다 27인 것처럼 <b>다른 조합이 같은 합</b>을 낸다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 문제5 코드 -->
+<section class="slide" data-name="문제 5 · 코드">
+  <div class="eyebrow">문제 5 · 풀이</div>
+  <h1 class="title">교과서 코드 — <span class="mono">f(k, s, j)</span></h1>
+  <div class="body grid2">
+    <div>
+            <div class="codebox">
+              <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
+              <div class="codewrap"><pre class="code">A = [<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">3</span>, <span class="nm">6</span>, <span class="nm">7</span>, <span class="nm">11</span>, <span class="nm">15</span>, <span class="nm">18</span>]
+ans = <span class="nm">0</span>
+
+<span class="kw">def</span> <span class="fn">f</span>(k, s, j) :
+  <span class="kw">if</span> j==<span class="nm">3</span>:
+    <span class="kw">if</span> (s%<span class="nm">3</span>)==<span class="nm">0</span>:
+      <span class="kw">global</span> ans
+      ans = ans+<span class="nm">1</span>
+    <span class="kw">return</span>
+
+  <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(k+<span class="nm">1</span>, <span class="nm">8</span>):
+    <span class="fn">f</span>(i, s+A[i], j+<span class="nm">1</span>)
+  <span class="kw">return</span>
+
+<span class="fn">f</span>(<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>)
+<span class="fn">print</span>(ans)</pre></div>
+            </div>
+      <div class="io" style="margin-top:12px">
+        <div>실행 결과</div><div>12</div>
+      </div>
+    </div>
+    <div>
+      <table class="tbl">
+        <tr><th style="width:70px">매개변수</th><th>뜻</th></tr>
+        <tr><td class="mono"><b>k</b></td><td>다음에 고를 수의 <b>시작 인덱스</b>. 중복 선택을 막는다.</td></tr>
+        <tr><td class="mono"><b>s</b></td><td>지금까지 고른 수들의 <b>합</b></td></tr>
+        <tr><td class="mono"><b>j</b></td><td>지금까지 <b>고른 개수</b>. 3이 되면 판정한다.</td></tr>
+      </table>
+      <div class="callout" style="margin-top:14px">
+        <b>A 앞에 0을 넣은 이유</b> — 1번 인덱스부터 실제 데이터가 오게 하여 <span class="mono">range(k+1, 8)</span> 로 깔끔하게 돌기 위해서다.<br>
+        0번부터 쓰고 싶다면 <span class="mono">f(0, 0, 0)</span> 대신 <span class="mono">range(start, 7)</span> 형태로 바꾸면 된다.
+      </div>
+      <div class="card amber" style="margin-top:14px">
+        <h4>흔한 실수 두 가지</h4>
+        <ul class="clean coral" style="font-size:15px">
+          <li><span class="mono">f(i, …)</span> 로 넘긴다 → <b>같은 수를 여러 번</b> 고른다</li>
+          <li><span class="mono">global ans</span> 를 빠뜨린다 → <b>UnboundLocalError</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 정리 -->
+<section class="slide" data-name="정리">
+  <div class="eyebrow">SUMMARY</div>
+  <h1 class="title">다섯 문제, 하나의 순서</h1>
+  <div class="body">
+    <table class="tbl">
+      <tr><th class="c" style="width:52px">번호</th><th style="width:170px">상태를 무엇으로 잡았나</th><th>겹치지 않게 만드는 장치</th><th class="c" style="width:90px">답</th></tr>
+      <tr><td class="c"><b>1</b></td><td>아직 만들어야 할 <b>남은 값</b></td><td>순열이므로 <b>매번 1부터</b> 다시 고른다 (중복을 허용하는 것이 맞다)</td><td class="c mono">4</td></tr>
+      <tr><td class="c"><b>2</b></td><td>지금 서 있는 <b>칸 번호</b></td><td>+1과 +2 두 갈래. <b>c &gt; n 이면 중단</b></td><td class="c mono">8</td></tr>
+      <tr><td class="c"><b>3</b></td><td>판정할 <b>수 하나</b></td><td>2부터 시작해 1을 제외한다</td><td class="c mono">4</td></tr>
+      <tr><td class="c"><b>4</b></td><td>판정할 <b>수 하나</b></td><td>gcd가 1인지만 본다</td><td class="c mono">7</td></tr>
+      <tr><td class="c"><b>5</b></td><td>고른 <b>세 수</b></td><td>다음 호출에 <b>i + 1</b> 을 넘긴다</td><td class="c mono">12</td></tr>
+    </table>
+    <div class="grid2" style="margin-top:20px">
+      <div class="card sea">
+        <h3>문제를 만나면 이 순서로</h3>
+        <ol class="num">
+          <li><b>상태를 정한다</b> — 무엇만 알면 나머지가 정해지는가</li>
+          <li><b>연결을 정한다</b> — 이 상태에서 갈 수 있는 다음은 어디인가</li>
+          <li><b>멈출 곳을 정한다</b> — 성공은 언제, 실패는 언제인가</li>
+          <li><b>겹치지 않게 만든다</b> — 같은 것을 두 번 세고 있지 않은가</li>
+        </ol>
+      </div>
+      <div class="card moss">
+        <h3>완전 탐색을 먼저</h3>
+        <p style="font-size:15px">느려도 좋다. <b>정확한 답의 기준</b>이 되기 때문이다.<br>
+        그다음 확인 횟수를 줄이고, 줄인 뒤에도 <b>답이 같은지 처음 결과와 비교</b>한다.</p>
+        <p style="font-size:15px;margin-top:10px">개선한 코드가 맞는지 확인할 방법이 없으면, 그것은 개선이 아니다.</p>
+      </div>
+    </div>
+    <div class="callout coral" style="margin-top:18px">
+      <b>다음 시간</b> — 상태 공간을 다 보지 않고 <b>미리 잘라내는 법</b>(분기 한정법)과, 아예 <b>한 갈래만 보는 법</b>(탐욕법)을 배운다.
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav">
+  <div class="left">
+    <button class="navbtn" id="prev">← 이전</button>
+    <button class="navbtn" id="next">다음 →</button>
+    <span class="chip2" id="counter"></span>
+  </div>
+  <div id="slidename"></div>
+</div>
+
+<script>
+const NS='http://www.w3.org/2000/svg';
+function mk(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+const STY={
+  idle:{f:'#ffffff',s:'#c3cedd',t:'#4a5a70'},
+  cur :{f:'#e0533d',s:'#e0533d',t:'#ffffff'},
+  done:{f:'#137a5e',s:'#137a5e',t:'#ffffff'},
+  sol :{f:'#e2f4ee',s:'#137a5e',t:'#137a5e'},
+  wait:{f:'#fdf3dc',s:'#c98a09',t:'#8a5f04'},
+  vio :{f:'#efeaff',s:'#6b4bc4',t:'#6b4bc4'}
+};
+function paint(svg,nodes,edges,r){
+  svg.innerHTML='';
+  edges.forEach(e=>{
+    const a=nodes[e.a],b=nodes[e.b];
+    if(!a||!b)return;
+    svg.appendChild(mk('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'gedge '+(e.cls||'')}));
+    if(e.label!==undefined){
+      const t=mk('text',{x:(a.x+b.x)/2+7,y:(a.y+b.y)/2-2,class:'elabel'});
+      t.textContent=e.label;svg.appendChild(t);
+    }
+  });
+  Object.keys(nodes).forEach(k=>{
+    const n=nodes[k],st=STY[n.st||'idle'];
+    const g=mk('g',{class:'gnode'});
+    g.appendChild(mk('circle',{cx:n.x,cy:n.y,r:n.r||r||18,fill:st.f,stroke:st.s,'stroke-width':2.5}));
+    const t=mk('text',{x:n.x,y:n.y+5,'text-anchor':'middle',fill:st.t,style:'font-size:'+(n.fs||14)+'px'});
+    t.textContent=n.label;g.appendChild(t);
+    svg.appendChild(g);
+  });
+}
+const fmt=n=>n.toLocaleString('ko-KR');
+
+/* ===== 문제 1 : 합 분해 트리 (n=3) ===== */
+function initP1Tree(){
+  const nodes={},edges=[];
+  /* 루트 3 → 2,1,0 / 2 → 1,0 / 1 → 0 */
+  const P={
+    r3:[80,42], n2:[240,42], n1b:[240,120], n0c:[240,198],
+    n1a:[400,20], n0b:[400,68], n0a:[400,150]
+  };
+  const V={r3:'3',n2:'2',n1b:'1',n0c:'0',n1a:'1',n0b:'0',n0a:'0'};
+  const leafs=['n0a','n0b','n0c'];
+  Object.keys(P).forEach(k=>{
+    nodes[k]={x:P[k][0],y:P[k][1],label:V[k],r:19,fs:14,
+      st: V[k]==='0' ? 'sol' : (k==='r3'?'cur':'idle')};
+  });
+  nodes.f1={x:540,y:20,label:'0',r:19,fs:14,st:'sol'};
+  edges.push({a:'r3',b:'n2',label:'+1'},{a:'r3',b:'n1b',label:'+2'},{a:'r3',b:'n0c',label:'+3'});
+  edges.push({a:'n2',b:'n1a',label:'+1'},{a:'n2',b:'n0b',label:'+2'});
+  edges.push({a:'n1b',b:'n0a',label:'+1'});
+  edges.push({a:'n1a',b:'f1',label:'+1'});
+  const svg=document.getElementById('p1Svg');
+  paint(svg,nodes,edges,19);
+  const lab=[[560,20,'1+1+1'],[470,68,'1+2'],[330,150,'2+1'],[300,198,'3']];
+  lab.forEach(([x,y,s])=>{
+    const t=mk('text',{x:x,y:y+5,class:'elabel',style:'font-size:13px;fill:#137a5e'});
+    t.textContent='= '+s;svg.appendChild(t);
+  });
+}
+
+/* ===== 문제 1 : 계산기 ===== */
+function initP1(){
+  const rg=document.getElementById('p1N'),vv=document.getElementById('p1Nv');
+  const ans=document.getElementById('p1Ans'),list=document.getElementById('p1List'),msg=document.getElementById('p1Msg');
+  function comps(n){
+    if(n===0)return [[]];
+    const out=[];
+    for(let x=1;x<=n;x++)comps(n-x).forEach(t=>out.push([x].concat(t)));
+    return out;
+  }
+  const upd=()=>{
+    const n=+rg.value;vv.textContent=n;
+    const c=comps(n);
+    ans.innerHTML=fmt(c.length)+'<small>순열의 개수</small>';
+    list.innerHTML='';
+    if(n<=5){
+      c.forEach(t=>{const s=document.createElement('span');s.className='chip on';
+        s.textContent=t.join('+');list.appendChild(s);});
+    }else{
+      list.innerHTML='<span class="empty">n이 5를 넘으면 개수만 표시합니다 ('+fmt(c.length)+'가지)</span>';
+    }
+    msg.innerHTML='f('+n+') = <b>'+fmt(c.length)+'</b> = 2<sup>'+(n-1)+'</sup> &nbsp; '+
+      (n>1?('f('+n+') 는 f('+(n-1)+') 의 <b>두 배</b>다.'):'n = 1 은 &ldquo;1&rdquo; 한 가지뿐이다.');
+  };
+  rg.oninput=upd;upd();
+}
+
+/* ===== 문제 2 : 계단 트리 (n=4) ===== */
+function initP2Tree(){
+  const N=4;
+  const nodes={},edges=[];
+  let leaf=0;const GAP=54,TOP=32,DY=66,LX=60;
+  const list=[];
+  (function build(c,depth,parent,path){
+    const id='k'+list.length;
+    const o={id,c,depth,parent,children:[]};list.push(o);
+    if(parent)parent.children.push(o);
+    if(c<N){build(c+1,depth+1,o,path.concat(1));build(c+2,depth+1,o,path.concat(2));}
+    return o;
+  })(0,0,null,[]);
+  (function layout(o){
+    if(!o.children.length){o.x=LX+(leaf++)*GAP;}
+    else{o.children.forEach(layout);o.x=(o.children[0].x+o.children[o.children.length-1].x)/2;}
+    o.y=TOP+o.depth*DY;
+  })(list[0]);
+  list.forEach(o=>{
+    nodes[o.id]={x:o.x,y:o.y,label:String(o.c),r:17,fs:13,
+      st:(o.c===N?'sol':(o.c>N?'wait':(o.depth===0?'cur':'idle')))};
+    if(o.parent)edges.push({a:o.parent.id,b:o.id,cls:(o.c>N?'dim':''),label:'+'+(o.c-o.parent.c)});
+  });
+  paint(document.getElementById('p2Svg'),nodes,edges,17);
+}
+
+/* ===== 문제 2 : 계산기 ===== */
+function initP2(){
+  const rg=document.getElementById('p2N'),vv=document.getElementById('p2Nv');
+  const ans=document.getElementById('p2Ans'),tbl=document.getElementById('p2Tbl'),msg=document.getElementById('p2Msg');
+  const F=[1,1];for(let i=2;i<=14;i++)F[i]=F[i-1]+F[i-2];   /* F[n] = 계단 n칸 방법 수 */
+  const upd=()=>{
+    const n=+rg.value;vv.textContent=n;
+    ans.innerHTML=fmt(F[n])+'<small>올라가는 방법의 수</small>';
+    let h='<tr><th class="c">n</th>',b='<tr><th class="c">방법 수</th>';
+    for(let i=1;i<=Math.min(n+2,12);i++){
+      const on=(i===n)?' style="background:var(--moss);color:#fff;font-weight:700"':'';
+      h+='<th class="c"'+on+'>'+i+'</th>';
+      b+='<td class="c mono"'+on+'>'+F[i]+'</td>';
+    }
+    tbl.innerHTML=h+'</tr>'+b+'</tr>';
+    msg.innerHTML=(n>=3)
+      ? 'f('+n+') = f('+(n-1)+') + f('+(n-2)+') = '+F[n-1]+' + '+F[n-2]+' = <b>'+F[n]+'</b> — <b>피보나치수열</b>이다.<br>n번째 칸에 오는 방법은 <b>n−1번 칸에서 1칸</b> 오르거나 <b>n−2번 칸에서 2칸</b> 오르는 것뿐이기 때문이다.'
+      : 'n = '+n+' 일 때는 '+F[n]+'가지. 여기서부터 피보나치가 시작된다.';
+  };
+  rg.oninput=upd;upd();
+}
+
+/* ===== 문제 3 : 소수 그리드 ===== */
+function isPrime(x){if(x<2)return false;for(let d=2;d*d<=x;d++)if(x%d===0)return false;return true;}
+function initP3(){
+  const rg=document.getElementById('p3N'),vv=document.getElementById('p3Nv');
+  const grid=document.getElementById('p3Grid'),ans=document.getElementById('p3Ans'),msg=document.getElementById('p3Msg');
+  const upd=()=>{
+    const n=+rg.value;vv.textContent=n;
+    let c=0,html='',ps=[];
+    for(let i=1;i<=n;i++){
+      const p=isPrime(i);if(p){c++;ps.push(i);}
+      html+='<span class="'+(p?'on':'')+'">'+i+'</span>';
+    }
+    grid.innerHTML=html;
+    ans.innerHTML=c+'<small>소수의 개수</small>';
+    msg.innerHTML='1부터 <b>'+n+'</b> 까지 소수는 <b>'+c+'개</b>. '+
+      (n>=20?'앞의 열 개: <span class="mono">'+ps.slice(0,10).join(', ')+' …</span>':'<span class="mono">'+ps.join(', ')+'</span>')+
+      '<br>n = 100 이면 <b>25개</b>다.';
+  };
+  rg.oninput=upd;upd();
+}
+
+/* ===== 문제 3-2 : 나눗셈 횟수 ===== */
+function initP3b(){
+  const rg=document.getElementById('p3bN'),vv=document.getElementById('p3bNv');
+  const tbl=document.getElementById('p3bTbl'),msg=document.getElementById('p3bMsg');
+  const upd=()=>{
+    const n=+rg.value;vv.textContent=fmt(n);
+    let a=0,b=0,c=0,cnt=0;
+    for(let x=2;x<=n;x++){
+      a+=Math.max(0,x-2);                       /* 교과서 : 끝까지 */
+      let d=2;for(;d<x;d++){b++;if(x%d===0)break;}   /* 찾으면 멈춤 */
+      d=2;for(;d*d<=x;d++){c++;if(x%d===0)break;}    /* √n 까지 */
+      if(isPrime(x))cnt++;
+    }
+    tbl.innerHTML=
+      '<tr><th>방법</th><th class="c">나눗셈 횟수</th><th class="c">답</th></tr>'+
+      '<tr><td>교과서 코드 (끝까지)</td><td class="c mono">'+fmt(a)+'</td><td class="c mono">'+cnt+'</td></tr>'+
+      '<tr><td>① 찾으면 바로 멈춤</td><td class="c mono">'+fmt(b)+'</td><td class="c mono">'+cnt+'</td></tr>'+
+      '<tr><td>② √n 까지만</td><td class="c mono" style="color:var(--moss);font-weight:700">'+fmt(c)+'</td><td class="c mono">'+cnt+'</td></tr>';
+    msg.innerHTML='n = <b>'+fmt(n)+'</b> 에서 <b>'+fmt(a)+'회 → '+fmt(c)+'회</b>로 줄었다. 약 <b>'+
+      (c>0?(a/c).toFixed(1):'—')+'배</b> 적은 연산으로 <b>같은 답 '+cnt+'</b>을 얻는다.';
+  };
+  rg.oninput=upd;upd();
+}
+
+/* ===== 문제 4 : 서로소 ===== */
+function gcd(a,b){while(b!==0){const t=b;b=a%b;a=t;}return a;}
+function gcdSteps(a,b){
+  const out=[];let x=a,y=b;
+  while(y!==0){out.push('gcd('+x+', '+y+') → '+x+' % '+y+' = '+(x%y));const t=y;y=x%y;x=t;}
+  out.push('gcd('+x+', 0) = <b>'+x+'</b>');
+  return out;
+}
+function initP4(){
+  const eN=document.getElementById('p4N'),eK=document.getElementById('p4K');
+  const grid=document.getElementById('p4Grid'),ans=document.getElementById('p4Ans'),msg=document.getElementById('p4Msg');
+  const run=()=>{
+    let n=Math.min(100,Math.max(1,Math.floor(+eN.value||10)));
+    let k=Math.min(100,Math.max(1,Math.floor(+eK.value||3)));
+    eN.value=n;eK.value=k;
+    let c=0,html='';
+    for(let i=1;i<=n;i++){
+      const co=gcd(i,k)===1;if(co)c++;
+      html+='<span class="'+(co?'on':'')+'" data-x="'+i+'">'+i+'</span>';
+    }
+    grid.innerHTML=html;
+    ans.innerHTML=c+'<small>서로소인 수의 개수</small>';
+    msg.innerHTML='n = <b>'+n+'</b>, k = <b>'+k+'</b> → 서로소인 수는 <b>'+c+'개</b>.<br>'+
+      '초록으로 칠해진 수를 <b>클릭</b>하면 유클리드 호제법의 계산 과정을 볼 수 있다.';
+    [...grid.children].forEach(sp=>{
+      sp.onclick=()=>{
+        const x=+sp.dataset.x;
+        msg.innerHTML='<b>gcd('+x+', '+k+')</b> 계산 과정<br><span class="mono" style="font-size:13.5px;line-height:1.9">'+
+          gcdSteps(x,k).join('<br>')+'</span><br>'+
+          (gcd(x,k)===1?'→ 최대공약수가 1이므로 <b>서로소</b>':'→ 최대공약수가 '+gcd(x,k)+' 이므로 <b>서로소가 아니다</b>');
+      };
+    });
+  };
+  document.getElementById('p4Run').onclick=run;
+  [eN,eK].forEach(e=>e.addEventListener('keydown',ev=>{if(ev.key==='Enter')run();}));
+  run();
+}
+
+/* ===== 문제 5 : 상태 공간 그림 ===== */
+function initP5Tree(){
+  const A=[1,3,6,7,11,15,18];
+  const nodes={},edges=[];
+  nodes.root={x:40,y:118,label:'( )',r:20,fs:12,st:'cur'};
+  /* 1단계 : 7개 */
+  A.forEach((v,i)=>{
+    const id='a'+i;
+    nodes[id]={x:170,y:24+i*32,label:String(v),r:14,fs:12,st:(i===1?'vio':'idle')};
+    edges.push({a:'root',b:id,cls:(i===1?'':'dim')});
+  });
+  /* 2단계 : 3 다음 (6,7,11,15,18) */
+  const sec=[6,7,11,15,18];
+  sec.forEach((v,i)=>{
+    const id='b'+i;
+    nodes[id]={x:330,y:40+i*38,label:String(v),r:14,fs:12,st:(i===0?'vio':'idle')};
+    edges.push({a:'a1',b:id,cls:(i===0?'':'dim')});
+  });
+  /* 3단계 : 3,6 다음 (7,11,15,18) */
+  const thr=[7,11,15,18];
+  thr.forEach((v,i)=>{
+    const id='c'+i;
+    const sum=3+6+v;
+    nodes[id]={x:490,y:44+i*44,label:String(v),r:14,fs:12,st:(sum%3===0?'sol':'idle')};
+    edges.push({a:'b0',b:id});
+  });
+  const svg=document.getElementById('p5Svg');
+  paint(svg,nodes,edges,16);
+  thr.forEach((v,i)=>{
+    const sum=3+6+v;
+    const t=mk('text',{x:520,y:49+i*44,class:'elabel',
+      style:'font-size:12.5px;fill:'+(sum%3===0?'#137a5e':'#8794a6')});
+    t.textContent='합 '+sum+(sum%3===0?'  ✓':'');
+    svg.appendChild(t);
+  });
+  const t2=mk('text',{x:300,y:232,class:'elabel',style:'font-size:13px;fill:#4a5a70'});
+  t2.textContent='보라색 경로 : 3 → 6 을 고른 뒤 남은 후보';svg.appendChild(t2);
+}
+
+/* ===== 문제 5 : 35가지 표 ===== */
+function initP5(){
+  const A=[1,3,6,7,11,15,18],N=7;
+  const rows=[];
+  for(let i=0;i<N;i++)for(let j=i+1;j<N;j++)for(let k=j+1;k<N;k++){
+    const s=A[i]+A[j]+A[k];
+    rows.push({a:A[i],b:A[j],c:A[k],s,ok:s%3===0});
+  }
+  const box=document.getElementById('p5Tbl'),cnt=document.getElementById('p5Cnt');
+  let onlyOk=false;
+  const draw=()=>{
+    const list=onlyOk?rows.filter(r=>r.ok):rows;
+    const per=Math.ceil(list.length/(onlyOk?2:3));
+    let html='<div style="display:grid;grid-template-columns:repeat('+(onlyOk?2:3)+',1fr);gap:14px">';
+    for(let c=0;c<(onlyOk?2:3);c++){
+      html+='<table class="tbl sm"><tr><th class="c">#</th><th class="c">a</th><th class="c">b</th><th class="c">c</th><th class="c">합</th><th class="c">3의 배수</th></tr>';
+      for(let i=c*per;i<Math.min((c+1)*per,list.length);i++){
+        const r=list[i],idx=rows.indexOf(r)+1;
+        const st=r.ok?' style="background:var(--moss-soft)"':'';
+        html+='<tr'+st+'><td class="c">'+idx+'</td><td class="c mono">'+r.a+'</td><td class="c mono">'+r.b+
+              '</td><td class="c mono">'+r.c+'</td><td class="c mono"><b>'+r.s+'</b></td><td class="c">'+
+              (r.ok?'<b style="color:var(--moss)">O</b>':'<span style="color:#b6c0cd">X</span>')+'</td></tr>';
+      }
+      html+='</table>';
+    }
+    box.innerHTML=html+'</div>';
+    cnt.innerHTML='전체 <b>'+rows.length+'</b>가지 중 3의 배수 <b style="color:var(--moss)">'+rows.filter(r=>r.ok).length+'</b>가지';
+  };
+  document.getElementById('p5Only').onclick=()=>{onlyOk=true;draw();};
+  document.getElementById('p5All').onclick=()=>{onlyOk=false;draw();};
+  draw();
+}
+
+function initCodeToggle(){
+  document.querySelectorAll('.codebox').forEach(box=>{
+    const btn=box.querySelector('.toggle');
+    btn.onclick=()=>{
+      box.classList.toggle('open');
+      btn.textContent=box.classList.contains('open')?'코드 숨기기':'코드 보기';
+    };
+  });
+}
+
+function initAll(){
+  initCodeToggle();
+  initP1Tree();initP1();initP2Tree();initP2();
+  initP3();initP3b();initP4();initP5Tree();initP5();
+}
+
+/* 슬라이드 엔진 */
+let SLIDES=[],idx=0;
+function show(i){
+  if(i<0||i>=SLIDES.length)return;
+  SLIDES.forEach(s=>s.classList.remove('active'));
+  SLIDES[i].classList.add('active');
+  SLIDES[i].scrollTop=0;idx=i;
+  document.getElementById('counter').textContent=(i+1)+' / '+SLIDES.length;
+  document.getElementById('slidename').textContent=SLIDES[i].dataset.name||'';
+  document.getElementById('progress').style.width=((i+1)/SLIDES.length*100)+'%';
+  document.getElementById('prev').disabled=(i===0);
+  document.getElementById('next').disabled=(i===SLIDES.length-1);
+}
+document.addEventListener('keydown',e=>{
+  const t=e.target.tagName;
+  if(t==='INPUT'||t==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){show(idx+1);e.preventDefault();}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){show(idx-1);e.preventDefault();}
+  if(e.key==='Home'){show(0);e.preventDefault();}
+  if(e.key==='End'){show(SLIDES.length-1);e.preventDefault();}
+});
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('prev').onclick=()=>show(idx-1);
+  document.getElementById('next').onclick=()=>show(idx+1);
+  SLIDES=[...document.getElementById('deck').querySelectorAll('.slide')];
+  show(0);
+  initAll();
+});
+</script>
+</body>
+</html>

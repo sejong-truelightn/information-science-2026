@@ -82,6 +82,35 @@
   .badge.stk{background:var(--good-pale);color:#1F5C41;}
   .footer-note{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
     font-size:12.5px;color:var(--ink-faint);text-align:center;}
+  /* --- 5-2 스택 뷰어 --- */
+  .stepper{display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;margin-top:6px;}
+  .stepper .pane{flex:1;min-width:260px;}
+  .btnrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 4px;}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 15px;
+    font-family:inherit;font-size:14px;font-weight:700;color:var(--primary-dark);cursor:pointer;}
+  .btn:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+  .btn:disabled{opacity:.35;cursor:default;}
+  .btn:disabled:hover{background:#fff;color:var(--primary-dark);border-color:var(--line);}
+  .stepn{font-family:var(--mono);font-size:13px;color:var(--ink-soft);margin-left:2px;}
+  .stkwrap{border:1px solid var(--line);border-radius:12px;background:#F7FAF9;padding:12px 14px;height:100%;}
+  .stk{display:flex;flex-direction:column;gap:6px;min-height:176px;justify-content:flex-end;}
+  .stkitem{font-family:var(--mono);font-size:12.5px;background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:7px 10px;display:flex;justify-content:space-between;gap:10px;align-items:center;}
+  .stkitem.top{border-color:var(--accent);background:var(--accent-pale);color:#8A5A1B;font-weight:700;}
+  .stkitem .tag2{font-size:10.5px;font-weight:700;color:var(--accent);white-space:nowrap;}
+  .stkempty{color:var(--ink-faint);font-size:13px;text-align:center;padding:12px 0;}
+  .curbox{font-family:var(--mono);font-size:15px;font-weight:700;padding:11px 14px;border-radius:10px;
+    background:var(--primary-pale);color:var(--primary-dark);}
+  .curbox span{font-family:'Pretendard',sans-serif;font-size:12px;font-weight:600;color:var(--ink-soft);
+    display:block;margin-bottom:3px;letter-spacing:.02em;}
+  .verdict{margin-top:10px;border-radius:10px;padding:11px 14px;font-size:14px;line-height:1.65;}
+  .verdict.push{background:var(--primary-pale);color:var(--primary-dark);}
+  .verdict.cut{background:var(--bad-pale);color:#8A3826;}
+  .verdict.hit{background:var(--good-pale);color:#1F5C41;}
+  .verdict.fail{background:#EFF3F2;color:var(--ink-soft);}
+  .foundrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .foundchip{font-family:var(--mono);font-size:12.5px;background:var(--good-pale);color:#1F5C41;
+    border:1px solid #BFE3CE;border-radius:8px;padding:5px 9px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -299,6 +328,128 @@ print(visited)</div>
   <!-- ===================== 4 ===================== -->
   <h2 id="s4"><span class="num">04</span>4번 · BFS 레벨과 경로</h2>
   <div class="card">
+    <h3>먼저 그림으로 — <span class="term">level</span> 과 <span class="term">parent</span> 가 무엇인가</h3>
+    <p>이 문제는 코드보다 <b>그림을 먼저</b> 보여 주는 편이 빠릅니다.
+    <b class="hl">level은 그림의 &lsquo;층 번호&rsquo;</b>이고, <b class="hl">parent는 화살표를 거꾸로 그려 둔 것</b>입니다.</p>
+
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;
+                padding:14px 10px;margin:14px 0;overflow-x:auto;">
+    <svg viewBox="0 0 800 310" style="width:100%;min-width:620px;display:block;" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="uparrow" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="5.5" markerHeight="5.5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#DB8A3B"/>
+        </marker>
+      </defs>
+
+      <!-- 레벨 밴드 -->
+      <g stroke="#E4EBEA" stroke-width="1" stroke-dasharray="5 5">
+        <line x1="118" y1="45"  x2="780" y2="45"/>
+        <line x1="118" y1="115" x2="780" y2="115"/>
+        <line x1="118" y1="185" x2="780" y2="185"/>
+        <line x1="118" y1="255" x2="780" y2="255"/>
+      </g>
+      <g font-family="'Pretendard',sans-serif" font-size="13" fill="#8A9C9E" text-anchor="end">
+        <text x="103" y="50">레벨 0</text>
+        <text x="103" y="120">레벨 1</text>
+        <text x="103" y="190">레벨 2</text>
+        <text x="103" y="260">레벨 3</text>
+      </g>
+
+      <!-- 일반 간선 -->
+      <g stroke="#C3CFCD" stroke-width="2.4" stroke-linecap="round">
+        <line x1="460" y1="45"  x2="620" y2="115"/>
+        <line x1="300" y1="115" x2="220" y2="185"/>
+        <line x1="620" y1="115" x2="540" y2="185"/>
+        <line x1="620" y1="115" x2="700" y2="185"/>
+        <line x1="220" y1="185" x2="220" y2="255"/>
+        <line x1="380" y1="185" x2="340" y2="255"/>
+        <line x1="540" y1="185" x2="540" y2="255"/>
+      </g>
+
+      <!-- 경로(= parent 화살표) : 자식에서 부모 쪽으로 -->
+      <g stroke="#DB8A3B" stroke-width="4" stroke-linecap="round" marker-end="url(#uparrow)">
+        <line x1="409.1" y1="235.9" x2="391.9" y2="205.8"/>
+        <line x1="363.4" y1="170.5" x2="318.1" y2="130.8"/>
+        <line x1="320.1" y1="106.2" x2="438.0" y2="54.6"/>
+      </g>
+
+      <!-- 노드 -->
+      <g font-family="'JetBrains Mono',monospace" font-size="17" font-weight="700" text-anchor="middle">
+        <!-- 경로 위 노드 (주황) -->
+        <g fill="#FBEBD8" stroke="#DB8A3B" stroke-width="2.6">
+          <circle cx="460" cy="45"  r="20"/>
+          <circle cx="300" cy="115" r="20"/>
+          <circle cx="380" cy="185" r="20"/>
+          <circle cx="420" cy="255" r="20"/>
+        </g>
+        <!-- 나머지 노드 -->
+        <g fill="#FFFFFF" stroke="#B9C7C5" stroke-width="2.2">
+          <circle cx="620" cy="115" r="20"/>
+          <circle cx="220" cy="185" r="20"/>
+          <circle cx="540" cy="185" r="20"/>
+          <circle cx="700" cy="185" r="20"/>
+          <circle cx="220" cy="255" r="20"/>
+          <circle cx="340" cy="255" r="20"/>
+          <circle cx="540" cy="255" r="20"/>
+        </g>
+        <!-- 글자 -->
+        <g fill="#8A5A1B">
+          <text x="460" y="51">a</text>
+          <text x="300" y="121">b</text>
+          <text x="380" y="191">e</text>
+          <text x="420" y="261">j</text>
+        </g>
+        <g fill="#4C6266">
+          <text x="620" y="121">c</text>
+          <text x="220" y="191">d</text>
+          <text x="540" y="191">f</text>
+          <text x="700" y="191">g</text>
+          <text x="220" y="261">h</text>
+          <text x="340" y="261">i</text>
+          <text x="540" y="261">k</text>
+        </g>
+      </g>
+
+      <!-- 범례 -->
+      <text x="118" y="300" font-family="'Pretendard',sans-serif" font-size="12.5" fill="#8A5A1B">
+        ↑ 주황 화살표 = parent[자식] = 부모 &#160;&#160;·&#160;&#160; 굵은 경로 = a → j
+      </text>
+    </svg>
+    </div>
+    <p style="font-size:13px;color:var(--ink-faint);margin:-6px 0 14px;text-align:center;">
+      아래로 내려가며 <span class="term" style="font-size:.9em">level</span> 을 적고,
+      위로 올라가며 <span class="term" style="font-size:.9em">parent</span> 를 따라 경로를 복원한다.
+    </p>
+
+    <div class="cols">
+      <div class="col">
+        <h4>level — 그림의 &lsquo;층 번호&rsquo;</h4>
+        <div class="out" style="margin:0">level['a'] = 0
+level['b'] = level['a'] + 1 = 1
+level['e'] = level['b'] + 1 = 2
+level['j'] = level['e'] + 1 = 3</div>
+        <p style="font-size:14px;margin:10px 0 0;color:var(--ink-soft)">
+        자식을 <b>처음 만나는 순간</b> &lsquo;부모 + 1&rsquo;을 적는다.
+        BFS는 층 순서로 훑으므로 이 값이 곧 <b>최소 이동 횟수</b>다.</p>
+      </div>
+      <div class="col">
+        <h4>parent — 화살표를 &lsquo;거꾸로&rsquo;</h4>
+        <div class="out" style="margin:0">parent['j'] = 'e'
+parent['e'] = 'b'
+parent['b'] = 'a'
+parent['a'] = None   ← 정지 신호</div>
+        <p style="font-size:14px;margin:10px 0 0;color:var(--ink-soft)">
+        j에서 화살표를 타고 올라가면 <span class="term">j → e → b → a</span>.
+        뒤집으면 경로 <b>['a', 'b', 'e', 'j']</b> 가 된다.</p>
+      </div>
+    </div>
+
+    <div class="tip"><b>그림에서 바로 읽히는 것</b><br>
+    <b>레벨 3</b>인 노드는 맨 아랫줄의 <span class="term">h, i, j, k</span> — <b>레벨 = 그림의 층</b>입니다.<br>
+    a에서 j까지 <b>선을 세 번</b> 지나갑니다. 그래서 <span class="term">level['j'] = 3</span>, 경로에 든 노드는 <b>4개</b>입니다.
+    <b class="hl">간선 수는 3, 노드 수는 4</b> — 학생이 자주 헷갈리는 지점이니 그림에서 직접 세어 보게 하세요.</div>
+
     <h3>정답</h3>
     <div class="codeblock">def bfs_path(root, goal):
     level = {}
@@ -336,7 +487,6 @@ a -&gt; j : 레벨 3 , 경로 ['a', 'b', 'e', 'j']</div>
       <li><b><span class="term">parent</span> 는 화살표를 거꾸로 그려 둔 것.</b> j에서 출발해
       <span class="term">j → e → b → a</span> 로 거슬러 올라가면 <span class="term">parent['a']</span> 가
       <span class="term">None</span> 이라 멈춥니다. 루트를 <span class="term">None</span> 으로 둔 이유가 이 <b>정지 신호</b>입니다.</li>
-      <li><b>이 패턴은 계속 재사용된다.</b> 6번에서도, 심화 자료의 다익스트라·A*에서도 경로 복원은 똑같이 이 방식입니다.</li>
     </ul>
 
     <div class="tip bad"><b><span class="term">path.reverse()</span> 를 빼면</b>
@@ -353,6 +503,212 @@ a -&gt; j : 레벨 3 , 경로 ['a', 'b', 'e', 'j']</div>
   <h2 id="s5"><span class="num">05</span>5-1번 · 조합의 합 (재귀) <span class="badge rec">재귀</span></h2>
   <div class="card">
     <p><b>문제</b> — <span class="term">data = [3, 34, 4, 12, 5, 2]</span> 에서 몇 개를 골라 합이 <span class="term">9</span> 가 되는 조합을 모두 찾기.</p>
+
+    <h3>왜 DFS 문제인가</h3>
+    <p>각 수마다 <b>&ldquo;고른다 / 고르지 않는다&rdquo;</b> 두 갈래로 상태가 갈라집니다.
+    수가 6개면 갈래가 6번 갈라지므로, 상태 공간은 <b>잎이 2<sup>6</sup> = 64개</b>인 <b class="hl">이진 트리</b>가 됩니다.
+    이 트리를 <b>깊이 우선</b>으로 내려가며 합이 <span class="term">target</span> 이 되는 지점을 찾으면 됩니다.</p>
+    <p>아래가 <b class="hl">실제로 탐색되는 트리 전부</b>입니다. 원 안의 숫자는 <b>그 시점까지의 합</b>,
+    <b>왼쪽 자식이 &lsquo;고른다&rsquo;</b>, <b>오른쪽 자식이 &lsquo;안 고른다&rsquo;</b> 입니다.</p>
+
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;
+                padding:14px 10px;margin:14px 0;overflow-x:auto;">
+    <svg viewBox="0 0 954 556" style="width:100%;min-width:954px;display:block;" xmlns="http://www.w3.org/2000/svg">
+      <g stroke="#E9EFEE" stroke-width="1" stroke-dasharray="4 5">
+        <line x1="122" y1="36" x2="946" y2="36"/>
+        <line x1="122" y1="114" x2="946" y2="114"/>
+        <line x1="122" y1="192" x2="946" y2="192"/>
+        <line x1="122" y1="270" x2="946" y2="270"/>
+        <line x1="122" y1="348" x2="946" y2="348"/>
+        <line x1="122" y1="426" x2="946" y2="426"/>
+        <line x1="122" y1="504" x2="946" y2="504"/>
+      </g>
+      <g font-family="'Pretendard',sans-serif" font-size="12" fill="#8A9C9E" text-anchor="end">
+        <text x="112" y="40">시작 · 합 0</text>
+        <text x="112" y="118">3 결정 후</text>
+        <text x="112" y="196">34 결정 후</text>
+        <text x="112" y="274">4 결정 후</text>
+        <text x="112" y="352">12 결정 후</text>
+        <text x="112" y="430">5 결정 후</text>
+        <text x="112" y="508">2 결정 후 (끝)</text>
+      </g>
+      <g stroke="#CCD8D6" stroke-width="1.8" stroke-linecap="round">
+        <line x1="225" y1="114" x2="144" y2="192"/>
+        <line x1="306" y1="192" x2="394" y2="270"/>
+        <line x1="219" y1="270" x2="184" y2="348"/>
+        <line x1="254" y1="348" x2="224" y2="426"/>
+        <line x1="284" y1="426" x2="304" y2="504"/>
+        <line x1="394" y1="270" x2="344" y2="348"/>
+        <line x1="394" y1="270" x2="444" y2="348"/>
+        <line x1="444" y1="348" x2="404" y2="426"/>
+        <line x1="444" y1="348" x2="484" y2="426"/>
+        <line x1="404" y1="426" x2="384" y2="504"/>
+        <line x1="404" y1="426" x2="424" y2="504"/>
+        <line x1="484" y1="426" x2="464" y2="504"/>
+        <line x1="484" y1="426" x2="504" y2="504"/>
+        <line x1="625" y1="114" x2="544" y2="192"/>
+        <line x1="706" y1="192" x2="794" y2="270"/>
+        <line x1="619" y1="270" x2="584" y2="348"/>
+        <line x1="654" y1="348" x2="684" y2="426"/>
+        <line x1="684" y1="426" x2="664" y2="504"/>
+        <line x1="684" y1="426" x2="704" y2="504"/>
+        <line x1="794" y1="270" x2="744" y2="348"/>
+        <line x1="794" y1="270" x2="844" y2="348"/>
+        <line x1="844" y1="348" x2="804" y2="426"/>
+        <line x1="844" y1="348" x2="884" y2="426"/>
+        <line x1="804" y1="426" x2="784" y2="504"/>
+        <line x1="804" y1="426" x2="824" y2="504"/>
+        <line x1="884" y1="426" x2="864" y2="504"/>
+        <line x1="884" y1="426" x2="904" y2="504"/>
+      </g>
+      <g stroke="#DB8A3B" stroke-width="3.4" stroke-linecap="round">
+        <line x1="425" y1="36" x2="225" y2="114"/>
+        <line x1="425" y1="36" x2="625" y2="114"/>
+        <line x1="225" y1="114" x2="306" y2="192"/>
+        <line x1="306" y1="192" x2="219" y2="270"/>
+        <line x1="219" y1="270" x2="254" y2="348"/>
+        <line x1="254" y1="348" x2="284" y2="426"/>
+        <line x1="284" y1="426" x2="264" y2="504"/>
+        <line x1="625" y1="114" x2="706" y2="192"/>
+        <line x1="706" y1="192" x2="619" y2="270"/>
+        <line x1="619" y1="270" x2="654" y2="348"/>
+        <line x1="654" y1="348" x2="624" y2="426"/>
+      </g>
+      <g font-family="'Pretendard',sans-serif" font-size="12.5" font-weight="700">
+        <text x="221" y="66" text-anchor="end" fill="#8A5A1B">← 3을 고른다</text>
+        <text x="629" y="66" fill="#6B7C7E">3을 안 고른다 →</text>
+      </g>
+      <g>
+        <circle cx="425" cy="36" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="225" cy="114" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="144" cy="192" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="306" cy="192" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="219" cy="270" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="184" cy="348" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="254" cy="348" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="224" cy="426" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="284" cy="426" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="264" cy="504" r="15" fill="#E4F4EB" stroke="#2E8B63" stroke-width="2.6"/>
+        <circle cx="304" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="394" cy="270" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="344" cy="348" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="444" cy="348" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="404" cy="426" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="384" cy="504" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="424" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="484" cy="426" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="464" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="504" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="625" cy="114" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="544" cy="192" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="706" cy="192" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="619" cy="270" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="584" cy="348" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="654" cy="348" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="624" cy="426" r="15" fill="#E4F4EB" stroke="#2E8B63" stroke-width="2.6"/>
+        <circle cx="684" cy="426" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="664" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="704" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="794" cy="270" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="744" cy="348" r="15" fill="#FAE7E2" stroke="#C4553D" stroke-width="2.6"/>
+        <circle cx="844" cy="348" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="804" cy="426" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="784" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="824" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="884" cy="426" r="15" fill="#FFFFFF" stroke="#B9C7C5" stroke-width="1.9"/>
+        <circle cx="864" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+        <circle cx="904" cy="504" r="15" fill="#F1F5F4" stroke="#D6E1DF" stroke-width="1.9"/>
+      </g>
+      <g font-family="'JetBrains Mono',monospace" font-size="11.5" font-weight="700" text-anchor="middle">
+        <text x="425" y="40" fill="#4C6266">0</text>
+        <text x="225" y="118" fill="#4C6266">3</text>
+        <text x="144" y="196" fill="#C4553D">37</text>
+        <text x="306" y="196" fill="#4C6266">3</text>
+        <text x="219" y="274" fill="#4C6266">7</text>
+        <text x="184" y="352" fill="#C4553D">19</text>
+        <text x="254" y="352" fill="#4C6266">7</text>
+        <text x="224" y="430" fill="#C4553D">12</text>
+        <text x="284" y="430" fill="#4C6266">7</text>
+        <text x="264" y="508" fill="#2E8B63">9</text>
+        <text x="304" y="508" fill="#8A9C9E">7</text>
+        <text x="394" y="274" fill="#4C6266">3</text>
+        <text x="344" y="352" fill="#C4553D">15</text>
+        <text x="444" y="352" fill="#4C6266">3</text>
+        <text x="404" y="430" fill="#4C6266">8</text>
+        <text x="384" y="508" fill="#C4553D">10</text>
+        <text x="424" y="508" fill="#8A9C9E">8</text>
+        <text x="484" y="430" fill="#4C6266">3</text>
+        <text x="464" y="508" fill="#8A9C9E">5</text>
+        <text x="504" y="508" fill="#8A9C9E">3</text>
+        <text x="625" y="118" fill="#4C6266">0</text>
+        <text x="544" y="196" fill="#C4553D">34</text>
+        <text x="706" y="196" fill="#4C6266">0</text>
+        <text x="619" y="274" fill="#4C6266">4</text>
+        <text x="584" y="352" fill="#C4553D">16</text>
+        <text x="654" y="352" fill="#4C6266">4</text>
+        <text x="624" y="430" fill="#2E8B63">9</text>
+        <text x="684" y="430" fill="#4C6266">4</text>
+        <text x="664" y="508" fill="#8A9C9E">6</text>
+        <text x="704" y="508" fill="#8A9C9E">4</text>
+        <text x="794" y="274" fill="#4C6266">0</text>
+        <text x="744" y="352" fill="#C4553D">12</text>
+        <text x="844" y="352" fill="#4C6266">0</text>
+        <text x="804" y="430" fill="#4C6266">5</text>
+        <text x="784" y="508" fill="#8A9C9E">7</text>
+        <text x="824" y="508" fill="#8A9C9E">5</text>
+        <text x="884" y="430" fill="#4C6266">0</text>
+        <text x="864" y="508" fill="#8A9C9E">2</text>
+        <text x="904" y="508" fill="#8A9C9E">0</text>
+      </g>
+      <g font-family="'Pretendard',sans-serif" font-size="13" font-weight="700" text-anchor="middle">
+        <text x="144" y="224" fill="#C4553D">✕</text>
+        <text x="184" y="380" fill="#C4553D">✕</text>
+        <text x="224" y="458" fill="#C4553D">✕</text>
+        <text x="264" y="537" fill="#2E8B63">★</text>
+        <text x="264" y="552" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="#2E8B63">[3,4,2]</text>
+        <text x="344" y="380" fill="#C4553D">✕</text>
+        <text x="384" y="536" fill="#C4553D">✕</text>
+        <text x="544" y="224" fill="#C4553D">✕</text>
+        <text x="584" y="380" fill="#C4553D">✕</text>
+        <text x="624" y="459" fill="#2E8B63">★</text>
+        <text x="624" y="474" font-family="'JetBrains Mono',monospace" font-size="11.5" fill="#2E8B63">[4,5]</text>
+        <text x="744" y="380" fill="#C4553D">✕</text>
+      </g>
+    </svg>
+    </div>
+
+    <div class="cols" style="margin-top:0">
+      <div class="col">
+        <h4>그림 읽는 법</h4>
+        <ul class="list" style="margin-top:6px">
+          <li><b style="color:#C4553D">빨강 ✕</b> — 합이 9를 넘어 <b>가지치기</b>. 그 아래를 통째로 버린다.</li>
+          <li><b style="color:#2E8B63">초록 ★</b> — 합이 정확히 9. <b>정답</b>이므로 더 내려가지 않는다.</li>
+          <li><b style="color:#8A9C9E">흐린 회색</b> — 6개를 다 봤지만 합이 9가 아님. 그냥 실패.</li>
+          <li><b style="color:#8A5A1B">주황 굵은 선</b> — 정답까지 내려간 경로.</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h4>숫자로 보면</h4>
+        <div class="scroll" style="margin:6px 0 0">
+        <table>
+          <tr><th></th><th>노드 수</th><th>잎</th></tr>
+          <tr><td class="label">가지치기 없이 전부</td><td>127</td><td>64</td></tr>
+          <tr class="hit"><td class="label">실제로 방문한 것</td><td>39</td><td>20</td></tr>
+        </table>
+        </div>
+        <p style="font-size:14px;margin:10px 0 0;color:var(--ink-soft)">
+        <span class="term">if total &gt; target</span> 한 줄이 <b>노드 127개를 39개로</b> 줄였습니다.
+        가지치기 <b>8번</b>, 정답 <b>2개</b>, 실패 <b>10개</b>.</p>
+      </div>
+    </div>
+
+    <div class="tip good"><b>첫 갈림길만 봐도 충분합니다.</b>
+    <span class="term">3</span> 을 고른 뒤 <span class="term">34</span> 까지 고르면 합이 <b>37</b> — 목표 9를 이미 넘습니다(그림 왼쪽 위 <b style="color:#C4553D">37 ✕</b>).
+    <b class="hl">34가 들어간 가지는 이 한 번의 판단으로 전부 사라집니다.</b>
+    아래 5-2의 추적표 3행에 나오는 바로 그 장면입니다.</div>
+
+    <p style="margin-top:18px">앞에서 트리를 두 가지 방법으로 훑었듯이, 이 문제도 <b>재귀(5-1)</b> 와 <b>명시적 스택(5-2)</b> 두 가지로 풀어봅니다.
+    <b>두 코드의 출력은 완전히 같습니다.</b></p>
 
     <h3>정답</h3>
     <div class="codeblock">def dfs(i, total, picked):
@@ -429,22 +785,53 @@ while stack:
     <h3>한 단계씩 추적 <span style="font-weight:400;font-size:13px;color:var(--ink-soft)">— 앞부분 14단계</span></h3>
     <div class="scroll">
     <table>
-      <tr><th>#</th><th>꺼낸 상태 (i, 합, 고른 것)</th><th>판정</th><th>남은 스택</th></tr>
-      <tr><td>1</td><td>(0, 0, [])</td><td class="label">push 2개</td><td>2</td></tr>
-      <tr><td>2</td><td>(1, 3, [3])</td><td class="label">push 2개</td><td>3</td></tr>
-      <tr class="cut"><td>3</td><td>(2, 37, [3, 34])</td><td class="label">가지치기 — 합 초과</td><td>2</td></tr>
-      <tr><td>4</td><td>(2, 3, [3])</td><td class="label">push 2개</td><td>3</td></tr>
-      <tr><td>5</td><td>(3, 7, [3, 4])</td><td class="label">push 2개</td><td>4</td></tr>
-      <tr class="cut"><td>6</td><td>(4, 19, [3, 4, 12])</td><td class="label">가지치기 — 합 초과</td><td>3</td></tr>
-      <tr><td>7</td><td>(4, 7, [3, 4])</td><td class="label">push 2개</td><td>4</td></tr>
-      <tr class="cut"><td>8</td><td>(5, 12, [3, 4, 5])</td><td class="label">가지치기 — 합 초과</td><td>3</td></tr>
-      <tr><td>9</td><td>(5, 7, [3, 4])</td><td class="label">push 2개</td><td>4</td></tr>
-      <tr class="hit"><td>10</td><td>(6, 9, [3, 4, 2])</td><td class="label">★ 정답 발견</td><td>3</td></tr>
-      <tr><td>11</td><td>(6, 7, [3, 4])</td><td class="label">끝까지 봤으나 실패</td><td>2</td></tr>
-      <tr><td>12</td><td>(3, 3, [3])</td><td class="label">push 2개</td><td>3</td></tr>
-      <tr class="cut"><td>13</td><td>(4, 15, [3, 12])</td><td class="label">가지치기 — 합 초과</td><td>2</td></tr>
-      <tr><td>14</td><td>(4, 3, [3])</td><td class="label">push 2개</td><td>3</td></tr>
+      <tr><th>#</th><th>꺼낸 상태 (i, 합, 고른 것)</th><th>판정</th><th>남은 스택 (아래 → 위)</th></tr>
+      <tr><td>1</td><td>(0, 0, [])</td><td class="label">push 2개</td><td>(1,0,[]) (1,3,[3])</td></tr>
+      <tr><td>2</td><td>(1, 3, [3])</td><td class="label">push 2개</td><td>(1,0,[]) (2,3,[3]) (2,37,[3,34])</td></tr>
+      <tr class="cut"><td>3</td><td>(2, 37, [3, 34])</td><td class="label">가지치기 — 합 초과</td><td>(1,0,[]) (2,3,[3])</td></tr>
+      <tr><td>4</td><td>(2, 3, [3])</td><td class="label">push 2개</td><td>(1,0,[]) (3,3,[3]) (3,7,[3,4])</td></tr>
+      <tr><td>5</td><td>(3, 7, [3, 4])</td><td class="label">push 2개</td><td>(1,0,[]) (3,3,[3]) (4,7,[3,4]) (4,19,[3,4,12])</td></tr>
+      <tr class="cut"><td>6</td><td>(4, 19, [3, 4, 12])</td><td class="label">가지치기 — 합 초과</td><td>(1,0,[]) (3,3,[3]) (4,7,[3,4])</td></tr>
+      <tr><td>7</td><td>(4, 7, [3, 4])</td><td class="label">push 2개</td><td>(1,0,[]) (3,3,[3]) (5,7,[3,4]) (5,12,[3,4,5])</td></tr>
+      <tr class="cut"><td>8</td><td>(5, 12, [3, 4, 5])</td><td class="label">가지치기 — 합 초과</td><td>(1,0,[]) (3,3,[3]) (5,7,[3,4])</td></tr>
+      <tr><td>9</td><td>(5, 7, [3, 4])</td><td class="label">push 2개</td><td>(1,0,[]) (3,3,[3]) (6,7,[3,4]) (6,9,[3,4,2])</td></tr>
+      <tr class="hit"><td>10</td><td>(6, 9, [3, 4, 2])</td><td class="label">★ 정답 발견</td><td>(1,0,[]) (3,3,[3]) (6,7,[3,4])</td></tr>
+      <tr><td>11</td><td>(6, 7, [3, 4])</td><td class="label">끝까지 봤으나 실패</td><td>(1,0,[]) (3,3,[3])</td></tr>
+      <tr><td>12</td><td>(3, 3, [3])</td><td class="label">push 2개</td><td>(1,0,[]) (4,3,[3]) (4,15,[3,12])</td></tr>
+      <tr class="cut"><td>13</td><td>(4, 15, [3, 12])</td><td class="label">가지치기 — 합 초과</td><td>(1,0,[]) (4,3,[3])</td></tr>
+      <tr><td>14</td><td>(4, 3, [3])</td><td class="label">push 2개</td><td>(1,0,[]) (5,3,[3]) (5,8,[3,5])</td></tr>
     </table>
+    </div>
+
+
+    <h3>스택을 직접 보며 한 단계씩
+      <span style="font-weight:400;font-size:13px;color:var(--ink-soft)">— 표에 없는 뒷부분까지 39단계 전부</span></h3>
+    <p style="font-size:14.5px;color:var(--ink-soft);margin-bottom:0">
+      <b>[다음 단계]</b> 를 누르며 <b>스택이 쌓이고 줄어드는 모습</b>을 그대로 보여 주세요.
+      화면 오른쪽이 <b>진짜 스택</b>입니다 — 맨 위가 <b>다음에 꺼낼 것</b>입니다.</p>
+
+    <div class="btnrow">
+      <button class="btn" id="s52prev">◀ 이전</button>
+      <button class="btn" id="s52next">다음 단계 ▶</button>
+      <button class="btn" id="s52reset">처음으로</button>
+      <span class="stepn" id="s52n">1 / 39</span>
+    </div>
+
+    <div class="stepper">
+      <div class="pane">
+        <div class="curbox" id="s52cur"></div>
+        <div class="verdict" id="s52v"></div>
+        <div style="margin-top:12px">
+          <h4>지금까지 찾은 정답</h4>
+          <div class="foundrow" id="s52found"></div>
+        </div>
+      </div>
+      <div class="pane">
+        <div class="stkwrap">
+          <h4>스택 <span style="font-weight:500;color:var(--ink-soft);font-size:12px">— 위가 top</span></h4>
+          <div class="stk" id="s52stk"></div>
+        </div>
+      </div>
     </div>
 
     <div class="tip good"><b>2행 → 3행을 꼭 짚어 주세요.</b>
@@ -607,5 +994,41 @@ while stack:
   </div>
 
 </div>
+<script>
+const S52=[{"cur": "(0,0,[])", "v": "push", "msg": "data[0]=3 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(1,0,[])", "(1,3,[3])"], "after": ["(1,0,[])", "(1,3,[3])"], "found": []}, {"cur": "(1,3,[3])", "v": "push", "msg": "data[1]=34 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(2,3,[3])", "(2,37,[3,34])"], "after": ["(1,0,[])", "(2,3,[3])", "(2,37,[3,34])"], "found": []}, {"cur": "(2,37,[3,34])", "v": "cut", "msg": "합 37 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(1,0,[])", "(2,3,[3])"], "found": []}, {"cur": "(2,3,[3])", "v": "push", "msg": "data[2]=4 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(3,3,[3])", "(3,7,[3,4])"], "after": ["(1,0,[])", "(3,3,[3])", "(3,7,[3,4])"], "found": []}, {"cur": "(3,7,[3,4])", "v": "push", "msg": "data[3]=12 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(4,7,[3,4])", "(4,19,[3,4,12])"], "after": ["(1,0,[])", "(3,3,[3])", "(4,7,[3,4])", "(4,19,[3,4,12])"], "found": []}, {"cur": "(4,19,[3,4,12])", "v": "cut", "msg": "합 19 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(1,0,[])", "(3,3,[3])", "(4,7,[3,4])"], "found": []}, {"cur": "(4,7,[3,4])", "v": "push", "msg": "data[4]=5 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(5,7,[3,4])", "(5,12,[3,4,5])"], "after": ["(1,0,[])", "(3,3,[3])", "(5,7,[3,4])", "(5,12,[3,4,5])"], "found": []}, {"cur": "(5,12,[3,4,5])", "v": "cut", "msg": "합 12 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(1,0,[])", "(3,3,[3])", "(5,7,[3,4])"], "found": []}, {"cur": "(5,7,[3,4])", "v": "push", "msg": "data[5]=2 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(6,7,[3,4])", "(6,9,[3,4,2])"], "after": ["(1,0,[])", "(3,3,[3])", "(6,7,[3,4])", "(6,9,[3,4,2])"], "found": []}, {"cur": "(6,9,[3,4,2])", "v": "hit", "msg": "합이 정확히 9 → 정답 발견", "pushed": [], "after": ["(1,0,[])", "(3,3,[3])", "(6,7,[3,4])"], "found": ["[3,4,2]"]}, {"cur": "(6,7,[3,4])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(1,0,[])", "(3,3,[3])"], "found": ["[3,4,2]"]}, {"cur": "(3,3,[3])", "v": "push", "msg": "data[3]=12 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(4,3,[3])", "(4,15,[3,12])"], "after": ["(1,0,[])", "(4,3,[3])", "(4,15,[3,12])"], "found": ["[3,4,2]"]}, {"cur": "(4,15,[3,12])", "v": "cut", "msg": "합 15 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(1,0,[])", "(4,3,[3])"], "found": ["[3,4,2]"]}, {"cur": "(4,3,[3])", "v": "push", "msg": "data[4]=5 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(5,3,[3])", "(5,8,[3,5])"], "after": ["(1,0,[])", "(5,3,[3])", "(5,8,[3,5])"], "found": ["[3,4,2]"]}, {"cur": "(5,8,[3,5])", "v": "push", "msg": "data[5]=2 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(6,8,[3,5])", "(6,10,[3,5,2])"], "after": ["(1,0,[])", "(5,3,[3])", "(6,8,[3,5])", "(6,10,[3,5,2])"], "found": ["[3,4,2]"]}, {"cur": "(6,10,[3,5,2])", "v": "cut", "msg": "합 10 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(1,0,[])", "(5,3,[3])", "(6,8,[3,5])"], "found": ["[3,4,2]"]}, {"cur": "(6,8,[3,5])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(1,0,[])", "(5,3,[3])"], "found": ["[3,4,2]"]}, {"cur": "(5,3,[3])", "v": "push", "msg": "data[5]=2 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(6,3,[3])", "(6,5,[3,2])"], "after": ["(1,0,[])", "(6,3,[3])", "(6,5,[3,2])"], "found": ["[3,4,2]"]}, {"cur": "(6,5,[3,2])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(1,0,[])", "(6,3,[3])"], "found": ["[3,4,2]"]}, {"cur": "(6,3,[3])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(1,0,[])"], "found": ["[3,4,2]"]}, {"cur": "(1,0,[])", "v": "push", "msg": "data[1]=34 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(2,0,[])", "(2,34,[34])"], "after": ["(2,0,[])", "(2,34,[34])"], "found": ["[3,4,2]"]}, {"cur": "(2,34,[34])", "v": "cut", "msg": "합 34 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(2,0,[])"], "found": ["[3,4,2]"]}, {"cur": "(2,0,[])", "v": "push", "msg": "data[2]=4 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(3,0,[])", "(3,4,[4])"], "after": ["(3,0,[])", "(3,4,[4])"], "found": ["[3,4,2]"]}, {"cur": "(3,4,[4])", "v": "push", "msg": "data[3]=12 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(4,4,[4])", "(4,16,[4,12])"], "after": ["(3,0,[])", "(4,4,[4])", "(4,16,[4,12])"], "found": ["[3,4,2]"]}, {"cur": "(4,16,[4,12])", "v": "cut", "msg": "합 16 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(3,0,[])", "(4,4,[4])"], "found": ["[3,4,2]"]}, {"cur": "(4,4,[4])", "v": "push", "msg": "data[4]=5 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(5,4,[4])", "(5,9,[4,5])"], "after": ["(3,0,[])", "(5,4,[4])", "(5,9,[4,5])"], "found": ["[3,4,2]"]}, {"cur": "(5,9,[4,5])", "v": "hit", "msg": "합이 정확히 9 → 정답 발견", "pushed": [], "after": ["(3,0,[])", "(5,4,[4])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(5,4,[4])", "v": "push", "msg": "data[5]=2 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(6,4,[4])", "(6,6,[4,2])"], "after": ["(3,0,[])", "(6,4,[4])", "(6,6,[4,2])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(6,6,[4,2])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(3,0,[])", "(6,4,[4])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(6,4,[4])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(3,0,[])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(3,0,[])", "v": "push", "msg": "data[3]=12 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(4,0,[])", "(4,12,[12])"], "after": ["(4,0,[])", "(4,12,[12])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(4,12,[12])", "v": "cut", "msg": "합 12 > 9 → 가지치기(백트랙)", "pushed": [], "after": ["(4,0,[])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(4,0,[])", "v": "push", "msg": "data[4]=5 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(5,0,[])", "(5,5,[5])"], "after": ["(5,0,[])", "(5,5,[5])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(5,5,[5])", "v": "push", "msg": "data[5]=2 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(6,5,[5])", "(6,7,[5,2])"], "after": ["(5,0,[])", "(6,5,[5])", "(6,7,[5,2])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(6,7,[5,2])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(5,0,[])", "(6,5,[5])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(6,5,[5])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(5,0,[])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(5,0,[])", "v": "push", "msg": "data[5]=2 → '안 고름' 먼저, '고름' 나중에 push", "pushed": ["(6,0,[])", "(6,2,[2])"], "after": ["(6,0,[])", "(6,2,[2])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(6,2,[2])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": ["(6,0,[])"], "found": ["[3,4,2]", "[4,5]"]}, {"cur": "(6,0,[])", "v": "fail", "msg": "수를 다 봤는데 합이 안 맞음 → 실패", "pushed": [], "after": [], "found": ["[3,4,2]", "[4,5]"]}];
+(function(){
+  var i=0, $=function(id){return document.getElementById(id);};
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+  function render(){
+    var s=S52[i];
+    $('s52n').textContent=(i+1)+' / '+S52.length;
+    $('s52cur').innerHTML='<span>꺼낸 상태 (i, 합, 고른 것)</span>'+esc(s.cur);
+    $('s52v').className='verdict '+s.v;
+    $('s52v').innerHTML=esc(s.msg)+(s.pushed.length
+      ? '<br><span style="opacity:.75">push → '+esc(s.pushed.join('   '))+'</span>' : '');
+    var box=$('s52stk'); box.innerHTML='';
+    if(!s.after.length){
+      box.innerHTML='<div class="stkempty">스택이 비었다 — 탐색 종료</div>';
+    }else{
+      s.after.slice().reverse().forEach(function(v,k){
+        var d=document.createElement('div');
+        d.className='stkitem'+(k===0?' top':'');
+        d.innerHTML='<span>'+esc(v)+'</span>'+(k===0?'<span class="tag2">top · 다음에 꺼냄</span>':'');
+        box.appendChild(d);
+      });
+    }
+    var f=$('s52found');
+    f.innerHTML=s.found.length
+      ? s.found.map(function(x){return '<span class="foundchip">'+esc(x)+'</span>';}).join('')
+      : '<span class="stkempty" style="padding:0">아직 없음</span>';
+    $('s52prev').disabled=(i===0);
+    $('s52next').disabled=(i===S52.length-1);
+  }
+  $('s52next').onclick=function(){if(i<S52.length-1){i++;render();}};
+  $('s52prev').onclick=function(){if(i>0){i--;render();}};
+  $('s52reset').onclick=function(){i=0;render();};
+  render();
+})();
+</script>
 </body>
 </html>

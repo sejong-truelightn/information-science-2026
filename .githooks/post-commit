@@ -1,0 +1,13 @@
+#!/bin/sh
+# 방금 만든 커밋의 메시지를 README '최근 업데이트'에 적고, 같은 커밋에 합친다.
+[ -n "$SKIP_CHANGELOG" ] && exit 0
+root=$(git rev-parse --show-toplevel)
+# 리베이스·머지 중에는 건드리지 않는다
+git_dir=$(git rev-parse --git-dir)
+[ -d "$git_dir/rebase-merge" ] || [ -d "$git_dir/rebase-apply" ] || [ -f "$git_dir/MERGE_HEAD" ] && exit 0
+[ -f "$root/tools/update-changelog.py" ] || exit 0
+python3 "$root/tools/update-changelog.py" || exit 0
+git -C "$root" diff --quiet -- README.md && exit 0
+git -C "$root" add README.md
+SKIP_CHANGELOG=1 git -C "$root" commit --amend --no-edit --no-verify --quiet
+exit 0

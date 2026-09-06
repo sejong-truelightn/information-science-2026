@@ -1,0 +1,19 @@
+# ── macOS ──
+.DS_Store
+
+# ── 배포 제외: 교과서·지도서 원문 PDF (저작권) ──
+*.pdf
+교과서/
+
+# ── 배포 제외: 교사용 자료 (완성본·해설) ──
+*_교사용.ipynb
+*_교사용.html
+
+# ── 배포 제외: 아직 정리 중인 자료 ──
+임시/
+
+# ── 작업용 로컬 파일 ──
+.claude/
+.claude-account
+.ipynb_checkpoints/
+__pycache__/

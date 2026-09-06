@@ -1,0 +1,7 @@
+#!/bin/sh
+# README의 업데이트 날짜를 커밋 직전에 자동으로 맞춘다.
+root=$(git rev-parse --show-toplevel)
+[ -f "$root/tools/update-dates.py" ] || exit 0
+python3 "$root/tools/update-dates.py" >/dev/null 2>&1 || exit 0
+git add "$root/README.md" 2>/dev/null
+exit 0
