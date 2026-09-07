@@ -397,6 +397,121 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
   </div>
 </section>
 
+<!-- 4b 문제1 DFS·BFS -->
+<section class="slide" data-name="문제 1 · DFS와 BFS">
+  <div class="eyebrow">문제 1 · 3차시와 이어 보기</div>
+  <h1 class="title">그 재귀는 <b>이미 DFS</b>였다</h1>
+  <p class="sub">함수 호출 스택이 눈에 보이지 않았을 뿐이다. 스택을 <b>직접</b> 만들면 3차시 코드가 그대로 나온다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card sea">
+        <h4>숨어 있던 트리를 꺼내면</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><td style="width:118px"><b>노드</b></td><td>남은 합 <span class="mono">rest</span></td></tr>
+          <tr><td><b>간선</b></td><td>다음 항으로 <span class="mono">x</span> 를 고르는 것</td></tr>
+          <tr><td><b><span class="mono">rest == 0</span> 인 잎</b></td><td>성공한 순열 <b>하나</b></td></tr>
+        </table>
+        <p style="font-size:15px;margin-top:10px">
+          곧 이 문제는 <b>트리의 잎을 세는 문제</b>다. 재귀의 종료 조건이 &ldquo;잎에 도착했다&rdquo;는 뜻이었다.
+        </p>
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        <b>3차시와 다른 점이 하나 있다.</b><br>
+        3차시에는 트리가 <span class="mono">tree</span> 딕셔너리로 <b>주어졌지만</b>, 여기서는 트리가 코드 속에 <b>숨어 있다</b>.
+        상태 공간을 먼저 그려 내는 것이 진짜 실력이다.
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b>방문 표시(<span class="mono">visited</span>)가 없다.</b><br>
+        <span class="mono">rest</span> 가 같아도 <b>거쳐 온 경로가 다르면 다른 순열</b>이기 때문이다. 3차시 트리 탐색과 같은 이유다.
+      </div>
+    </div>
+    <div>
+      <pre class="code sm"><span class="cm"># DFS — 스택</span>
+<span class="kw">def</span> <span class="fn">count_dfs</span>(n):
+    stack = [n]
+    cnt = <span class="nm">0</span>
+    <span class="kw">while</span> stack:
+        rest = stack.<span class="fn">pop</span>()        <span class="cm"># 맨 뒤 (LIFO)</span>
+        <span class="kw">if</span> rest == <span class="nm">0</span>:
+            cnt = cnt + <span class="nm">1</span>
+            <span class="kw">continue</span>
+        <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, rest + <span class="nm">1</span>):
+            stack.<span class="fn">append</span>(rest - x)
+    <span class="kw">return</span> cnt</pre>
+      <pre class="code sm" style="margin-top:12px"><span class="cm"># BFS — 큐</span>
+<span class="kw">def</span> <span class="fn">count_bfs</span>(n):
+    q = <span class="fn">deque</span>([n])
+    cnt = <span class="nm">0</span>
+    <span class="kw">while</span> q:
+        rest = q.<span class="fn">popleft</span>()      <span class="cm"># 맨 앞 (FIFO)</span>
+        <span class="kw">if</span> rest == <span class="nm">0</span>:
+            cnt = cnt + <span class="nm">1</span>
+            <span class="kw">continue</span>
+        <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, rest + <span class="nm">1</span>):
+            q.<span class="fn">append</span>(rest - x)
+    <span class="kw">return</span> cnt</pre>
+      <div class="callout coral" style="margin-top:14px">
+        두 함수의 차이는 <span class="mono">pop()</span> 과 <span class="mono">popleft()</span> <b>딱 한 글자뿐</b>이다.
+        그런데도 답을 찾아내는 순서는 완전히 달라진다. &rarr;
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4c 문제1 순서와 메모리 -->
+<section class="slide" data-name="문제 1 · 순서와 메모리">
+  <div class="eyebrow">문제 1 · 3차시와 이어 보기</div>
+  <h1 class="title">개수는 같고, <b>순서와 대가</b>가 다르다</h1>
+  <div class="body grid2">
+    <div>
+      <div class="card violet">
+        <h4>n = 4 일 때 찾아내는 순서</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th style="width:64px">DFS</th>
+              <td class="mono">1+1+1+1 · 1+1+2 · 1+2+1 · 1+3 · 2+1+1 · 2+2 · 3+1 · 4</td></tr>
+          <tr><th>BFS</th>
+              <td class="mono">4 · 1+3 · 2+2 · 3+1 · 1+1+2 · 1+2+1 · 2+1+1 · 1+1+1+1</td></tr>
+        </table>
+      </div>
+      <ul class="clean" style="margin-top:14px">
+        <li><b>DFS는 사전순</b> — 한 갈래를 끝까지 파고들기 때문에 <span class="mono">1+…</span> 을 모두 끝낸 뒤에야 <span class="mono">2+…</span> 로 넘어간다</li>
+        <li><b>BFS는 항의 개수 순</b> — 레벨이 곧 <b>지금까지 고른 항의 개수</b>다</li>
+      </ul>
+      <div class="callout moss" style="margin-top:14px">
+        그래서 &ldquo;<b>가장 적은 항으로 n 을 만드는 방법</b>&rdquo;을 물으면
+        BFS는 <b>처음 찾은 답이 곧 정답</b>이다. 더 볼 필요가 없다.
+      </div>
+    </div>
+    <div>
+      <div class="card coral">
+        <h4>그런데 BFS는 왜 위험한가</h4>
+        <p style="font-size:15px">DFS는 <b>지금 파고드는 한 갈래</b>만 들고 있으면 되지만,
+        BFS는 <b>한 레벨을 통째로</b> 큐에 쌓아 두어야 한다.</p>
+        <table class="tbl sm" style="margin-top:8px">
+          <tr><th class="c">n</th><th class="c">DFS 스택 최대</th><th class="c">BFS 큐 최대</th></tr>
+          <tr><td class="c mono">4</td><td class="c mono">4</td><td class="c mono">7</td></tr>
+          <tr><td class="c mono">8</td><td class="c mono">8</td><td class="c mono">78</td></tr>
+          <tr><td class="c mono">12</td><td class="c mono">12</td><td class="c mono">988</td></tr>
+          <tr><td class="c mono">16</td><td class="c mono">16</td><td class="c mono">13,495</td></tr>
+        </table>
+        <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
+          DFS 스택의 최대 크기는 <b>정확히 n</b>. BFS 큐는 n이 4 커질 때마다 자릿수가 늘어난다.
+          답이 <b>2<sup>n-1</sup></b> 개라 마지막 레벨이 그만큼 크기 때문이다.
+        </p>
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        <b>여기서 5차시로 넘어간다.</b><br>
+        전체 탐색은 언제나 옳지만, <b>언제나 끝나지는 않는다.</b>
+        n = 25 면 DFS는 스택에 25개만 들고 버티는데 BFS는 메모리에서 먼저 무너진다.
+      </div>
+      <div class="callout" style="margin-top:14px">
+        <b>문제 2도 똑같다.</b> 상태 = 지금 서 있는 칸, 간선 = 1칸 또는 2칸 오르기.
+        <span class="mono">range(1, rest+1)</span> 을 <span class="mono">(1, 2)</span> 로만 바꾸면 그대로 돌아간다.
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 5 문제2 상태공간 -->
 <section class="slide" data-name="문제 2 · 상태 공간">
   <div class="eyebrow">문제 2 · 교과서 176쪽</div>
