@@ -488,25 +488,71 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         <p style="font-size:15px">DFS는 <b>지금 파고드는 한 갈래</b>만 들고 있으면 되지만,
         BFS는 <b>한 레벨을 통째로</b> 큐에 쌓아 두어야 한다.</p>
         <table class="tbl sm" style="margin-top:8px">
-          <tr><th class="c">n</th><th class="c">DFS 스택 최대</th><th class="c">BFS 큐 최대</th></tr>
-          <tr><td class="c mono">4</td><td class="c mono">4</td><td class="c mono">7</td></tr>
-          <tr><td class="c mono">8</td><td class="c mono">8</td><td class="c mono">78</td></tr>
-          <tr><td class="c mono">12</td><td class="c mono">12</td><td class="c mono">988</td></tr>
-          <tr><td class="c mono">16</td><td class="c mono">16</td><td class="c mono">13,495</td></tr>
+          <tr><th class="c">n</th><th class="c">DFS 스택 최대</th><th class="c">BFS 큐 최대</th><th class="c">C(n, n/2)</th></tr>
+          <tr><td class="c mono">4</td><td class="c mono">4</td><td class="c mono">7</td><td class="c mono">6</td></tr>
+          <tr><td class="c mono">8</td><td class="c mono">8</td><td class="c mono">78</td><td class="c mono">70</td></tr>
+          <tr><td class="c mono">12</td><td class="c mono">12</td><td class="c mono">988</td><td class="c mono">924</td></tr>
+          <tr><td class="c mono">16</td><td class="c mono">16</td><td class="c mono">13,495</td><td class="c mono">12,870</td></tr>
+        </table>
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b>DFS 스택이 정확히 n 인 것은 우연이 아니다.</b><br>
+        꺼내는 것은 <b>맨 위 = 가장 작은 값</b> <span class="mono">r</span> 인데, 거기서 넣는 자식
+        <span class="mono">r-1, r-2, …, 0</span> 은 <b>전부 r 보다 작다</b>. 아래에 깔린 값은 모두 r 보다 크다.<br>
+        &rarr; 스택은 언제나 <b>아래에서 위로 강하게 감소</b>한다. 0 이상 n 미만인 서로 다른 정수를
+        감소 순으로 늘어놓으면 <b>아무리 길어야 n 개</b>다.
+        <div class="mono" style="font-size:13px;margin-top:8px;color:var(--ink-soft)">
+          [4] &rarr; [3,2,1,0] &rarr; [3,2,1] &rarr; [3,2,0] &rarr; [3,2] &rarr; …
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4d 문제1 레벨의 크기 -->
+<section class="slide" data-name="문제 1 · 레벨의 크기">
+  <div class="eyebrow">문제 1 · 3차시와 이어 보기</div>
+  <h1 class="title">큐가 터지는 곳은 <b>마지막이 아니라 한가운데</b></h1>
+  <div class="body grid2">
+    <div>
+      <div class="card violet">
+        <h4>레벨 k 의 노드 수는 <span class="mono">C(n, k)</span> 다</h4>
+        <p style="font-size:15px">레벨 k = <b>지금까지 항을 k 개 골랐다</b>는 뜻. n = 8 이면 —</p>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th class="c">k</th><th class="c">0</th><th class="c">1</th><th class="c">2</th><th class="c">3</th>
+              <th class="c" style="background:#fdf0e6">4</th><th class="c">5</th><th class="c">6</th><th class="c">7</th><th class="c">8</th></tr>
+          <tr><th class="c">노드</th><td class="c mono">1</td><td class="c mono">8</td><td class="c mono">28</td><td class="c mono">56</td>
+              <td class="c mono" style="background:#fdf0e6"><b>70</b></td><td class="c mono">56</td><td class="c mono">28</td><td class="c mono">8</td><td class="c mono">1</td></tr>
         </table>
         <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
-          DFS 스택의 최대 크기는 <b>정확히 n</b>. BFS 큐는 n이 4 커질 때마다 자릿수가 늘어난다.
-          답이 <b>2<sup>n-1</sup></b> 개라 마지막 레벨이 그만큼 크기 때문이다.
+          <b>파스칼 삼각형의 한 줄</b>이다. 전부 더하면 <b>2<sup>n</sup></b> = 트리 전체 노드 수.
         </p>
+        <ul class="clean coral" style="margin-top:6px">
+          <li><b>마지막 레벨은 노드가 딱 1개</b> — <span class="mono">1+1+…+1</span> 하나뿐이다</li>
+          <li><b>병목은 한가운데 레벨</b> <span class="mono">C(n, n/2)</span> — 종 모양의 가장 불룩한 곳</li>
+        </ul>
+        <p style="font-size:14px;color:var(--ink-soft);margin-top:6px">
+          실측이 <span class="mono">C(n, n/2)</span> 보다 조금 큰 것은, 큐가 한 레벨을 다 비우기 전에
+          다음 레벨을 만들기 시작해 <b>두 레벨이 잠깐 겹치기</b> 때문이다.
+        </p>
+      </div>
+    </div>
+    <div>
+      <div class="callout coral">
+        <b>오해 주의 — DFS가 더 <u>빠른</u> 것이 아니다.</b><br>
+        둘 다 <b>2<sup>n</sup></b> 개 노드를 전부 방문하므로 <b>시간은 같다</b>. 차이는 오직
+        &ldquo;한 번에 얼마나 들고 있어야 하는가&rdquo; — <b>메모리</b>다.
       </div>
       <div class="callout amber" style="margin-top:14px">
         <b>여기서 5차시로 넘어간다.</b><br>
+        <span class="mono">C(n, n/2)</span> 는 대략 <b>2<sup>n</sup>/&radic;n</b> 이라 n이 1 커질 때마다 거의 두 배가 된다.
+        n = 25 면 BFS는 <b>520만 개</b>를 큐에 들고 있어야 한다. DFS는 <b>25개</b>면 된다.<br>
         전체 탐색은 언제나 옳지만, <b>언제나 끝나지는 않는다.</b>
-        n = 25 면 DFS는 스택에 25개만 들고 버티는데 BFS는 메모리에서 먼저 무너진다.
       </div>
       <div class="callout" style="margin-top:14px">
         <b>문제 2도 똑같다.</b> 상태 = 지금 서 있는 칸, 간선 = 1칸 또는 2칸 오르기.
-        <span class="mono">range(1, rest+1)</span> 을 <span class="mono">(1, 2)</span> 로만 바꾸면 그대로 돌아간다.
+        <span class="mono">range(1, rest+1)</span> 을 <span class="mono">(1, 2)</span> 로만 바꾸면 된다 —
+        <b>문제 2에서 직접 해 본다.</b>
       </div>
     </div>
   </div>
@@ -585,6 +631,124 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         <table class="tbl sm" id="p2Tbl" style="margin-top:14px"></table>
       </div>
       <div class="msg ok" id="p2Msg" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6b 문제2 DFS·BFS -->
+<section class="slide" data-name="문제 2 · DFS와 BFS">
+  <div class="eyebrow">문제 2 · 3차시와 이어 보기</div>
+  <h1 class="title">같은 방법을 <b>계단</b>에 그대로</h1>
+  <p class="sub">문제 1에서 <span class="mono">range(1, rest+1)</span> 이던 자리가 <span class="mono">(1, 2)</span> 로 바뀌는 것뿐이다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card sea">
+        <h4>숨어 있던 트리</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><td style="width:130px"><b>노드</b></td><td>지금 서 있는 칸 <span class="mono">c</span></td></tr>
+          <tr><td><b>간선</b></td><td>1칸 또는 2칸 오르기</td></tr>
+          <tr><td><b><span class="mono">c == n</span> 인 잎</b></td><td>도착 성공 — 방법 하나</td></tr>
+          <tr><td><b><span class="mono">c &gt; n</span> 인 잎</b></td><td>지나쳐 버린 <b>실패</b> — 버린다</td></tr>
+        </table>
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        <b>문제 1과 딱 두 가지가 다르다.</b><br>
+        ① 자식이 <b>언제나 2개</b>다 — 곧 <b>이진 트리</b>다.<br>
+        ② <b>실패하는 잎이 생긴다.</b> 문제 1은 모든 잎이 성공이었다.
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <span class="mono">c &gt; n</span> 을 <span class="mono">continue</span> 로 버리는 것이 곧
+        <b>&ldquo;더 볼 필요가 없는 가지를 잘라내는 것&rdquo;</b> 이다.<br>
+        <b>5차시 분기 한정법</b>의 가장 단순한 형태를 여기서 이미 쓰고 있다.
+      </div>
+    </div>
+    <div>
+      <pre class="code sm"><span class="cm"># DFS — 스택</span>
+<span class="kw">def</span> <span class="fn">climb_dfs</span>(n):
+    stack = [<span class="nm">0</span>]
+    cnt = <span class="nm">0</span>
+    <span class="kw">while</span> stack:
+        c = stack.<span class="fn">pop</span>()          <span class="cm"># 맨 뒤 (LIFO)</span>
+        <span class="kw">if</span> c == n:
+            cnt = cnt + <span class="nm">1</span>
+            <span class="kw">continue</span>
+        <span class="kw">if</span> c &gt; n:                 <span class="cm"># 지나쳤다</span>
+            <span class="kw">continue</span>
+        <span class="kw">for</span> step <span class="kw">in</span> (<span class="nm">1</span>, <span class="nm">2</span>):
+            stack.<span class="fn">append</span>(c + step)
+    <span class="kw">return</span> cnt</pre>
+      <pre class="code sm" style="margin-top:12px"><span class="cm"># BFS — 큐  (pop() 이 popleft() 로만 바뀐다)</span>
+<span class="kw">def</span> <span class="fn">climb_bfs</span>(n):
+    q = <span class="fn">deque</span>([<span class="nm">0</span>])
+    cnt = <span class="nm">0</span>
+    <span class="kw">while</span> q:
+        c = q.<span class="fn">popleft</span>()          <span class="cm"># 맨 앞 (FIFO)</span>
+        <span class="kw">if</span> c == n:
+            cnt = cnt + <span class="nm">1</span>
+            <span class="kw">continue</span>
+        <span class="kw">if</span> c &gt; n:
+            <span class="kw">continue</span>
+        <span class="kw">for</span> step <span class="kw">in</span> (<span class="nm">1</span>, <span class="nm">2</span>):
+            q.<span class="fn">append</span>(c + step)
+    <span class="kw">return</span> cnt</pre>
+      <div class="io" style="margin-top:14px">
+        <div>n</div><div>5</div>
+        <div>DFS · BFS</div><div>둘 다 8</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6c 문제2 최소 횟수와 메모리 -->
+<section class="slide" data-name="문제 2 · 최소 횟수와 메모리">
+  <div class="eyebrow">문제 2 · 3차시와 이어 보기</div>
+  <h1 class="title">여기서는 <b>BFS가 더 흥미롭다</b></h1>
+  <div class="body grid2">
+    <div>
+      <div class="card violet">
+        <h4>n = 5 일 때 찾아내는 순서</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th style="width:64px">DFS</th>
+              <td class="mono">1+1+1+1+1 · 1+1+1+2 · 1+1+2+1 · 1+2+1+1 · 1+2+2 · 2+1+1+1 · 2+1+2 · 2+2+1</td></tr>
+          <tr><th>BFS</th>
+              <td class="mono"><b>1+2+2 · 2+1+2 · 2+2+1</b> · 1+1+1+2 · 1+1+2+1 · 1+2+1+1 · 2+1+1+1 · 1+1+1+1+1</td></tr>
+        </table>
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b>BFS가 맨 먼저 찾는 세 가지는 전부 3번 만에 오른 것</b>이다.
+        5칸을 오르는 <b>최소 횟수</b>가 3번(&lceil;5/2&rceil;)이기 때문이다.<br>
+        &rarr; &ldquo;<b>가장 적게 밟고 오르는 방법</b>&rdquo;을 물으면 BFS는 <b>처음 찾은 답이 곧 정답</b>이다.
+        여기서는 <b>레벨 = 계단을 오른 횟수</b>라 문제 1보다 훨씬 또렷하다.
+      </div>
+      <div class="callout" style="margin-top:14px">
+        DFS는 여전히 <b>사전순</b>이다. <span class="mono">1+1+1+1+1</span> 부터 나온다.
+      </div>
+    </div>
+    <div>
+      <div class="card coral">
+        <h4>메모리는 문제 1과 같은 이야기</h4>
+        <table class="tbl sm" style="margin-top:8px">
+          <tr><th class="c">n</th><th class="c">방법의 수</th><th class="c">방문한 노드</th><th class="c">DFS 스택</th><th class="c">BFS 큐</th></tr>
+          <tr><td class="c mono">5</td><td class="c mono">8</td><td class="c mono">25</td><td class="c mono">4</td><td class="c mono">11</td></tr>
+          <tr><td class="c mono">10</td><td class="c mono">89</td><td class="c mono">287</td><td class="c mono">6</td><td class="c mono">93</td></tr>
+          <tr><td class="c mono">15</td><td class="c mono">987</td><td class="c mono">3,193</td><td class="c mono">9</td><td class="c mono">881</td></tr>
+          <tr><td class="c mono">20</td><td class="c mono">10,946</td><td class="c mono">35,421</td><td class="c mono">11</td><td class="c mono">8,661</td></tr>
+        </table>
+        <ul class="clean coral" style="margin-top:10px">
+          <li><b>DFS 스택은 약 n/2</b> — 자식이 2개뿐이라 한 칸 내려갈 때마다 1개씩만 늘고,
+              <span class="mono">pop()</span> 이 <b>2칸짜리를 먼저</b> 꺼내 가장 깊은 길이 n/2 단계다</li>
+          <li><b>BFS 큐는 방법의 수와 같은 속도</b>로 커진다. 방법의 수가 피보나치수열이니 n이 1 커질 때마다 약 <b>1.6배</b></li>
+        </ul>
+      </div>
+      <div class="callout coral" style="margin-top:14px">
+        <b>방문한 노드 수를 보라.</b> DFS든 BFS든 n=20에서 <b>똑같이 35,421개</b>를 방문한다.<br>
+        다시 — <b>DFS가 빠른 것이 아니다. 덜 들고 있을 뿐이다.</b>
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        옆 슬라이드의 반복문 풀이 <span class="mono">f[i] = f[i-1] + f[i-2]</span> 는 같은 답을
+        <b>21번의 덧셈</b>으로 구한다. <b>35,421 대 21.</b><br>
+        3단원(관계기반 알고리즘)에서 이 차이를 정면으로 다룬다.
+      </div>
     </div>
   </div>
 </section>
