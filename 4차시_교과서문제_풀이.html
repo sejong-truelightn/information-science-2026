@@ -637,8 +637,8 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
 <!-- 6b 문제2 DFS·BFS -->
 <section class="slide" data-name="문제 2 · DFS와 BFS">
   <div class="eyebrow">문제 2 · 3차시와 이어 보기</div>
-  <h1 class="title">같은 방법을 <b>계단</b>에 그대로</h1>
-  <p class="sub">문제 1에서 <span class="mono">range(1, rest+1)</span> 이던 자리가 <span class="mono">(1, 2)</span> 로 바뀌는 것뿐이다.</p>
+  <h1 class="title">계단도 <b>똑같다</b></h1>
+  <p class="sub"><span class="mono">range(1, rest+1)</span> 이 <span class="mono">(1, 2)</span> 로 바뀔 뿐이다.</p>
   <div class="body grid2">
     <div>
       <div class="card sea">
@@ -656,9 +656,8 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         ② <b>실패하는 잎이 생긴다.</b> 문제 1은 모든 잎이 성공이었다.
       </div>
       <div class="callout moss" style="margin-top:14px">
-        <span class="mono">c &gt; n</span> 을 <span class="mono">continue</span> 로 버리는 것이 곧
-        <b>&ldquo;더 볼 필요가 없는 가지를 잘라내는 것&rdquo;</b> 이다.<br>
-        <b>5차시 분기 한정법</b>의 가장 단순한 형태를 여기서 이미 쓰고 있다.
+        <span class="mono">c &gt; n</span> 을 <span class="mono">continue</span> 로 버리는 것이
+        <b>가지를 잘라내는 것</b>이다. <b>5차시 분기 한정법</b>의 가장 단순한 형태다.
       </div>
     </div>
     <div>
@@ -701,7 +700,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
 <!-- 6c 문제2 최소 횟수와 메모리 -->
 <section class="slide" data-name="문제 2 · 최소 횟수와 메모리">
   <div class="eyebrow">문제 2 · 3차시와 이어 보기</div>
-  <h1 class="title">여기서는 <b>BFS가 더 흥미롭다</b></h1>
+  <h1 class="title">여기서는 <b>BFS</b>가 흥미롭다</h1>
   <div class="body grid2">
     <div>
       <div class="card violet">
@@ -714,10 +713,9 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         </table>
       </div>
       <div class="callout moss" style="margin-top:14px">
-        <b>BFS가 맨 먼저 찾는 세 가지는 전부 3번 만에 오른 것</b>이다.
-        5칸을 오르는 <b>최소 횟수</b>가 3번(&lceil;5/2&rceil;)이기 때문이다.<br>
-        &rarr; &ldquo;<b>가장 적게 밟고 오르는 방법</b>&rdquo;을 물으면 BFS는 <b>처음 찾은 답이 곧 정답</b>이다.
-        여기서는 <b>레벨 = 계단을 오른 횟수</b>라 문제 1보다 훨씬 또렷하다.
+        <b>레벨 = 계단을 오른 횟수</b>다.<br>
+        BFS가 맨 먼저 찾는 셋은 전부 <b>3번</b> 만에 오른 것 — 5칸의 <b>최소 횟수</b>다.<br>
+        &rarr; &ldquo;가장 적게 밟고 오르는 방법&rdquo;은 BFS가 <b>처음 찾은 답이 곧 정답</b>이다.
       </div>
       <div class="callout" style="margin-top:14px">
         DFS는 여전히 <b>사전순</b>이다. <span class="mono">1+1+1+1+1</span> 부터 나온다.
@@ -734,19 +732,17 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
           <tr><td class="c mono">20</td><td class="c mono">10,946</td><td class="c mono">35,421</td><td class="c mono">11</td><td class="c mono">8,661</td></tr>
         </table>
         <ul class="clean coral" style="margin-top:10px">
-          <li><b>DFS 스택은 약 n/2</b> — 자식이 2개뿐이라 한 칸 내려갈 때마다 1개씩만 늘고,
-              <span class="mono">pop()</span> 이 <b>2칸짜리를 먼저</b> 꺼내 가장 깊은 길이 n/2 단계다</li>
-          <li><b>BFS 큐는 방법의 수와 같은 속도</b>로 커진다. 방법의 수가 피보나치수열이니 n이 1 커질 때마다 약 <b>1.6배</b></li>
+          <li><b>DFS 스택은 약 n/2</b> — 자식이 2개뿐이고 <span class="mono">pop()</span> 이 2칸짜리를 먼저 꺼낸다</li>
+          <li><b>BFS 큐는 방법의 수와 같은 속도</b> — 피보나치수열이니 n이 1 커질 때마다 약 <b>1.6배</b></li>
         </ul>
       </div>
       <div class="callout coral" style="margin-top:14px">
-        <b>방문한 노드 수를 보라.</b> DFS든 BFS든 n=20에서 <b>똑같이 35,421개</b>를 방문한다.<br>
-        다시 — <b>DFS가 빠른 것이 아니다. 덜 들고 있을 뿐이다.</b>
+        n=20에서 DFS든 BFS든 <b>똑같이 35,421개</b>를 방문한다.<br>
+        <b>DFS가 빠른 것이 아니다. 덜 들고 있을 뿐이다.</b>
       </div>
       <div class="callout amber" style="margin-top:14px">
-        옆 슬라이드의 반복문 풀이 <span class="mono">f[i] = f[i-1] + f[i-2]</span> 는 같은 답을
-        <b>21번의 덧셈</b>으로 구한다. <b>35,421 대 21.</b><br>
-        3단원(관계기반 알고리즘)에서 이 차이를 정면으로 다룬다.
+        반복문 풀이 <span class="mono">f[i] = f[i-1] + f[i-2]</span> 는 같은 답을 <b>21번의 덧셈</b>으로 구한다.
+        <b>35,421 대 21</b> — 3단원에서 이 차이를 다룬다.
       </div>
     </div>
   </div>
