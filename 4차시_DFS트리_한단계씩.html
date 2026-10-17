@@ -1,0 +1,562 @@
+<title>스택이 그리는 탐색 트리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202e; --ink-soft:#4a5a70; --ink-faint:#93a1b3;
+  --line:#dfe5ee; --paper:#f7f9fc; --surface:#ffffff;
+  --sea:#1d5fd0; --sea-soft:#e8f0ff; --sea-edge:#c6dbff;
+  --coral:#e0533d; --coral-soft:#fdece8; --coral-edge:#f7cec4;
+  --moss:#137a5e; --moss-soft:#e2f4ee; --moss-edge:#bfe6d8;
+  --amber:#c98a09; --amber-soft:#fdf3dc; --amber-edge:#f0dfae;
+  --codebg:#111a26; --codefg:#dbe6f4; --codehl:#2a3346; --codecm:#7e93ab; --codenm:#e2c07d; --codekw:#ff9d7a; --codefn:#7fd3ff;
+  --ghost:#e4eaf2; --shadow:0 1px 2px rgba(22,32,46,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#e8eef7; --ink-soft:#a3b2c6; --ink-faint:#6d7e96;
+    --line:#293546; --paper:#0d141d; --surface:#151f2b;
+    --sea:#6ba6ff; --sea-soft:#172940; --sea-edge:#2b4467;
+    --coral:#f2836d; --coral-soft:#372018; --coral-edge:#5b3327;
+    --moss:#3fbf96; --moss-soft:#123028; --moss-edge:#1f4e41;
+    --amber:#e0b155; --amber-soft:#332b16; --amber-edge:#544628;
+    --codebg:#0a1119; --ghost:#1d2836; --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e8eef7; --ink-soft:#a3b2c6; --ink-faint:#6d7e96;
+  --line:#293546; --paper:#0d141d; --surface:#151f2b;
+  --sea:#6ba6ff; --sea-soft:#172940; --sea-edge:#2b4467;
+  --coral:#f2836d; --coral-soft:#372018; --coral-edge:#5b3327;
+  --moss:#3fbf96; --moss-soft:#123028; --moss-edge:#1f4e41;
+  --amber:#e0b155; --amber-soft:#332b16; --amber-edge:#544628;
+  --codebg:#0a1119; --ghost:#1d2836; --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+body{
+  font-family:'IBM Plex Sans KR',-apple-system,BlinkMacSystemFont,'Malgun Gothic',sans-serif;
+  background:var(--paper); color:var(--ink);
+  padding:24px 28px 40px; line-height:1.6;
+}
+.mono{font-family:'JetBrains Mono','SFMono-Regular',Consolas,monospace}
+.wrap{max-width:1240px; margin:0 auto}
+
+/* ── 헤더 ─────────────────────────────── */
+.eyebrow{font-size:12.5px;font-weight:600;letter-spacing:.14em;color:var(--sea);display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line)}
+h1{font-size:29px;font-weight:700;letter-spacing:-.02em;line-height:1.25;margin:9px 0 6px;text-wrap:balance}
+.lede{font-size:15px;color:var(--ink-soft);max-width:64ch;margin:0}
+
+/* ── 컨트롤 ───────────────────────────── */
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0 16px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}
+.btn{border:none;border-radius:9px;padding:8px 15px;font:600 14px/1 'IBM Plex Sans KR',sans-serif;cursor:pointer;background:var(--sea);color:#fff;transition:filter .12s}
+.btn:hover:not(:disabled){filter:brightness(1.1)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover:not(:disabled){background:var(--sea-soft);border-color:var(--sea-edge)}
+.btn.play{background:var(--coral);min-width:92px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg button{border:none;background:transparent;color:var(--ink-soft);font:600 13.5px/1 'IBM Plex Sans KR',sans-serif;padding:9px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--sea);color:#fff}
+.ctl-label{font-size:13px;font-weight:600;color:var(--ink-soft);letter-spacing:.03em}
+.spacer{flex:1}
+.stepcount{font-size:13px;color:var(--ink-faint);font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+label.chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-soft);cursor:pointer}
+
+/* ── 본문 그리드 ──────────────────────── */
+.stage{display:grid;grid-template-columns:326px minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+
+.rail{display:flex;flex-direction:column;gap:14px}
+pre.code{background:var(--codebg);color:var(--codefg);border-radius:12px;padding:14px 0;margin:0;font:400 13px/1.72 'JetBrains Mono',monospace;overflow-x:auto}
+pre.code .ln{display:block;padding:0 16px;white-space:pre}
+pre.code .ln.on{background:var(--codehl);box-shadow:inset 3px 0 0 var(--amber)}
+pre.code .kw{color:var(--codekw)} pre.code .fn{color:var(--codefn)}
+pre.code .nm{color:var(--codenm)} pre.code .cm{color:var(--codecm);font-style:italic}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:14px 16px;box-shadow:var(--shadow)}
+.panel h2{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--ink-soft);margin:0 0 4px}
+.panel .hint{font-size:12px;color:var(--ink-faint);margin:0 0 10px}
+
+/* 스택/큐 */
+.mouth{font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--coral);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.cells{display:flex;flex-direction:column;gap:5px;min-height:44px}
+.cell{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:8px;padding:6px 11px;background:var(--paper);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;animation:slot .25s ease}
+.cell .idx{color:var(--ink-faint);font-size:11px;min-width:16px}
+.cell.head{background:var(--coral-soft);border-color:var(--coral-edge);color:var(--coral);font-weight:700}
+.cell.head .idx{color:var(--coral)}
+.cell.fresh{border-color:var(--sea-edge);background:var(--sea-soft)}
+.cells .empty{font-size:13px;color:var(--ink-faint);padding:6px 2px}
+@keyframes slot{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+.tally{display:flex;align-items:baseline;gap:10px}
+.tally .num{font-family:'JetBrains Mono',monospace;font-size:31px;font-weight:700;color:var(--moss);line-height:1.1;font-variant-numeric:tabular-nums}
+.tally .of{font-size:13px;color:var(--ink-faint)}
+.found{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;min-height:26px}
+.found span{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;padding:3px 8px;border-radius:6px;background:var(--moss-soft);border:1px solid var(--moss-edge);color:var(--moss);animation:slot .25s ease}
+.found .none{background:none;border:none;color:var(--ink-faint);font-family:inherit;padding-left:0}
+
+/* ── 트리 ─────────────────────────────── */
+.canvas{background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+.narrate{display:flex;gap:11px;align-items:flex-start;padding:13px 17px;border-bottom:1px solid var(--line);background:var(--sea-soft);font-size:14.5px;line-height:1.6;min-height:54px}
+.narrate .badge{flex:none;font:700 11px/1 'IBM Plex Sans KR',sans-serif;letter-spacing:.05em;padding:5px 8px;border-radius:6px;background:var(--sea);color:#fff;margin-top:1px}
+.narrate.pop{background:var(--coral-soft)} .narrate.pop .badge{background:var(--coral)}
+.narrate.hit{background:var(--moss-soft)} .narrate.hit .badge{background:var(--moss)}
+.narrate.fin{background:var(--amber-soft)} .narrate.fin .badge{background:var(--amber);color:#241a02}
+.narrate b{font-weight:700}
+.scroller{overflow-x:auto;padding:6px 10px 10px}
+svg.tree{display:block;font-family:'JetBrains Mono',monospace}
+.nd circle{stroke-width:1.6px;transition:fill .25s,stroke .25s,opacity .25s,r .2s}
+.nd text{font-size:14px;font-weight:700;text-anchor:middle;dominant-baseline:central;transition:fill .25s,opacity .25s}
+.nd.hidden{opacity:0;pointer-events:none}
+.nd.ghost{opacity:.55}
+.nd.ghost circle{fill:none;stroke:var(--ghost);stroke-dasharray:3 3}
+.nd.ghost text{fill:var(--ghost)}
+.nd.wait circle{fill:var(--surface);stroke:var(--sea-edge);stroke-dasharray:4 3}
+.nd.wait text{fill:var(--sea)}
+.nd.cur circle{fill:var(--coral);stroke:var(--coral);r:22}
+.nd.cur text{fill:#fff}
+.nd.open circle{fill:var(--paper);stroke:var(--line)}
+.nd.open text{fill:var(--ink-faint)}
+.nd.hit circle{fill:var(--moss);stroke:var(--moss)}
+.nd.hit text{fill:#fff}
+.ed{stroke:var(--line);stroke-width:1.6px;fill:none;transition:opacity .25s,stroke .25s}
+.ed.hidden{opacity:0} .ed.ghosted{opacity:.4;stroke:var(--ghost)}
+.ed.live{stroke:var(--sea-edge)} .ed.trail{stroke:var(--moss-edge)}
+.elabel{font-size:10.5px;font-weight:500;text-anchor:middle;fill:var(--ink-faint);transition:opacity .25s}
+.elabel.hidden{opacity:0} .elabel.ghosted{opacity:.35}
+@media (prefers-reduced-motion:reduce){
+  *,.cell,.found span{animation:none!important;transition:none!important}
+}
+
+/* ── 아래 설명 ────────────────────────── */
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+@media (max-width:900px){.notes{grid-template-columns:1fr}}
+.note{border-left:4px solid var(--amber);background:var(--amber-soft);padding:12px 15px;border-radius:0 10px 10px 0;font-size:14px;line-height:1.7}
+.note.sea{border-color:var(--sea);background:var(--sea-soft)}
+.note b{font-weight:700}
+.note code{font-family:'JetBrains Mono',monospace;font-size:13px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--ink-soft)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend .l-wait{background:var(--surface);border:1.5px dashed var(--sea-edge)}
+.legend .l-cur{background:var(--coral)} .legend .l-hit{background:var(--moss)}
+.legend .l-open{background:var(--paper);border:1.5px solid var(--line)}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">4차시 · 문제 1 · 상태 공간 추적</p>
+    <h1>스택이 그리는 탐색 트리</h1>
+    <p class="lede"><span class="mono">count_dfs(n)</span> 을 한 줄씩 실행하면서, 코드 속에 숨어 있던 트리가 어떻게 자라나는지 본다. 노드에 적힌 숫자는 <b>앞으로 더 채워야 할 남은 합</b>(<span class="mono">node</span>)이다.</p>
+  </header>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="탐색 방법">
+      <button id="mDfs" aria-pressed="true">DFS · 스택</button>
+      <button id="mBfs" aria-pressed="false">BFS · 큐</button>
+    </div>
+    <span class="ctl-label">n</span>
+    <div class="seg" role="group" aria-label="n 값" id="nSeg"></div>
+    <span class="spacer"></span>
+    <label class="chk"><input type="checkbox" id="ghostChk"> 앞으로 그려질 트리 미리보기</label>
+    <span class="stepcount" id="stepCount">1 / 1</span>
+    <button class="btn ghost" id="btnFirst">처음</button>
+    <button class="btn ghost" id="btnPrev">← 이전</button>
+    <button class="btn" id="btnNext">다음 →</button>
+    <button class="btn play" id="btnPlay">자동 재생</button>
+  </div>
+
+  <div class="stage">
+    <div class="rail">
+      <pre class="code" id="code"></pre>
+      <section class="panel">
+        <h2 id="boxTitle">스택</h2>
+        <p class="hint" id="boxHint">아직 살펴보지 않은 노드들이 담겨 있다.</p>
+        <div class="mouth" id="mouth">↑ 여기서 꺼낸다</div>
+        <div class="cells" id="cells"></div>
+      </section>
+      <section class="panel">
+        <h2>지금까지 센 순열</h2>
+        <div class="tally"><span class="num" id="cnt">0</span><span class="of" id="target">목표 2<sup>n-1</sup> = 4</span></div>
+        <div class="found" id="found"></div>
+      </section>
+    </div>
+
+    <div>
+      <div class="canvas">
+        <div class="narrate" id="narrate"><span class="badge" id="narrBadge">시작</span><span id="narrText"></span></div>
+        <div class="scroller"><svg class="tree" id="tree"></svg></div>
+      </div>
+      <div class="legend">
+        <span><i class="l-wait"></i>상자 안에서 차례를 기다리는 중</span>
+        <span><i class="l-cur"></i>방금 꺼낸 노드</span>
+        <span><i class="l-open"></i>펼쳐서 자식을 넣은 노드</span>
+        <span><i class="l-hit"></i>남은 합 0 · 순열 하나 완성</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div class="note">
+      <b>자식은 왼쪽부터 <code>x = 1, 2, …</code> 순서로 넣는데, 왜 오른쪽부터 꺼낼까?</b><br>
+      <code>append</code> 는 맨 뒤에 쌓고 <code>pop</code> 은 맨 뒤에서 꺼내기 때문이다. 가장 마지막에 넣은 <code>x = node</code> 가지가 먼저 열린다. 왼쪽부터 탐색하게 하려면 <code>range(node, 0, -1)</code> 로 거꾸로 넣으면 된다.
+    </div>
+    <div class="note sea">
+      <b>방문 표시(<code>visited</code>)가 없다.</b><br>
+      숫자가 같은 노드가 트리 여기저기에 나타나지만, <b>거쳐 온 경로가 다르면 다른 순열</b>이므로 각각 따로 세야 한다. 3차시 트리 탐색과 같은 이유다. BFS 로 바꿔 보면 같은 트리를 <b>층 단위</b>로 훑는 것을 볼 수 있다.
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var CODE = {
+    dfs: [
+      [['kw','def '],['fn','count_dfs'],['','(n):']],
+      [['','    stack = [n]']],
+      [['','    cnt = '],['nm','0']],
+      [['kw','    while '],['','stack:']],
+      [['','        node = stack.'],['fn','pop'],['','()          '],['cm','# 맨 뒤 (LIFO)']],
+      [['kw','        if '],['','node == '],['nm','0'],['',':']],
+      [['','            cnt = cnt + '],['nm','1']],
+      [['kw','            continue']],
+      [['kw','        for '],['','x '],['kw','in '],['fn','range'],['','('],['nm','1'],['',', node + '],['nm','1'],['','):']],
+      [['','            stack.'],['fn','append'],['','(node - x)']],
+      [['kw','    return '],['','cnt']]
+    ],
+    bfs: [
+      [['kw','def '],['fn','count_bfs'],['','(n):']],
+      [['','    q = '],['fn','deque'],['','([n])']],
+      [['','    cnt = '],['nm','0']],
+      [['kw','    while '],['','q:']],
+      [['','        node = q.'],['fn','popleft'],['','()        '],['cm','# 맨 앞 (FIFO)']],
+      [['kw','        if '],['','node == '],['nm','0'],['',':']],
+      [['','            cnt = cnt + '],['nm','1']],
+      [['kw','            continue']],
+      [['kw','        for '],['','x '],['kw','in '],['fn','range'],['','('],['nm','1'],['',', node + '],['nm','1'],['','):']],
+      [['','            q.'],['fn','append'],['','(node - x)']],
+      [['kw','    return '],['','cnt']]
+    ]
+  };
+
+  var el = function(id){ return document.getElementById(id); };
+  var SVGNS = 'http://www.w3.org/2000/svg';
+
+  /* ── 트리 만들기 + 자리 잡기 ─────────────────── */
+  function buildTree(n){
+    var nodes = [];
+    function make(val, parent, edge){
+      var id = nodes.length;
+      nodes.push({id:id, val:val, parent:parent, edge:edge,
+                  depth: parent === null ? 0 : nodes[parent].depth + 1, kids:[]});
+      if(parent !== null) nodes[parent].kids.push(id);
+      return id;
+    }
+    var root = make(n, null, null);
+    (function expand(id){
+      var v = nodes[id].val;
+      for(var x = 1; x <= v; x++) expand(make(v - x, id, x));
+    })(root);
+
+    var slot = 0;
+    (function place(id){
+      var nd = nodes[id];
+      if(nd.kids.length === 0){ nd.col = slot++; return; }
+      nd.kids.forEach(place);
+      nd.col = (nodes[nd.kids[0]].col + nodes[nd.kids[nd.kids.length-1]].col) / 2;
+    })(root);
+
+    return {nodes:nodes, root:root, leaves:slot, depth:n};
+  }
+
+  function pathOf(tree, id){
+    var parts = [], nd = tree.nodes[id];
+    while(nd.parent !== null){ parts.unshift(nd.edge); nd = tree.nodes[nd.parent]; }
+    return parts.join('+');
+  }
+
+  /* ── 한 걸음씩 실행 기록 ─────────────────────── */
+  function simulate(tree, mode){
+    var isDfs = mode === 'dfs';
+    var box = [tree.root];
+    var cnt = 0, steps = [];
+    var revealed = {}, opened = {}, hit = {}, found = [];
+    revealed[tree.root] = true;
+
+    function snap(o){
+      o.box = box.slice();
+      o.cnt = cnt;
+      o.revealed = Object.keys(revealed).map(Number);
+      o.opened = Object.keys(opened).map(Number);
+      o.hit = Object.keys(hit).map(Number);
+      o.found = found.slice();
+      steps.push(o);
+    }
+
+    var boxName = isDfs ? '스택' : '큐';
+    snap({line:[1], cur:null, tone:'', badge:'시작',
+      text:'뿌리 노드 하나만 ' + boxName + '에 넣고 시작한다. 남은 합 <b class="mono">' +
+           tree.nodes[tree.root].val + '</b> 을 어떻게 쪼갤지는 아직 아무것도 정해지지 않았다.'});
+
+    while(box.length){
+      var id = isDfs ? box.pop() : box.shift();
+      var nd = tree.nodes[id];
+      snap({line:[4], cur:id, tone:'pop', badge:'꺼냄',
+        text: (isDfs ? '맨 뒤' : '맨 앞') + '에서 <b class="mono">' + nd.val +
+              '</b> 을 꺼냈다. 여기까지 오면서 <b class="mono">' +
+              (nd.parent === null ? '아직 아무것도' : pathOf(tree, id)) + '</b> 를 골라 놓은 상태다.'});
+
+      if(nd.val === 0){
+        cnt++; hit[id] = true;
+        var p = pathOf(tree, id);
+        found.push(p);
+        snap({line:[6,7], cur:id, tone:'hit', badge:'성공',
+          text:'남은 합이 <b>0</b> — 더 채울 것이 없다. 순열 <b class="mono">' + p +
+               '</b> 하나 완성. <b>cnt = ' + cnt + '</b>'});
+      } else {
+        opened[id] = true;
+        nd.kids.forEach(function(k){ box.push(k); revealed[k] = true; });
+        var vals = nd.kids.map(function(k){ return tree.nodes[k].val; });
+        snap({line:[8,9], cur:id, fresh:nd.kids.slice(), tone:'', badge:'펼침',
+          text:'다음 항 <b class="mono">x</b> 로 <b class="mono">1…' + nd.val +
+               '</b> 을 하나씩 고를 수 있다. 남은 합 <b class="mono">' + vals.join(', ') +
+               '</b> 을 ' + boxName + '에 넣는다.'});
+      }
+    }
+
+    snap({line:[10], cur:null, tone:'fin', badge:'끝',
+      text: boxName + '이 비었다 — 더 볼 상태가 없다. <b>cnt = ' + cnt +
+            '</b> 를 돌려준다. 잎(초록 노드)의 개수가 그대로 답이다.'});
+    return steps;
+  }
+
+  /* ── 화면 상태 ───────────────────────────────── */
+  var state = {n:3, mode:'dfs', i:0, ghost:false, playing:false, timer:null};
+  var tree, steps, nodeEls = {}, edgeEls = {}, labelEls = {};
+
+  var NR = 19, LEVEL = 82, GAP = 54, PADX = 30, PADY = 30;
+
+  function drawTree(){
+    var svg = el('tree');
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    nodeEls = {}; edgeEls = {}; labelEls = {};
+
+    var w = Math.max(360, (tree.leaves - 1) * GAP + PADX * 2);
+    var h = tree.depth * LEVEL + PADY * 2;
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    function px(nd){ return PADX + nd.col * GAP; }
+    function py(nd){ return PADY + nd.depth * LEVEL; }
+
+    var gEdge = document.createElementNS(SVGNS, 'g');
+    var gLabel = document.createElementNS(SVGNS, 'g');
+    var gNode = document.createElementNS(SVGNS, 'g');
+    svg.appendChild(gEdge); svg.appendChild(gLabel); svg.appendChild(gNode);
+
+    tree.nodes.forEach(function(nd){
+      if(nd.parent !== null){
+        var pa = tree.nodes[nd.parent];
+        var line = document.createElementNS(SVGNS, 'line');
+        line.setAttribute('x1', px(pa)); line.setAttribute('y1', py(pa) + NR);
+        line.setAttribute('x2', px(nd)); line.setAttribute('y2', py(nd) - NR);
+        line.setAttribute('class', 'ed hidden');
+        gEdge.appendChild(line);
+        edgeEls[nd.id] = line;
+
+        var lab = document.createElementNS(SVGNS, 'text');
+        lab.setAttribute('x', (px(pa) + px(nd)) / 2 + (px(nd) >= px(pa) ? 9 : -9));
+        lab.setAttribute('y', (py(pa) + py(nd)) / 2 + 4);
+        lab.setAttribute('class', 'elabel hidden');
+        lab.textContent = 'x=' + nd.edge;
+        gLabel.appendChild(lab);
+        labelEls[nd.id] = lab;
+      }
+
+      var g = document.createElementNS(SVGNS, 'g');
+      g.setAttribute('class', 'nd hidden');
+      var c = document.createElementNS(SVGNS, 'circle');
+      c.setAttribute('cx', px(nd)); c.setAttribute('cy', py(nd)); c.setAttribute('r', NR);
+      var t = document.createElementNS(SVGNS, 'text');
+      t.setAttribute('x', px(nd)); t.setAttribute('y', py(nd));
+      t.textContent = nd.val;
+      g.appendChild(c); g.appendChild(t);
+      gNode.appendChild(g);
+      nodeEls[nd.id] = g;
+    });
+  }
+
+  function has(arr, v){ return arr.indexOf(v) !== -1; }
+
+  function render(){
+    var s = steps[state.i];
+
+    /* 코드 */
+    var lines = CODE[state.mode];
+    var html = '';
+    lines.forEach(function(parts, idx){
+      var body = parts.map(function(p){
+        var txt = p[1].replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        return p[0] ? '<span class="' + p[0] + '">' + txt + '</span>' : txt;
+      }).join('');
+      html += '<span class="ln' + (has(s.line, idx) ? ' on' : '') + '">' + (body || ' ') + '</span>';
+    });
+    el('code').innerHTML = html;
+
+    /* 안내 문장 */
+    el('narrate').className = 'narrate ' + s.tone;
+    el('narrBadge').textContent = s.badge;
+    el('narrText').innerHTML = s.text;
+
+    /* 상자 */
+    var isDfs = state.mode === 'dfs';
+    el('boxTitle').textContent = isDfs ? '스택' : '큐';
+    el('boxHint').textContent = isDfs
+      ? '넣는 곳과 꺼내는 곳이 같다 (LIFO).'
+      : '뒤로 넣고 앞에서 꺼낸다 (FIFO).';
+    el('mouth').textContent = isDfs ? '↑ 맨 뒤 — 여기서 꺼낸다' : '↑ 맨 앞 — 여기서 꺼낸다';
+
+    var order = isDfs ? s.box.slice().reverse() : s.box.slice();
+    var cells = el('cells');
+    cells.innerHTML = '';
+    if(order.length === 0){
+      var e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = '비어 있음';
+      cells.appendChild(e);
+    } else {
+      order.forEach(function(id, k){
+        var d = document.createElement('div');
+        d.className = 'cell' + (k === 0 ? ' head' : '') +
+                      (s.fresh && has(s.fresh, id) ? ' fresh' : '');
+        d.innerHTML = '<span class="idx">' + (k + 1) + '</span><span>' +
+                      tree.nodes[id].val + '</span>';
+        cells.appendChild(d);
+      });
+    }
+
+    /* 계수기 */
+    el('cnt').textContent = s.cnt;
+    var foundBox = el('found');
+    foundBox.innerHTML = '';
+    if(s.found.length === 0){
+      foundBox.innerHTML = '<span class="none">아직 없음</span>';
+    } else {
+      s.found.forEach(function(p){
+        var sp = document.createElement('span');
+        sp.textContent = p;
+        foundBox.appendChild(sp);
+      });
+    }
+
+    /* 트리 */
+    tree.nodes.forEach(function(nd){
+      var id = nd.id, cls;
+      if(s.cur === id) cls = 'nd cur';
+      else if(has(s.hit, id)) cls = 'nd hit';
+      else if(has(s.opened, id)) cls = 'nd open';
+      else if(has(s.revealed, id)) cls = 'nd wait';
+      else cls = state.ghost ? 'nd ghost' : 'nd hidden';
+      nodeEls[id].setAttribute('class', cls);
+
+      if(id !== tree.root){
+        var shown = has(s.revealed, id);
+        var ec = 'ed', lc = 'elabel';
+        if(!shown){ ec += state.ghost ? ' ghosted' : ' hidden'; lc += state.ghost ? ' ghosted' : ' hidden'; }
+        else if(has(s.hit, id) || has(s.hit, nd.parent)) ec += ' trail';
+        else ec += ' live';
+        edgeEls[id].setAttribute('class', ec);
+        labelEls[id].setAttribute('class', lc);
+      }
+    });
+
+    /* 컨트롤 */
+    el('stepCount').textContent = (state.i + 1) + ' / ' + steps.length;
+    el('btnPrev').disabled = state.i === 0;
+    el('btnFirst').disabled = state.i === 0;
+    el('btnNext').disabled = state.i === steps.length - 1;
+  }
+
+  function reset(){
+    tree = buildTree(state.n);
+    steps = simulate(tree, state.mode);
+    state.i = 0;
+    el('target').innerHTML = '목표 2<sup>n-1</sup> = ' + Math.pow(2, state.n - 1);
+    drawTree();
+    render();
+  }
+
+  function go(d){
+    var next = Math.min(steps.length - 1, Math.max(0, state.i + d));
+    if(next === state.i && d > 0) stop();
+    state.i = next;
+    render();
+  }
+
+  function stop(){
+    state.playing = false;
+    if(state.timer){ clearInterval(state.timer); state.timer = null; }
+    el('btnPlay').textContent = '자동 재생';
+  }
+
+  function play(){
+    if(state.playing){ stop(); return; }
+    if(state.i === steps.length - 1) state.i = 0;
+    state.playing = true;
+    el('btnPlay').textContent = '멈춤';
+    state.timer = setInterval(function(){ go(1); }, 850);
+    render();
+  }
+
+  /* ── 컨트롤 연결 ─────────────────────────────── */
+  var nSeg = el('nSeg');
+  [2,3,4,5].forEach(function(v){
+    var b = document.createElement('button');
+    b.textContent = v;
+    b.setAttribute('aria-pressed', v === state.n ? 'true' : 'false');
+    b.addEventListener('click', function(){
+      stop();
+      state.n = v;
+      Array.prototype.forEach.call(nSeg.children, function(x){
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      reset();
+    });
+    nSeg.appendChild(b);
+  });
+
+  function setMode(m){
+    stop();
+    state.mode = m;
+    el('mDfs').setAttribute('aria-pressed', m === 'dfs' ? 'true' : 'false');
+    el('mBfs').setAttribute('aria-pressed', m === 'bfs' ? 'true' : 'false');
+    reset();
+  }
+  el('mDfs').addEventListener('click', function(){ setMode('dfs'); });
+  el('mBfs').addEventListener('click', function(){ setMode('bfs'); });
+
+  el('btnNext').addEventListener('click', function(){ stop(); go(1); });
+  el('btnPrev').addEventListener('click', function(){ stop(); go(-1); });
+  el('btnFirst').addEventListener('click', function(){ stop(); state.i = 0; render(); });
+  el('btnPlay').addEventListener('click', play);
+  el('ghostChk').addEventListener('change', function(e){
+    state.ghost = e.target.checked;
+    render();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.target.tagName === 'INPUT') return;
+    if(e.key === 'ArrowRight'){ e.preventDefault(); stop(); go(1); }
+    else if(e.key === 'ArrowLeft'){ e.preventDefault(); stop(); go(-1); }
+    else if(e.key === ' '){ e.preventDefault(); play(); }
+  });
+
+  reset();
+})();
+</script>

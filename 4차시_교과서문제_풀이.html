@@ -133,6 +133,28 @@ input[type=range]{width:230px}
 .chip{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;padding:0 10px;border-radius:8px;font-weight:700;font-size:14px;font-family:'JetBrains Mono';background:var(--paper);border:1px solid var(--line)}
 .chip.on{background:var(--moss);color:#fff;border-color:var(--moss)}
 .chip.cur{background:var(--coral);color:#fff;border-color:var(--coral)}
+.grid3{display:grid;grid-template-columns:0.95fr 0.8fr 1.15fr;gap:18px}
+.grouplist{display:flex;flex-direction:column;gap:7px}
+.grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grpk{font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:var(--sea);min-width:58px;flex:none}
+.chip .lp{color:#ffd97d}
+/* 호출 스택 위젯 */
+.stackbox{display:flex;flex-direction:column-reverse;gap:5px;min-height:210px;justify-content:flex-start;
+  padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.frm{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:9px;font-family:'JetBrains Mono';
+  font-size:14px;background:#fff;border:1px solid var(--line);color:var(--ink-soft)}
+.frm b{font-size:15px;color:var(--ink)}
+.frm.top{background:var(--coral);border-color:var(--coral);color:#ffd9d2}
+.frm.top b{color:#fff}
+.frm .sep{flex:1}
+.stackbase{font-size:12px;color:#a9b5c6;text-align:center;padding-bottom:4px;border-bottom:1px dashed var(--line);margin-bottom:4px}
+.trace{border-collapse:collapse;width:100%;font-size:13.5px;font-family:'JetBrains Mono'}
+.trace td{border:1px solid var(--line);padding:5px 8px;line-height:1.5}
+.trace td.k{white-space:nowrap;width:1%}
+.trace tr.live td{background:var(--coral-soft)}
+.trace tr.doneR td{background:var(--moss-soft)}
+.q{color:var(--coral);font-weight:700}
+.v{color:var(--moss);font-weight:700}
 .empty{color:#a9b5c6;font-size:14px}
 
 .vizstage{border:1px solid var(--line);border-radius:14px;background:#fcfdff;padding:6px}
@@ -161,6 +183,95 @@ input[type=range]{width:230px}
 #progress{position:fixed;top:0;left:0;height:3px;background:var(--sea);z-index:60;transition:width .3s}
 #slidename{font-size:13px;color:var(--ink-soft);max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kbdkey{display:inline-block;border:1px solid #c9d3e0;border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:13px;background:#fff;font-family:'JetBrains Mono'}
+
+/* ── 4b 슬라이드: 스택이 그리는 탐색 트리 (범위 한정) ───────────── */
+#dvWrap{
+  --ink-faint:#93a1b3; --surface:#ffffff;
+  --sea-edge:#c6dbff; --coral-edge:#f7cec4; --moss-edge:#bfe6d8; --amber-edge:#f0dfae;
+  --codebg:#111a26; --codefg:#dbe6f4; --codehl:#2a3346;
+  --codecm:#7e93ab; --codenm:#e2c07d; --codekw:#ff9d7a; --codefn:#7fd3ff;
+  --ghost:#e4eaf2; --shadow:0 1px 2px rgba(22,32,46,.06);
+  line-height:1.6;
+}
+#dvWrap .controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:0 0 14px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}
+#dvWrap .btn{border:none;border-radius:9px;padding:7px 14px;font:600 13.5px/1 'IBM Plex Sans KR',sans-serif;cursor:pointer;background:var(--sea);color:#fff}
+#dvWrap .btn:hover:not(:disabled){filter:brightness(1.1)}
+#dvWrap .btn:disabled{opacity:.35;cursor:default;filter:none}
+#dvWrap .btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+#dvWrap .btn.ghost:hover:not(:disabled){background:var(--sea-soft);border-color:var(--sea-edge);filter:none}
+#dvWrap .btn.play{background:var(--coral);min-width:88px}
+#dvWrap .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+#dvWrap .seg button{border:none;background:transparent;color:var(--ink-soft);font:600 13px/1 'IBM Plex Sans KR',sans-serif;padding:8px 13px;cursor:pointer}
+#dvWrap .seg button[aria-pressed="true"]{background:var(--sea);color:#fff}
+#dvWrap .ctl-label{font-size:13px;font-weight:600;color:var(--ink-soft);letter-spacing:.03em}
+#dvWrap .spacer{flex:1}
+#dvWrap .stepcount{font-size:13px;color:var(--ink-faint);font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+#dvWrap label.chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-soft);cursor:pointer}
+
+#dvWrap .stage{display:grid;grid-template-columns:316px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){#dvWrap .stage{grid-template-columns:1fr}}
+#dvWrap .rail{display:flex;flex-direction:column;gap:12px}
+#dvWrap pre.code{background:var(--codebg);color:var(--codefg);border-radius:12px;padding:13px 0;margin:0;font:400 12.6px/1.7 'JetBrains Mono',monospace;overflow-x:auto}
+#dvWrap pre.code .ln{display:block;padding:0 15px;white-space:pre}
+#dvWrap pre.code .ln.on{background:var(--codehl);box-shadow:inset 3px 0 0 var(--amber)}
+#dvWrap pre.code .kw{color:var(--codekw)} #dvWrap pre.code .fn{color:var(--codefn)}
+#dvWrap pre.code .nm{color:var(--codenm)} #dvWrap pre.code .cm{color:var(--codecm);font-style:italic}
+
+#dvWrap .panel{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:12px 14px;box-shadow:var(--shadow)}
+#dvWrap .panel h2{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--ink-soft);margin:0 0 4px}
+#dvWrap .panel .hint{font-size:12px;color:var(--ink-faint);margin:0 0 9px}
+#dvWrap .mouth{font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--coral);margin-bottom:6px}
+#dvWrap .cells{display:flex;flex-direction:column;gap:5px;min-height:40px}
+#dvWrap .cell{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-radius:8px;padding:5px 10px;background:var(--paper);font-family:'JetBrains Mono',monospace;font-size:13.5px;font-weight:500;font-variant-numeric:tabular-nums;animation:dvslot .25s ease}
+#dvWrap .cell .idx{color:var(--ink-faint);font-size:11px;min-width:16px}
+#dvWrap .cell.head{background:var(--coral-soft);border-color:var(--coral-edge);color:var(--coral);font-weight:700}
+#dvWrap .cell.head .idx{color:var(--coral)}
+#dvWrap .cell.fresh{border-color:var(--sea-edge);background:var(--sea-soft)}
+#dvWrap .cells .empty{font-size:13px;color:var(--ink-faint);padding:5px 2px}
+@keyframes dvslot{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+#dvWrap .tally{display:flex;align-items:baseline;gap:10px}
+#dvWrap .tally .num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--moss);line-height:1.1;font-variant-numeric:tabular-nums}
+#dvWrap .tally .of{font-size:13px;color:var(--ink-faint)}
+#dvWrap .found{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;min-height:24px}
+#dvWrap .found span{font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;padding:3px 8px;border-radius:6px;background:var(--moss-soft);border:1px solid var(--moss-edge);color:var(--moss);animation:dvslot .25s ease}
+#dvWrap .found .none{background:none;border:none;color:var(--ink-faint);font-family:inherit;padding-left:0}
+
+#dvWrap .canvas{background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+#dvWrap .narrate{display:flex;gap:11px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--sea-soft);font-size:14.5px;line-height:1.6;min-height:52px}
+#dvWrap .narrate .badge{flex:none;font:700 11px/1 'IBM Plex Sans KR',sans-serif;letter-spacing:.05em;padding:5px 8px;border-radius:6px;background:var(--sea);color:#fff;margin-top:1px}
+#dvWrap .narrate.pop{background:var(--coral-soft)} #dvWrap .narrate.pop .badge{background:var(--coral)}
+#dvWrap .narrate.hit{background:var(--moss-soft)} #dvWrap .narrate.hit .badge{background:var(--moss)}
+#dvWrap .narrate.fin{background:var(--amber-soft)} #dvWrap .narrate.fin .badge{background:var(--amber);color:#241a02}
+#dvWrap .scroller{overflow-x:auto;padding:6px 10px 10px}
+#dvWrap svg.tree{display:block;font-family:'JetBrains Mono',monospace;width:auto;max-width:none}
+#dvWrap .nd circle{stroke-width:1.6px;transition:fill .25s,stroke .25s,opacity .25s,r .2s}
+#dvWrap .nd text{font-size:14px;font-weight:700;text-anchor:middle;dominant-baseline:central;transition:fill .25s,opacity .25s}
+#dvWrap .nd.hidden{opacity:0;pointer-events:none}
+#dvWrap .nd.ghost{opacity:.55}
+#dvWrap .nd.ghost circle{fill:none;stroke:var(--ghost);stroke-dasharray:3 3}
+#dvWrap .nd.ghost text{fill:var(--ghost)}
+#dvWrap .nd.wait circle{fill:var(--surface);stroke:var(--sea-edge);stroke-dasharray:4 3}
+#dvWrap .nd.wait text{fill:var(--sea)}
+#dvWrap .nd.cur circle{fill:var(--coral);stroke:var(--coral);r:22}
+#dvWrap .nd.cur text{fill:#fff}
+#dvWrap .nd.open circle{fill:var(--paper);stroke:var(--line)}
+#dvWrap .nd.open text{fill:var(--ink-faint)}
+#dvWrap .nd.hit circle{fill:var(--moss);stroke:var(--moss)}
+#dvWrap .nd.hit text{fill:#fff}
+#dvWrap .ed{stroke:var(--line);stroke-width:1.6px;fill:none;transition:opacity .25s,stroke .25s}
+#dvWrap .ed.hidden{opacity:0} #dvWrap .ed.ghosted{opacity:.4;stroke:var(--ghost)}
+#dvWrap .ed.live{stroke:var(--sea-edge)} #dvWrap .ed.trail{stroke:var(--moss-edge)}
+#dvWrap .elabel{font-size:10.5px;font-weight:500;text-anchor:middle;fill:var(--ink-faint);transition:opacity .25s}
+#dvWrap .elabel.hidden{opacity:0} #dvWrap .elabel.ghosted{opacity:.35}
+#dvWrap .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--ink-soft)}
+#dvWrap .legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+#dvWrap .legend .l-wait{background:var(--surface);border:1.5px dashed var(--sea-edge)}
+#dvWrap .legend .l-cur{background:var(--coral)} #dvWrap .legend .l-hit{background:var(--moss)}
+#dvWrap .legend .l-open{background:var(--paper);border:1.5px solid var(--line)}
+@media (prefers-reduced-motion:reduce){
+  #dvWrap *,#dvWrap .cell,#dvWrap .found span{animation:none!important;transition:none!important}
+}
 </style>
 </head>
 <body>
@@ -187,106 +298,6 @@ input[type=range]{width:230px}
   </p>
 </section>
 
-<!-- 개념 점검 1 : 파이썬 -->
-<section class="slide" data-name="풀기 전에 · 파이썬 개념">
-  <div class="eyebrow">CHECKPOINT 1</div>
-  <h1 class="title">풀기 전에 — 알아야 할 파이썬</h1>
-  <p class="sub">다섯 문제 <b>전부</b>에 쓰이는 것들이다. 하나라도 흔들리면 답이 아니라 <span class="mono">None</span> 이나 <span class="mono">0</span> 이 나온다.</p>
-  <div class="body grid-2-1">
-    <div>
-      <table class="tbl">
-        <tr><th style="width:190px">개념</th><th>이 노트북에서 걸리는 지점</th></tr>
-        <tr><td><b><span class="mono">return</span> 과 <span class="mono">print</span> 의 차이</b></td>
-            <td>뼈대가 <span class="mono">print('...', count(n))</span> 형태다. 함수는 <b>값을 돌려줘야</b> 한다. 함수 안에서 출력하면 <span class="mono">None</span> 이 같이 찍힌다</td></tr>
-        <tr><td><b>함수 정의 · 매개변수</b></td>
-            <td>매개변수가 곧 <b>상태</b>다. &ldquo;무엇만 알면 나머지가 정해지는가&rdquo;를 매개변수로 적는다</td></tr>
-        <tr><td><b><span class="mono">%</span> 나머지 연산</b></td>
-            <td><span class="mono">a % b == 0</span> 이면 나누어떨어진다. 문제 3·4·5의 판정이 전부 이것이다</td></tr>
-        <tr><td><b><span class="mono">range(a, b)</span> 는 b를 포함하지 않는다</b></td>
-            <td><span class="mono">range(1, n+1)</span> 에서 <b>+1</b> 을 빠뜨리는 실수가 가장 흔하다</td></tr>
-        <tr><td><b>누적 변수</b></td>
-            <td><span class="mono">count = count + 1</span> — 세는 문제는 전부 이 꼴이다</td></tr>
-        <tr><td><b>불리언 반환</b></td>
-            <td><span class="mono">is_prime(x)</span> 는 <span class="mono">True</span>/<span class="mono">False</span> 를 돌려준다. 그래야 <span class="mono">if is_prime(x):</span> 로 쓸 수 있다</td></tr>
-        <tr><td><b><span class="mono">global</span></b></td>
-            <td>함수 <b>안에서 바깥 변수를 바꾸려면</b> 필요하다 (문제 2·5)</td></tr>
-        <tr><td><b>재귀 — 종료 조건 + 자기 호출</b></td>
-            <td>종료 조건이 없으면 <b>영원히</b> 내려간다 (문제 1·2·5)</td></tr>
-      </table>
-    </div>
-    <div>
-      <div class="card coral">
-        <h4>가장 많이 나오는 실수</h4>
-        <pre class="code sm"><span class="cm"># ✗ 함수가 값을 안 돌려준다</span>
-<span class="kw">def</span> <span class="fn">count</span>(rest):
-    <span class="fn">print</span>(rest)      <span class="cm"># 출력만 하고 끝</span>
-
-<span class="fn">print</span>(<span class="fn">count</span>(<span class="nm">3</span>))
-<span class="cm"># -&gt; 3
-#    None  &lt;- 돌려준 값이 없다</span>
-
-<span class="cm"># ✓ 값을 돌려준다</span>
-<span class="kw">def</span> <span class="fn">count</span>(rest):
-    <span class="kw">return</span> <span class="nm">4</span>
-
-<span class="fn">print</span>(<span class="fn">count</span>(<span class="nm">3</span>))   <span class="cm"># -&gt; 4</span></pre>
-      </div>
-      <div class="callout amber" style="margin-top:14px">
-        <b><span class="mono">pass</span> 는 &ldquo;아무것도 하지 않는다&rdquo;</b>는 뜻이다.<br>
-        뼈대를 그대로 실행하면 <span class="mono">None</span> 이나 <span class="mono">0</span> 이 나온다. <b>오류가 아니다.</b> 왜 그 값이 나왔는지부터 설명할 수 있어야 한다.
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 개념 점검 2 : 수학 · 오류 -->
-<section class="slide" data-name="풀기 전에 · 수학 개념과 오류">
-  <div class="eyebrow">CHECKPOINT 2</div>
-  <h1 class="title">풀기 전에 — 수학 용어와 만나게 될 오류</h1>
-  <div class="body">
-    <div class="grid2">
-      <div class="card sea">
-        <h3>수학 용어 여섯 개</h3>
-        <table class="tbl sm" style="margin-top:6px">
-          <tr><td style="width:96px"><b>약수</b></td><td>나누어떨어지게 하는 수. <span class="mono">n % d == 0</span></td></tr>
-          <tr><td><b>배수</b></td><td>약수의 반대편. 3의 배수 &rarr; <span class="mono">s % 3 == 0</span> <span class="tag gray">문제 5</span></td></tr>
-          <tr><td><b>소수</b></td><td>1과 자기 자신 외에 약수가 없는, <b>1보다 큰</b> 수 <span class="tag gray">문제 3</span></td></tr>
-          <tr><td><b>최대공약수</b></td><td>두 수의 공통 약수 중 가장 큰 것 <span class="tag gray">문제 4</span></td></tr>
-          <tr><td><b>서로소</b></td><td>최대공약수가 <b>1</b>인 두 수 <span class="tag gray">문제 4</span></td></tr>
-          <tr><td><b>순열 · 조합</b></td><td>순서를 <b>따지면</b> 순열, <b>안 따지면</b> 조합 <span class="tag gray">문제 1 · 5</span></td></tr>
-        </table>
-      </div>
-      <div class="card amber">
-        <h3>순열과 조합이 한 노트북에 같이 있다</h3>
-        <table class="tbl sm" style="margin-top:6px">
-          <tr><th style="width:110px"></th><th class="c">문제 1 <span class="tag violet">순열</span></th><th class="c">문제 5 <span class="tag moss">조합</span></th></tr>
-          <tr><td><b>다르게 세나?</b></td><td class="c"><span class="mono">1+2</span> 와 <span class="mono">2+1</span><br><b>다르다</b></td><td class="c"><span class="mono">(1,3,6)</span> 과 <span class="mono">(3,1,6)</span><br><b>같다</b></td></tr>
-          <tr><td><b>코드의 차이</b></td><td class="c">매번 <b>1부터</b> 다시<br><span class="mono">range(1, rest+1)</span></td><td class="c"><b>다음 것부터</b><br><span class="mono">range(start, N)</span> + <span class="mono">i+1</span></td></tr>
-        </table>
-        <p style="font-size:14.5px;margin-top:10px">이 한 글자 차이가 답을 바꾼다. <b>문제를 읽고 어느 쪽인지 먼저 정하는 것</b>이 코드보다 앞선다.</p>
-      </div>
-    </div>
-
-    <h3 style="margin:22px 0 10px;font-size:19px">만나게 될 오류 세 가지</h3>
-    <table class="tbl">
-      <tr><th style="width:210px">화면에 나오는 것</th><th>원인</th><th style="width:150px">어느 문제</th></tr>
-      <tr><td class="mono" style="color:var(--coral)"><b>RecursionError</b></td>
-          <td>재귀에 <b>종료 조건이 없다</b>. 계단 문제에서 <span class="mono">c &gt; n</span> 검사를 빠뜨리면 계단을 넘어서도 계속 올라간다</td>
-          <td>문제 1 · 2 · 5</td></tr>
-      <tr><td class="mono" style="color:var(--coral)"><b>UnboundLocalError</b></td>
-          <td><span class="mono">global</span> 없이 함수 안에서 바깥 변수를 바꾸려 했다</td>
-          <td>문제 5</td></tr>
-      <tr><td class="mono"><b>None</b> &nbsp;또는&nbsp; <b>0</b></td>
-          <td>오류는 아니다. <span class="mono">return</span> 을 안 썼거나, <b>1부터 n까지 훑는 반복문을 안 썼다</b></td>
-          <td>전부</td></tr>
-    </table>
-
-    <div class="callout coral" style="margin-top:18px">
-      <b>문제 3 · 4의 뼈대에는 <span class="mono">for</span> 문이 아예 없다.</b> <span class="mono">count = 0</span> 만 있고, 1부터 n까지 훑는 반복문은 직접 써야 한다.<br>
-      함수만 채우고 끝내면 계속 <b>0</b> 이 나온다.
-    </div>
-  </div>
-</section>
 
 <!-- 2 문제 목록 -->
 <section class="slide" data-name="오늘의 다섯 문제">
@@ -315,35 +326,85 @@ input[type=range]{width:230px}
   </div>
 </section>
 
-<!-- 3 문제1 상태공간 -->
-<section class="slide" data-name="문제 1 · 상태 공간">
+
+<!-- 4 문제1 8가지 나누기 -->
+<section class="slide" data-name="문제 1 · 4를 만드는 8가지">
   <div class="eyebrow">문제 1 · 교과서 175쪽</div>
-  <h1 class="title"><span class="qnum">1</span>자연수의 합으로 3을 나타내는 순열</h1>
-  <p class="sub">자연수의 합으로 <b>n</b>을 나타낼 수 있는 <b>모든 순열</b>의 개수를 구하시오.</p>
-  <div class="body grid-2-1">
+  <h1 class="title"><span class="qnum">1</span>4를 만드는 8가지 &mdash; 앞을 가려 보면</h1>
+  <p class="sub">자연수의 합으로 <b>n</b>을 나타낼 수 있는 <b>모든 순열</b>의 개수를 구하시오. &mdash; 먼저 <b>n = 4</b>를 손으로 다 적어 본 뒤, <b>맨 앞 숫자</b>를 가려 본다. 남는 것이 무엇인지 보면 재귀식이 저절로 나온다.</p>
+  <div class="body grid2">
+
     <div>
-      <div class="vizstage"><svg id="p1Svg" viewBox="0 0 560 300"></svg></div>
-      <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
-        노드의 수는 <b>아직 만들어야 할 남은 값</b>. 가지에 적힌 것은 <b>이번에 더한 수</b>. 0에 닿으면 한 가지가 완성된다.
-      </p>
-    </div>
-    <div>
-      <div class="card flat" style="margin-bottom:14px">
-        <h4>3을 만드는 네 가지</h4>
-        <ul class="clean moss" style="font-family:'JetBrains Mono';font-size:15px">
-          <li>1 + 1 + 1</li><li>1 + 2</li><li>2 + 1</li><li>3</li>
-        </ul>
+      <div class="card flat">
+        <h4>① 먼저 다 적어 본다 &mdash; 8가지</h4>
+        <div style="font-family:'JetBrains Mono';font-size:15px;line-height:1.9;columns:2;column-gap:18px">
+          1+1+1+1<br>1+1+2<br>1+2+1<br>1+3<br>2+1+1<br>2+2<br>3+1<br>4
+        </div>
       </div>
-      <div class="callout amber">
-        <b>순열</b>이므로 <b>1+2</b> 와 <b>2+1</b> 은 <b>다른 것</b>으로 센다.<br>
-        그래서 매번 <b>1부터 다시</b> 고른다. 조합이었다면 이렇게 하면 안 된다.
-      </div>
+
       <div class="card sea" style="margin-top:14px">
-        <h4>재귀로 옮기면</h4>
-        <p style="font-size:15px">남은 값이 <b>0</b> → 한 가지 완성, <b>1</b>을 돌려준다.<br>
-        아니면 1부터 남은 값까지 <b>x</b>를 골라, <b>남은 값 − x</b> 를 다시 센다.</p>
+        <h4>② 맨 앞 숫자로 줄 세우기</h4>
+        <table class="tbl sm" style="background:#fff">
+          <tr><th class="c" style="width:78px">맨 앞</th><th>식</th><th class="c" style="width:56px">개수</th></tr>
+          <tr><td class="c mono"><b>1</b></td><td class="mono">1+1+1+1 &nbsp; 1+1+2 &nbsp; 1+2+1 &nbsp; 1+3</td><td class="c mono"><b>4</b></td></tr>
+          <tr><td class="c mono"><b>2</b></td><td class="mono">2+1+1 &nbsp; 2+2</td><td class="c mono"><b>2</b></td></tr>
+          <tr><td class="c mono"><b>3</b></td><td class="mono">3+1</td><td class="c mono"><b>1</b></td></tr>
+          <tr><td class="c mono"><b>4</b></td><td class="mono">4</td><td class="c mono"><b>1</b></td></tr>
+        </table>
+        <p style="font-size:15px;margin-top:10px">4 + 2 + 1 + 1 = <b>8</b>. 맞다.</p>
       </div>
     </div>
+
+    <div>
+      <div class="card flat">
+        <h4>③ 이제 앞을 손으로 가려 본다</h4>
+        <table class="tbl sm" style="background:#fff">
+          <tr><th style="width:132px">가리는 것</th><th>남는 것</th><th class="c" style="width:112px">그것은?</th></tr>
+          <tr>
+            <td class="c mono"><b>1+</b></td>
+            <td class="mono" style="line-height:1.95">
+              <span style="color:#c3cedd">1+</span>1+1+1<br>
+              <span style="color:#c3cedd">1+</span>1+2<br>
+              <span style="color:#c3cedd">1+</span>2+1<br>
+              <span style="color:#c3cedd">1+</span>3
+            </td>
+            <td class="c">3을 만드는<br>모든 방법<br><span class="tag moss mono">f(3) = 4</span></td>
+          </tr>
+          <tr>
+            <td class="c mono"><b>2+</b></td>
+            <td class="mono" style="line-height:1.95">
+              <span style="color:#c3cedd">2+</span>1+1<br>
+              <span style="color:#c3cedd">2+</span>2
+            </td>
+            <td class="c">2를 만드는<br>모든 방법<br><span class="tag moss mono">f(2) = 2</span></td>
+          </tr>
+          <tr>
+            <td class="c mono"><b>3+</b></td>
+            <td class="mono"><span style="color:#c3cedd">3+</span>1</td>
+            <td class="c">1을 만드는<br>모든 방법<br><span class="tag moss mono">f(1) = 1</span></td>
+          </tr>
+          <tr>
+            <td class="c mono"><b>4</b></td>
+            <td class="mono"><span style="color:#c3cedd">4</span> &nbsp;<span style="font-family:'IBM Plex Sans KR';color:var(--ink-soft)">(아무것도 안 남음)</span></td>
+            <td class="c">더 채울 것이<br>없는 한 가지<br><span class="tag moss mono">f(0) = 1</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="callout moss" style="margin-top:14px">
+        <b>1+ 을 가리고 남은 4개</b>(1+1+1, 1+2, 2+1, 3)는 <b>3을 만드는 네 가지</b> 그 자체다. 우연이 아니라, <b>맨 앞을 x로 정하면 그 뒤는 n−x를 만드는 문제 그 자체</b>이기 때문이다.
+      </div>
+
+      <div class="card violet" style="margin-top:14px">
+        <h4>④ 그래서 재귀식</h4>
+        <p class="mono" style="font-size:17px;font-weight:700;line-height:1.6">
+          f(4) = f(3) + f(2) + f(1) + f(0)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 4 + 2 + 1 + 1 = <span style="color:var(--violet)">8</span>
+        </p>
+        <p style="font-size:15px;margin-top:8px">일반적으로 <span class="mono"><b>f(n) = f(0) + f(1) + … + f(n−1)</b></span>, 그리고 <span class="mono"><b>f(0) = 1</b></span>.</p>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -384,7 +445,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
           <span class="mono" id="p1Nv" style="font-weight:700;font-size:17px;color:var(--sea)">3</span>
         </div>
         <div class="bignum" id="p1Ans">4<small>순열의 개수</small></div>
-        <div class="chiprow" id="p1List" style="margin-top:12px"></div>
+        <div class="grouplist" id="p1List" style="margin-top:12px"></div>
       </div>
       <div class="msg" id="p1Msg" style="margin-top:14px"></div>
       <table class="tbl sm" style="margin-top:14px">
@@ -392,6 +453,88 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         <tr><th class="c">f(n)</th><td class="c mono">1</td><td class="c mono">2</td><td class="c mono">4</td><td class="c mono">8</td><td class="c mono">16</td><td class="c mono">32</td><td class="c mono">64</td></tr>
       </table>
       <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">n이 1 늘 때마다 <b>두 배</b>가 된다. 곧 <b>2<sup>n-1</sup></b> 이다. n=1000이면 손으로는 불가능하다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4a 문제1 호출 스택 -->
+<section class="slide" data-name="문제 1 · 호출 스택">
+  <div class="eyebrow">문제 1 · 풀이</div>
+  <h1 class="title">for 문이 도는 동안 <span class="mono">스택</span>에 쌓이는 것</h1>
+  <div class="ctrlbar" style="margin-top:0">
+    <span style="font-size:15px">n =</span>
+    <input type="range" id="stN" min="1" max="4" value="3" style="width:110px">
+    <span class="mono" id="stNv" style="font-weight:700;font-size:17px;color:var(--sea)">3</span>
+    <button class="btn sm ghost" id="stPrev">◀ 이전</button>
+    <button class="btn sm" id="stNext">다음 ▶</button>
+    <button class="btn sm ghost" id="stReset">처음부터</button>
+    <span class="mono" id="stStep" style="font-size:13px;color:var(--ink-soft)"></span>
+    <span class="sep" style="flex:1"></span>
+    <span style="font-size:13px;color:var(--ink-soft)">코드의 <b style="color:var(--amber)">노란 줄</b>이 지금 실행 중인 곳이다</span>
+  </div>
+  <div class="msg" id="stMsg" style="margin-bottom:14px"></div>
+  <div class="body grid3">
+    <div>
+      <pre class="code" id="stCode"><span class="ln"><span class="kw">def</span> <span class="fn">f</span>(n):</span>
+<span class="ln">    <span class="kw">if</span> n==<span class="nm">0</span>:</span>
+<span class="ln">      <span class="kw">return</span> <span class="nm">1</span></span>
+<span class="ln">    cnt = <span class="nm">0</span></span>
+<span class="ln">    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):</span>
+<span class="ln">       cnt = cnt+<span class="fn">f</span>(i)</span>
+<span class="ln">    <span class="kw">return</span> cnt</span></pre>
+      <div class="callout amber" style="margin-top:14px">
+        <b>쌓인 함수는 멈춰 있다</b> — f(3)은 f(0)을 부르는 순간
+        <span class="mono">i</span> 와 <span class="mono">cnt</span> 를 그대로 든 채 기다린다.
+        되돌려받으면 멈췄던 자리에서 for 문을 <b>이어서</b> 돌린다.
+      </div>
+    </div>
+    <div>
+      <h4 style="font-size:14px;font-weight:700;color:var(--ink-soft);margin:0 0 8px">호출 스택 <span style="font-weight:500">(위가 실행 중)</span></h4>
+      <div class="stackbox" id="stStack"></div>
+      <div class="card moss" style="margin-top:12px">
+        <h4>눈여겨볼 것</h4>
+        <p style="font-size:14px">같은 <span class="mono">f(1)</span>, <span class="mono">f(0)</span> 이 <b>몇 번이나 다시</b> 계산된다.
+        n이 조금만 커져도 이 중복이 폭발한다.</p>
+      </div>
+    </div>
+    <div>
+      <h4 style="font-size:14px;font-weight:700;color:var(--ink-soft);margin:0 0 8px">실행 기록 — <span class="q">?</span> 는 아직 모르는 값</h4>
+      <table class="trace"><tbody id="stRows"></tbody></table>
+      <p style="font-size:13.5px;color:var(--ink-soft);margin-top:10px">
+        물음표는 <b>돌아올 때</b> 채워진다. 가장 깊은 f(0)이 먼저 1이 되고,
+        그 값이 <b>아래에서 위로</b> 전해지며 나머지 <span class="q">?</span> 가 메워진다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3 문제1 상태공간 -->
+<section class="slide" data-name="문제 1 · 상태 공간">
+  <div class="eyebrow">문제 1 · 교과서 175쪽</div>
+  <h1 class="title"><span class="qnum">1</span>자연수의 합으로 3을 나타내는 순열</h1>
+  <p class="sub">자연수의 합으로 <b>n</b>을 나타낼 수 있는 <b>모든 순열</b>의 개수를 구하시오.</p>
+  <div class="body grid-2-1">
+    <div>
+      <div class="vizstage"><svg id="p1Svg" viewBox="0 0 560 300"></svg></div>
+      <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
+        노드의 수는 <b>아직 만들어야 할 남은 값</b>. 가지에 적힌 것은 <b>이번에 더한 수</b>. 0에 닿으면 한 가지가 완성된다.
+      </p>
+    </div>
+    <div>
+      <div class="card flat" style="margin-bottom:14px">
+        <h4>3을 만드는 네 가지</h4>
+        <ul class="clean moss" style="font-family:'JetBrains Mono';font-size:15px">
+          <li>1 + 1 + 1</li><li>1 + 2</li><li>2 + 1</li><li>3</li>
+        </ul>
+      </div>
+      <div class="callout amber">
+        <b>순열</b>이므로 <b>1+2</b> 와 <b>2+1</b> 은 <b>다른 것</b>으로 센다.<br>
+        그래서 매번 <b>1부터 다시</b> 고른다. 조합이었다면 이렇게 하면 안 된다.
+      </div>
+      <div class="card sea" style="margin-top:14px">
+        <h4>재귀로 옮기면</h4>
+        <p style="font-size:15px">남은 값이 <b>0</b> → 한 가지 완성, <b>1</b>을 돌려준다.<br>
+        아니면 1부터 남은 값까지 <b>x</b>를 골라, <b>남은 값 − x</b> 를 다시 센다.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -406,9 +549,9 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
       <div class="card sea">
         <h4>숨어 있던 트리를 꺼내면</h4>
         <table class="tbl sm" style="margin-top:6px">
-          <tr><td style="width:118px"><b>노드</b></td><td>남은 합 <span class="mono">rest</span></td></tr>
+          <tr><td style="width:118px"><b>노드</b></td><td>남은 합 (변수 <span class="mono">node</span>)</td></tr>
           <tr><td><b>간선</b></td><td>다음 항으로 <span class="mono">x</span> 를 고르는 것</td></tr>
-          <tr><td><b><span class="mono">rest == 0</span> 인 잎</b></td><td>성공한 순열 <b>하나</b></td></tr>
+          <tr><td><b><span class="mono">node == 0</span> 인 잎</b></td><td>성공한 순열 <b>하나</b></td></tr>
         </table>
         <p style="font-size:15px;margin-top:10px">
           곧 이 문제는 <b>트리의 잎을 세는 문제</b>다.
@@ -421,7 +564,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
       </div>
       <div class="callout moss" style="margin-top:14px">
         <b>방문 표시(<span class="mono">visited</span>)가 없다.</b><br>
-        <span class="mono">rest</span> 가 같아도 <b>거쳐 온 경로가 다르면 다른 순열</b>이기 때문이다. 3차시 트리 탐색과 같은 이유다.
+        <span class="mono">node</span> 가 같아도 <b>거쳐 온 경로가 다르면 다른 순열</b>이기 때문이다. 3차시 트리 탐색과 같은 이유다.
       </div>
     </div>
     <div>
@@ -430,24 +573,24 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
     stack = [n]
     cnt = <span class="nm">0</span>
     <span class="kw">while</span> stack:
-        rest = stack.<span class="fn">pop</span>()        <span class="cm"># 맨 뒤 (LIFO)</span>
-        <span class="kw">if</span> rest == <span class="nm">0</span>:
+        node = stack.<span class="fn">pop</span>()        <span class="cm"># 맨 뒤 (LIFO)</span>
+        <span class="kw">if</span> node == <span class="nm">0</span>:
             cnt = cnt + <span class="nm">1</span>
             <span class="kw">continue</span>
-        <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, rest + <span class="nm">1</span>):
-            stack.<span class="fn">append</span>(rest - x)
+        <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, node + <span class="nm">1</span>):
+            stack.<span class="fn">append</span>(node - x)
     <span class="kw">return</span> cnt</pre>
       <pre class="code sm" style="margin-top:12px"><span class="cm"># BFS — 큐</span>
 <span class="kw">def</span> <span class="fn">count_bfs</span>(n):
     q = <span class="fn">deque</span>([n])
     cnt = <span class="nm">0</span>
     <span class="kw">while</span> q:
-        rest = q.<span class="fn">popleft</span>()      <span class="cm"># 맨 앞 (FIFO)</span>
-        <span class="kw">if</span> rest == <span class="nm">0</span>:
+        node = q.<span class="fn">popleft</span>()      <span class="cm"># 맨 앞 (FIFO)</span>
+        <span class="kw">if</span> node == <span class="nm">0</span>:
             cnt = cnt + <span class="nm">1</span>
             <span class="kw">continue</span>
-        <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, rest + <span class="nm">1</span>):
-            q.<span class="fn">append</span>(rest - x)
+        <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, node + <span class="nm">1</span>):
+            q.<span class="fn">append</span>(node - x)
     <span class="kw">return</span> cnt</pre>
       <div class="callout coral" style="margin-top:14px">
         두 함수의 차이는 <span class="mono">pop()</span> 과 <span class="mono">popleft()</span> <b>딱 한 글자뿐</b>이다.
@@ -487,71 +630,78 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         <p style="font-size:15px">DFS는 <b>지금 파고드는 한 갈래</b>만 들고 있으면 되지만,
         BFS는 <b>한 레벨을 통째로</b> 큐에 쌓아 두어야 한다.</p>
         <table class="tbl sm" style="margin-top:8px">
-          <tr><th class="c">n</th><th class="c">DFS 스택 최대</th><th class="c">BFS 큐 최대</th><th class="c">C(n, n/2)</th></tr>
-          <tr><td class="c mono">4</td><td class="c mono">4</td><td class="c mono">7</td><td class="c mono">6</td></tr>
-          <tr><td class="c mono">8</td><td class="c mono">8</td><td class="c mono">78</td><td class="c mono">70</td></tr>
-          <tr><td class="c mono">12</td><td class="c mono">12</td><td class="c mono">988</td><td class="c mono">924</td></tr>
-          <tr><td class="c mono">16</td><td class="c mono">16</td><td class="c mono">13,495</td><td class="c mono">12,870</td></tr>
+          <tr><th class="c">n</th><th class="c">DFS 스택 최대</th><th class="c">BFS 큐 최대</th></tr>
+          <tr><td class="c mono">4</td><td class="c mono">4</td><td class="c mono">7</td></tr>
+          <tr><td class="c mono">8</td><td class="c mono">8</td><td class="c mono">78</td></tr>
+          <tr><td class="c mono">12</td><td class="c mono">12</td><td class="c mono">988</td></tr>
+          <tr><td class="c mono">16</td><td class="c mono">16</td><td class="c mono">13,495</td></tr>
         </table>
-      </div>
-      <div class="callout moss" style="margin-top:14px">
-        <b>DFS 스택이 정확히 n 인 것은 우연이 아니다.</b><br>
-        꺼내는 것은 <b>맨 위 = 가장 작은 값</b> <span class="mono">r</span> 인데, 거기서 넣는 자식
-        <span class="mono">r-1, r-2, …, 0</span> 은 <b>전부 r 보다 작다</b>. 아래에 깔린 값은 모두 r 보다 크다.<br>
-        &rarr; 스택은 언제나 <b>아래에서 위로 강하게 감소</b>한다. 0 이상 n 미만인 서로 다른 정수를
-        감소 순으로 늘어놓으면 <b>아무리 길어야 n 개</b>다.
-        <div class="mono" style="font-size:13px;margin-top:8px;color:var(--ink-soft)">
-          [4] &rarr; [3,2,1,0] &rarr; [3,2,1] &rarr; [3,2,0] &rarr; [3,2] &rarr; …
-        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 4d 문제1 레벨의 크기 -->
-<section class="slide" data-name="문제 1 · 레벨의 크기">
-  <div class="eyebrow">문제 1 · 3차시와 이어 보기</div>
-  <h1 class="title">큐가 터지는 곳은 <b>마지막이 아니라 한가운데</b></h1>
-  <div class="body grid2">
-    <div>
-      <div class="card violet">
-        <h4>레벨 k 의 노드 수는 <span class="mono">C(n, k)</span> 다</h4>
-        <p style="font-size:15px">레벨 k = <b>지금까지 항을 k 개 골랐다</b>는 뜻. n = 8 이면 —</p>
-        <table class="tbl sm" style="margin-top:6px">
-          <tr><th class="c">k</th><th class="c">0</th><th class="c">1</th><th class="c">2</th><th class="c">3</th>
-              <th class="c" style="background:#fdf0e6">4</th><th class="c">5</th><th class="c">6</th><th class="c">7</th><th class="c">8</th></tr>
-          <tr><th class="c">노드</th><td class="c mono">1</td><td class="c mono">8</td><td class="c mono">28</td><td class="c mono">56</td>
-              <td class="c mono" style="background:#fdf0e6"><b>70</b></td><td class="c mono">56</td><td class="c mono">28</td><td class="c mono">8</td><td class="c mono">1</td></tr>
-        </table>
-        <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
-          <b>파스칼 삼각형의 한 줄</b>이다. 전부 더하면 <b>2<sup>n</sup></b> = 트리 전체 노드 수.
-        </p>
-        <ul class="clean coral" style="margin-top:6px">
-          <li><b>마지막 레벨은 노드가 딱 1개</b> — <span class="mono">1+1+…+1</span> 하나뿐이다</li>
-          <li><b>병목은 한가운데 레벨</b> <span class="mono">C(n, n/2)</span> — 종 모양의 가장 불룩한 곳</li>
-        </ul>
-        <p style="font-size:14px;color:var(--ink-soft);margin-top:6px">
-          실측이 <span class="mono">C(n, n/2)</span> 보다 조금 큰 것은, 큐가 한 레벨을 다 비우기 전에
-          다음 레벨을 만들기 시작해 <b>두 레벨이 잠깐 겹치기</b> 때문이다.
-        </p>
+<!-- 4c 문제1 스택이 그리는 탐색 트리 -->
+<section class="slide" data-name="문제 1 · 스택이 그리는 탐색 트리">
+  <div class="eyebrow">문제 1 · 상태 공간 추적</div>
+  <h1 class="title">스택이 그리는 탐색 트리</h1>
+  <p class="sub"><span class="mono">count_dfs(n)</span> 을 한 줄씩 실행하면서, 코드 속에 숨어 있던 트리가 어떻게 자라나는지 본다. 노드에 적힌 숫자는 <b>앞으로 더 채워야 할 남은 합</b>(<span class="mono">node</span>)이다.</p>
+
+  <div class="body" id="dvWrap">
+    <div class="controls">
+      <div class="seg" role="group" aria-label="탐색 방법">
+        <button id="dvDfs" aria-pressed="true">DFS · 스택</button>
+        <button id="dvBfs" aria-pressed="false">BFS · 큐</button>
       </div>
+      <span class="ctl-label">n</span>
+      <div class="seg" role="group" aria-label="n 값" id="dvNSeg"></div>
+      <span class="spacer"></span>
+      <label class="chk"><input type="checkbox" id="dvGhost"> 앞으로 그려질 트리 미리보기</label>
+      <span class="stepcount" id="dvStepCount">1 / 1</span>
+      <button class="btn ghost" id="dvFirst">처음</button>
+      <button class="btn ghost" id="dvPrev">◀ 이전</button>
+      <button class="btn" id="dvNext">다음 ▶</button>
+      <button class="btn play" id="dvPlay">자동 재생</button>
     </div>
-    <div>
-      <div class="callout coral">
-        <b>오해 주의 — DFS가 더 <u>빠른</u> 것이 아니다.</b><br>
-        둘 다 <b>2<sup>n</sup></b> 개 노드를 전부 방문하므로 <b>시간은 같다</b>. 차이는 오직
-        &ldquo;한 번에 얼마나 들고 있어야 하는가&rdquo; — <b>메모리</b>다.
+
+    <div class="stage">
+      <div class="rail">
+        <pre class="code" id="dvCode"></pre>
+        <section class="panel">
+          <h2 id="dvBoxTitle">스택</h2>
+          <p class="hint" id="dvBoxHint">아직 살펴보지 않은 노드들이 담겨 있다.</p>
+          <div class="mouth" id="dvMouth">↑ 여기서 꺼낸다</div>
+          <div class="cells" id="dvCells"></div>
+        </section>
+        <section class="panel">
+          <h2>지금까지 센 순열</h2>
+          <div class="tally"><span class="num" id="dvCnt">0</span><span class="of" id="dvTarget">목표 2<sup>n-1</sup> = 4</span></div>
+          <div class="found" id="dvFound"></div>
+        </section>
       </div>
-      <div class="callout amber" style="margin-top:14px">
-        <b>여기서 5차시로 넘어간다.</b><br>
-        <span class="mono">C(n, n/2)</span> 는 대략 <b>2<sup>n</sup>/&radic;n</b> 이라 n이 1 커질 때마다 거의 두 배가 된다.
-        n = 25 면 BFS는 <b>520만 개</b>를 큐에 들고 있어야 한다. DFS는 <b>25개</b>면 된다.<br>
-        전체 탐색은 언제나 옳지만, <b>언제나 끝나지는 않는다.</b>
-      </div>
-      <div class="callout" style="margin-top:14px">
-        <b>문제 2도 똑같다.</b> 상태 = 지금 서 있는 칸, 간선 = 1칸 또는 2칸 오르기.
-        <span class="mono">range(1, rest+1)</span> 을 <span class="mono">(1, 2)</span> 로만 바꾸면 된다 —
-        <b>문제 2에서 직접 해 본다.</b>
+
+      <div>
+        <div class="canvas">
+          <div class="narrate" id="dvNarrate"><span class="badge" id="dvBadge">시작</span><span id="dvText"></span></div>
+          <div class="scroller"><svg class="tree" id="dvTree"></svg></div>
+        </div>
+        <div class="legend">
+          <span><i class="l-wait"></i>상자 안에서 차례를 기다리는 중</span>
+          <span><i class="l-cur"></i>방금 꺼낸 노드</span>
+          <span><i class="l-open"></i>펼쳐서 자식을 넣은 노드</span>
+          <span><i class="l-hit"></i>남은 합 0 · 순열 하나 완성</span>
+        </div>
+
+        <div class="grid2" style="margin-top:14px">
+          <div class="callout amber">
+            <b>자식은 왼쪽부터 <span class="mono">x = 1, 2, …</span> 순서로 넣는데, 왜 오른쪽부터 꺼낼까?</b><br>
+            <span class="mono">append</span> 는 맨 뒤에 쌓고 <span class="mono">pop</span> 은 맨 뒤에서 꺼내기 때문이다. 가장 마지막에 넣은 <span class="mono">x = node</span> 가지가 먼저 열린다. 왼쪽부터 탐색하게 하려면 <span class="mono">range(node, 0, -1)</span> 로 거꾸로 넣으면 된다.
+          </div>
+          <div class="callout">
+            <b>방문 표시(<span class="mono">visited</span>)가 없다.</b><br>
+            숫자가 같은 노드가 트리 여기저기에 나타나지만, <b>거쳐 온 경로가 다르면 다른 순열</b>이므로 각각 따로 세야 한다. 3차시 트리 탐색과 같은 이유다. BFS 로 바꿔 보면 같은 트리를 <b>층 단위</b>로 훑는 것을 볼 수 있다.
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -586,36 +736,70 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
   </div>
 </section>
 
+<!-- 5b 문제2 남은 칸 수 트리 -->
+<section class="slide" data-name="문제 2 · 남은 칸 수로 보면">
+  <div class="eyebrow">문제 2 · 상태를 바꿔 잡으면</div>
+  <h1 class="title"><b>4</b>에서 출발해 <b>−1, −2</b>로 내려가는 트리</h1>
+  <p class="sub">노드를 <b>지금 서 있는 칸</b> 대신 <b>남은 칸 수</b>로 잡아도 된다. n=4이면 뿌리가 <b>4</b>, 도착이 <b>0</b>이다.</p>
+  <div class="body grid-2-1">
+    <div>
+      <div class="vizstage"><svg id="p2kSvg" viewBox="0 0 560 290"></svg></div>
+      <p style="font-size:14px;color:var(--ink-soft);margin-top:8px">
+        노드는 <b>남은 칸 수</b>. 각 노드에서 <b>−1</b> 과 <b>−2</b>, 두 갈래로 갈라진다. 도착(초록)은 앞 트리와 똑같이 <b>5가지</b>.
+      </p>
+    </div>
+    <div>
+      <div class="card sea">
+        <h4>앞 트리와 무엇이 다른가</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th></th><th class="c">서 있는 칸 <span class="mono">c</span></th><th class="c">남은 칸 수 <span class="mono">k</span></th></tr>
+          <tr><td><b>뿌리</b></td><td class="c mono">0</td><td class="c mono">n</td></tr>
+          <tr><td><b>갈래</b></td><td class="c mono">+1, +2</td><td class="c mono">&minus;1, &minus;2</td></tr>
+          <tr><td><b>성공</b></td><td class="c mono">c == n</td><td class="c mono">k == 0</td></tr>
+          <tr><td><b>실패</b></td><td class="c mono">c &gt; n</td><td class="c mono">k &lt; 0</td></tr>
+        </table>
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b>모양은 똑같다.</b> 노드의 수만 <span class="mono">4 &minus; c</span> 로 바뀌었다.
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        이렇게 잡으면 <b>문제 1과 같은 모양</b>이 된다 &mdash; 남은 양이 <b>0</b>이 되면 성공.<br>
+        재귀로 쓰면 <span class="mono">climb(k - 1) + climb(k - 2)</span>, 곧 <b>f(n) = f(n&minus;1) + f(n&minus;2)</b> 그대로다.
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 6 문제2 코드 -->
 <section class="slide" data-name="문제 2 · 코드">
   <div class="eyebrow">문제 2 · 풀이</div>
-  <h1 class="title">교과서 코드 — <span class="mono">f(c)</span></h1>
+  <h1 class="title">코드 — <span class="mono">climb(c)</span></h1>
   <div class="body grid2">
     <div>
             <div class="codebox">
               <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
-              <div class="codewrap"><pre class="code">ans = <span class="nm">0</span>
-<span class="kw">def</span> <span class="fn">f</span>(c):
-  <span class="kw">if</span> c==n:
-    <span class="kw">global</span> ans
-    ans = ans+<span class="nm">1</span>
-    <span class="kw">return</span>
-  <span class="kw">if</span> c&gt;n:
-    <span class="kw">return</span>
-  <span class="fn">f</span>(c+<span class="nm">1</span>)
-  <span class="fn">f</span>(c+<span class="nm">2</span>)
+              <div class="codewrap"><pre class="code"><span class="kw">def</span> <span class="fn">climb</span>(c):
+    <span class="kw">if</span> c == n:         <span class="cm"># ①</span>
+        <span class="kw">return</span> <span class="nm">1</span>
 
-n = <span class="fn">int</span>(<span class="fn">input</span>())
-<span class="fn">f</span>(<span class="nm">0</span>)
-<span class="fn">print</span>(ans)</pre></div>
+    <span class="kw">if</span> c &gt; n:          <span class="cm"># ②</span>
+        <span class="kw">return</span> <span class="nm">0</span>
+
+    <span class="kw">return</span> <span class="fn">climb</span>(c + <span class="nm">1</span>) + <span class="fn">climb</span>(c + <span class="nm">2</span>)      <span class="cm"># ③</span>
+
+
+n = <span class="nm">5</span>
+
+<span class="fn">print</span>(<span class="st">'n ='</span>, n)
+<span class="fn">print</span>(<span class="st">'방법의 수 :'</span>, <span class="fn">climb</span>(<span class="nm">0</span>))</pre></div>
             </div>
       <div class="io" style="margin-top:14px">
-        <div>입력</div><div>5</div>
-        <div>실행 결과</div><div>8</div>
+        <div>실행 결과</div><div>n = 5<br>방법의 수 : 8</div>
       </div>
       <div class="callout" style="margin-top:14px">
-        도착할 때마다 전역 변수 <b>ans</b> 를 1씩 늘린다.<br>
-        <b>반환값으로 더하는 방식</b>(<span class="mono">return f(c+1)+f(c+2)</span>)으로 써도 결과는 같다. 두 방식을 비교해 보자.
+        <b>①</b> 정확히 도착하면 방법 하나 → <span class="mono">1</span> 을 돌려준다. <b>②</b> 지나쳤으면 <span class="mono">0</span> — 이 조건이 없으면 끝없이 올라가 <b>RecursionError</b>.<br>
+        <b>③</b> 1칸 오른 뒤의 방법 수 + 2칸 오른 뒤의 방법 수. 전역 변수 <span class="mono">ans</span> 로 세는 교과서 방식과 <b>반환값으로 더하는</b> 이 방식을 비교해 보자.<br>
+        <span class="mono">n</span> 은 매개변수가 아닌 <b>전역 변수</b>다. 읽기만 하므로 <span class="mono">global</span> 없이도 된다.
       </div>
     </div>
     <div>
@@ -638,7 +822,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
 <section class="slide" data-name="문제 2 · DFS와 BFS">
   <div class="eyebrow">문제 2 · 3차시와 이어 보기</div>
   <h1 class="title">계단도 <b>똑같다</b></h1>
-  <p class="sub"><span class="mono">range(1, rest+1)</span> 이 <span class="mono">(1, 2)</span> 로 바뀔 뿐이다.</p>
+  <p class="sub"><span class="mono">range(1, node+1)</span> 이 <span class="mono">(1, 2)</span> 로 바뀔 뿐이다.</p>
   <div class="body grid2">
     <div>
       <div class="card sea">
@@ -740,9 +924,54 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         n=20에서 DFS든 BFS든 <b>똑같이 35,421개</b>를 방문한다.<br>
         <b>DFS가 빠른 것이 아니다. 덜 들고 있을 뿐이다.</b>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6d 문제2 반복문 -->
+<section class="slide" data-name="문제 2 · 반복문">
+  <div class="eyebrow">문제 2 · 재귀를 쓰지 않으면</div>
+  <h1 class="title"><b>반복문</b>으로 풀기</h1>
+  <p class="sub">n번째 칸에 오는 방법은 <b>n−1번 칸에서 1칸</b> 오르거나 <b>n−2번 칸에서 2칸</b> 오르는 것뿐이다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card sea">
+        <h4>점화식</h4>
+        <div class="mono" style="font-size:22px;font-weight:700;text-align:center;margin:10px 0 4px">f(n) = f(n−1) + f(n−2)</div>
+        <div style="text-align:center;color:var(--ink-soft)">곧 <b>피보나치수열</b>이다</div>
+      </div>
+      <div class="card flat" style="margin-top:14px">
+        <h4>앞에서부터 차례로 채운다</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th class="c">i</th><td class="c mono">0</td><td class="c mono">1</td><td class="c mono">2</td><td class="c mono">3</td><td class="c mono">4</td><td class="c mono">5</td></tr>
+          <tr><th class="c">f[i]</th><td class="c mono">1</td><td class="c mono">1</td><td class="c mono">2</td><td class="c mono">3</td><td class="c mono">5</td><td class="c mono"><b>8</b></td></tr>
+        </table>
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b><span class="mono">f[0] = 1</span> 인 이유</b> — 0번 칸에서 0번 칸으로 가는 방법은 &ldquo;가만히 있기&rdquo; 하나다.
+        이렇게 두어야 <span class="mono">f[2] = f[1] + f[0] = 2</span> 가 맞게 나온다.
+      </div>
+    </div>
+    <div>
+      <div class="codebox">
+        <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
+        <div class="codewrap"><pre class="code">n = <span class="nm">5</span>
+
+f = [<span class="nm">0</span>] * (n + <span class="nm">1</span>)
+f[<span class="nm">0</span>] = <span class="nm">1</span>
+f[<span class="nm">1</span>] = <span class="nm">1</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2</span>, n + <span class="nm">1</span>):
+    f[i] = f[i-<span class="nm">1</span>] + f[i-<span class="nm">2</span>]
+
+<span class="fn">print</span>(<span class="st">'n ='</span>, n)
+<span class="fn">print</span>(<span class="st">'반복문으로 구한 방법의 수 :'</span>, f[n])</pre></div>
+      </div>
+      <div class="io" style="margin-top:14px">
+        <div>실행 결과</div><div>n = 5<br>반복문으로 구한 방법의 수 : 8</div>
+      </div>
       <div class="callout amber" style="margin-top:14px">
-        반복문 풀이 <span class="mono">f[i] = f[i-1] + f[i-2]</span> 는 같은 답을 <b>21번의 덧셈</b>으로 구한다.
-        <b>35,421 대 21</b> — 3단원에서 이 차이를 다룬다.
+        트리 위에서 보면 <span class="mono">f[i-1] + f[i-2]</span> 는 <b>&ldquo;1칸 오른 갈래 + 2칸 오른 갈래&rdquo;</b>다.
+        같은 칸에서 출발하는 방법의 수는 언제나 같으니, <b>세지 않고 기억해 두고</b> 꺼내 쓴다.
       </div>
     </div>
   </div>
@@ -833,6 +1062,56 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
   </div>
 </section>
 
+<!-- 8b 문제3 √n 까닭 -->
+<section class="slide" data-name="문제 3 · 왜 √n까지만">
+  <div class="eyebrow">문제 3 · 한 걸음 더</div>
+  <h1 class="title">왜 <b>√n</b> 까지만 나눠 봐도 되나</h1>
+  <p class="sub">약수는 항상 <b>짝</b>으로 나온다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card sea">
+        <h4>36의 약수를 곱해서 36이 되는 짝으로 묶으면</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th class="c">작은 쪽</th><th class="c">큰 쪽</th></tr>
+          <tr><td class="c mono">2</td><td class="c mono">18</td></tr>
+          <tr><td class="c mono">3</td><td class="c mono">12</td></tr>
+          <tr><td class="c mono">4</td><td class="c mono">9</td></tr>
+          <tr><td class="c mono"><b>6</b></td><td class="c mono"><b>6</b> &larr; √36</td></tr>
+        </table>
+      </div>
+      <div class="callout" style="margin-top:14px">
+        짝의 작은 쪽은 <b>언제나 6(= √36) 이하</b>다. 둘 다 6보다 크면 곱이 36을 넘기 때문이다.
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        그래서 <b>2부터 √n 까지 나눠 봐서 약수가 하나도 없으면, √n 보다 큰 쪽에도 약수가 없다.</b><br>
+        큰 쪽 약수가 있었다면 짝인 작은 쪽을 이미 만났을 것이다.
+      </div>
+    </div>
+    <div>
+      <div class="card flat">
+        <h4>37 과 91 &mdash; <span class="mono">d*d &lt;= n</span> 인 동안만 나눠 본다</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th class="c">d</th><th class="c">d*d</th><th class="c">37 % d</th><th class="c">91 % d</th></tr>
+          <tr><td class="c mono">2</td><td class="c mono">4</td><td class="c mono">1</td><td class="c mono">1</td></tr>
+          <tr><td class="c mono">3</td><td class="c mono">9</td><td class="c mono">1</td><td class="c mono">1</td></tr>
+          <tr><td class="c mono">4</td><td class="c mono">16</td><td class="c mono">1</td><td class="c mono">3</td></tr>
+          <tr><td class="c mono">5</td><td class="c mono">25</td><td class="c mono">2</td><td class="c mono">1</td></tr>
+          <tr><td class="c mono">6</td><td class="c mono">36</td><td class="c mono">1</td><td class="c mono">1</td></tr>
+          <tr><td class="c mono">7</td><td class="c mono">49</td><td class="c"><b>49 &gt; 37 → 끝</b></td><td class="c"><b class="mono">0</b> <b>→ 약수!</b></td></tr>
+        </table>
+      </div>
+      <div class="callout amber" style="margin-top:14px">
+        <b>37 (소수)</b> &mdash; 2~6 에서 약수가 없다. 큰 쪽(7~36)에 약수가 있었다면 짝이 6 이하에 있어야 하니, <b>큰 쪽에도 없다.</b>
+        교과서 코드는 <b>35번</b>, 이 방식은 <b>5번</b>.
+      </div>
+      <div class="callout coral" style="margin-top:14px">
+        <b>91 = 7 × 13 (소수 아님)</b> &mdash; 큰 쪽 약수 13 이 있으니, 짝인 <b>작은 쪽 7 이 √91 ≈ 9.5 이하에서 반드시 먼저 걸린다.</b>
+        13 까지 갈 필요가 없다.
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 9 문제4 -->
 <section class="slide" data-name="문제 4 · 서로소">
   <div class="eyebrow">문제 4 · 교과서 182쪽</div>
@@ -862,7 +1141,7 @@ ans = <span class="nm">0</span>
     <span class="kw">while</span> b != <span class="nm">0</span>:
         a, b = b, a % b     <span class="cm"># 반드시 동시에</span>
     <span class="kw">return</span> a</pre>
-        <p style="font-size:14.5px;margin-top:8px"><b>a = b</b> 를 먼저 쓰면 다음 줄의 <span class="mono">a % b</span> 가 바뀐 a를 써서 <b>무한 반복</b>에 빠진다.</p>
+        <p style="font-size:14.5px;margin-top:8px"><b>a = b</b> 를 먼저 쓰면 다음 줄의 <span class="mono">a % b</span> 가 바뀐 a를 써서 0이 되고, 반복이 바로 끝나 <b>틀린 답</b>(원래 b)이 나온다.</p>
       </div>
     </div>
     <div>
@@ -877,6 +1156,81 @@ ans = <span class="nm">0</span>
         <div class="bignum" id="p4Ans" style="margin-top:12px">7<small>서로소인 수의 개수</small></div>
       </div>
       <div class="msg" id="p4Msg" style="margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9b 문제4 유클리드 호제법 -->
+<section class="slide" data-name="문제 4 · 유클리드 호제법">
+  <div class="eyebrow">문제 4 · 한 걸음 더</div>
+  <h1 class="title">나머지가 <b>0</b>이 될 때까지 &mdash; 유클리드 호제법</h1>
+  <p class="sub"><b>a를 b로 나눈 나머지를 r</b>이라 하면 <span class="mono">gcd(a, b) = gcd(b, r)</span> 이다.
+    이 성질을 한 번만 써서는 쓸모가 적다. 보통은 <b>나머지가 0이 될 때까지 연속해서</b> 쓴다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card sea">
+        <h4>연속해서 나누면</h4>
+        <table class="tbl sm mono" style="margin-top:6px;font-size:15px">
+          <tr><td>a</td><td>= b&middot;q<sub>1</sub> + r<sub>1</sub></td><td style="color:var(--ink-soft)">(0 &lt; r<sub>1</sub> &lt; b)</td></tr>
+          <tr><td>b</td><td>= r<sub>1</sub>&middot;q<sub>2</sub> + r<sub>2</sub></td><td style="color:var(--ink-soft)">(0 &lt; r<sub>2</sub> &lt; r<sub>1</sub>)</td></tr>
+          <tr><td>r<sub>1</sub></td><td>= r<sub>2</sub>&middot;q<sub>3</sub> + r<sub>3</sub></td><td style="color:var(--ink-soft)">(0 &lt; r<sub>3</sub> &lt; r<sub>2</sub>)</td></tr>
+          <tr><td class="c">&vellip;</td><td></td><td></td></tr>
+          <tr><td>r<sub>n&minus;2</sub></td><td>= r<sub>n&minus;1</sub>&middot;q<sub>n</sub> + r<sub>n</sub></td><td style="color:var(--ink-soft)">(0 &lt; r<sub>n</sub> &lt; r<sub>n&minus;1</sub>)</td></tr>
+          <tr><td>r<sub>n&minus;1</sub></td><td>= r<sub>n</sub>&middot;q<sub>n+1</sub></td><td style="color:var(--coral)"><b>나머지 0</b></td></tr>
+        </table>
+        <div class="mono" style="font-size:18px;font-weight:700;text-align:center;margin-top:12px">&there4; gcd(a, b) = r<sub>n</sub></div>
+      </div>
+      <div class="callout" style="margin-top:14px">
+        한 줄 내려갈 때마다 <b>나누는 수가 다음 줄의 나눠지는 수</b>가 되고, <b>나머지가 다음 줄의 나누는 수</b>가 된다.<br>
+        나머지는 계속 작아지므로 언젠가 반드시 <b>0</b>이 된다. 그 직전의 나머지 r<sub>n</sub>이 최대공약수다.
+      </div>
+    </div>
+    <div>
+      <div class="card flat">
+        <h4>예시 &mdash; gcd(1071, 1029)</h4>
+        <table class="tbl sm mono" style="margin-top:6px;font-size:15px">
+          <tr><td>1071</td><td>= 1029 &middot; 1 + <b>42</b></td></tr>
+          <tr><td>1029</td><td>= 42 &middot; 24 + <b>21</b></td></tr>
+          <tr><td>42</td><td>= 21 &middot; 2 + <b style="color:var(--coral)">0</b></td></tr>
+        </table>
+        <div class="mono" style="font-size:17px;font-weight:700;text-align:center;margin-top:10px">&there4; gcd(1071, 1029) = <span style="color:var(--moss)">21</span></div>
+      </div>
+      <div class="card violet" style="margin-top:14px">
+        <h4>코드로 보면 &mdash; 한 줄이 한 바퀴</h4>
+        <table class="tbl sm" style="margin-top:6px">
+          <tr><th class="c">바퀴</th><th class="c">a</th><th class="c">b</th><th class="c">a % b</th></tr>
+          <tr><td class="c">1</td><td class="c mono">1071</td><td class="c mono">1029</td><td class="c mono">42</td></tr>
+          <tr><td class="c">2</td><td class="c mono">1029</td><td class="c mono">42</td><td class="c mono">21</td></tr>
+          <tr><td class="c">3</td><td class="c mono">42</td><td class="c mono">21</td><td class="c mono">0</td></tr>
+          <tr><td class="c">끝</td><td class="c mono"><b>21</b></td><td class="c mono">0</td><td class="c">b = 0 &rarr; 멈춤</td></tr>
+        </table>
+        <p style="font-size:14.5px;margin-top:8px"><span class="mono">a, b = b, a % b</span> 가 &ldquo;한 줄 내려가기&rdquo;이고, <span class="mono">while b != 0</span> 이 &ldquo;나머지가 0이 될 때까지&rdquo;다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9c 문제4 GCD(270,192) 따라가기 -->
+<section class="slide" data-name="문제 4 · GCD(270, 192)">
+  <div class="eyebrow">문제 4 · 한 걸음 더</div>
+  <h1 class="title"><b>GCD(270, 192)</b> 한 단계씩 따라가기</h1>
+  <p class="sub">매 단계마다 <b>A &ne; 0, B &ne; 0</b>인지 확인하고, A를 B로 나눈 나머지로 다음 단계의 두 수를 정한다.
+    <b>B = 0</b>이 되는 순간 A가 최대공약수다.</p>
+  <div class="body">
+    <table class="tbl mono" style="font-size:15px">
+      <tr><th class="c">단계</th><th>찾는 것</th><th class="c">A</th><th class="c">B</th><th class="c">확인</th><th>A = B &middot; 몫 + 나머지</th><th>그러므로</th></tr>
+      <tr><td class="c">1</td><td>GCD(270, 192)</td><td class="c">270</td><td class="c">192</td><td class="c">A &ne; 0, B &ne; 0</td><td>270 = 192 &middot; 1 + <b>78</b></td><td>GCD(270, 192) = GCD(192, 78)</td></tr>
+      <tr><td class="c">2</td><td>GCD(192, 78)</td><td class="c">192</td><td class="c">78</td><td class="c">A &ne; 0, B &ne; 0</td><td>192 = 78 &middot; 2 + <b>36</b></td><td>GCD(192, 78) = GCD(78, 36)</td></tr>
+      <tr><td class="c">3</td><td>GCD(78, 36)</td><td class="c">78</td><td class="c">36</td><td class="c">A &ne; 0, B &ne; 0</td><td>78 = 36 &middot; 2 + <b>6</b></td><td>GCD(78, 36) = GCD(36, 6)</td></tr>
+      <tr><td class="c">4</td><td>GCD(36, 6)</td><td class="c">36</td><td class="c">6</td><td class="c">A &ne; 0, B &ne; 0</td><td>36 = 6 &middot; 6 + <b style="color:var(--coral)">0</b></td><td>GCD(36, 6) = GCD(6, 0)</td></tr>
+      <tr style="background:var(--moss-soft)"><td class="c">5</td><td>GCD(6, 0)</td><td class="c"><b>6</b></td><td class="c">0</td><td class="c">A &ne; 0, <b style="color:var(--coral)">B = 0</b></td><td colspan="2">B가 0이므로 멈춘다 &rarr; GCD(6, 0) = <b style="color:var(--moss)">6</b></td></tr>
+    </table>
+    <div class="card flat" style="margin-top:16px">
+      <h4>지금까지의 과정</h4>
+      <div class="mono" style="font-size:16.5px;line-height:1.9">
+        GCD(270, 192) = GCD(192, 78) = GCD(78, 36) = GCD(36, 6) = GCD(6, 0) = 6
+      </div>
+      <div class="mono" style="font-size:19px;font-weight:700;text-align:center;margin-top:8px">&there4; GCD(270, 192) = <span style="color:var(--moss)">6</span></div>
     </div>
   </div>
 </section>
@@ -933,51 +1287,141 @@ ans = <span class="nm">0</span>
   </div>
 </section>
 
+<!-- 11-1 문제5 왜 재귀인가 -->
+<section class="slide" data-name="문제 5 · 왜 재귀를 쓰나">
+  <div class="eyebrow">문제 5 · 코드 이전에</div>
+  <h1 class="title">왜 하필 <b>재귀</b>로 풀까</h1>
+  <p class="sub">7개 중 3개를 고르는 방법은 <b>35가지</b>. 손으로 하나씩 적으면 빠뜨리거나 겹치기 쉽다. 그래서 컴퓨터에게 <b>빠짐없이, 겹치지 않게</b> 35가지를 전부 만들어 보라고 시켜야 한다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card violet">
+        <h4>마트료시카 비유</h4>
+        <p style="font-size:15px;line-height:1.75">큰 인형을 열면 <b>똑같이 생긴 작은 인형</b>이 나오고, 그 인형을 열면 더 작은 인형이 나온다.<br>
+        <b>같은 동작을 반복하는데 문제만 점점 작아지는 것</b> — 이것이 재귀다.</p>
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <b>3개 고르기</b> = 한 개 고르고 → 남은 수들 중에서 <b>2개 고르기</b><br>
+        <b>2개 고르기</b> = 한 개 고르고 → 남은 수들 중에서 <b>1개 고르기</b><br>
+        <b>1개 고르기</b> = 한 개 고르면 → <b>끝</b>
+      </div>
+      <p style="font-size:15px;color:var(--ink-soft);margin-top:12px;line-height:1.7">
+        쪼개어 놓고 보면 <b>모양이 똑같다</b>. 그래서 함수 <span class="mono">f</span> 가 자기 자신인 <span class="mono">f</span> 를 다시 부른다.<br>
+        그 한 줄이 <span class="mono">f(i + 1, sum + A[i], picked + 1)</span> 이다.
+      </p>
+    </div>
+    <div>
+      <table class="tbl">
+        <tr><th style="width:88px">매개변수</th><th>비유하자면</th></tr>
+        <tr><td class="mono"><b>picked</b></td><td>몇 개 골랐는지 세는 <b>손가락</b>. 3이 되면 “다 골랐다!”</td></tr>
+        <tr><td class="mono"><b>sum</b></td><td>지금까지 고른 수를 <b>더해 둔 값</b></td></tr>
+        <tr><td class="mono"><b>start</b></td><td>“이제부터는 <b>여기서부터만</b> 고를 수 있어”라는 표시</td></tr>
+      </table>
+      <div class="card amber" style="margin-top:14px">
+        <h4>언제 멈추나 — 종료 조건</h4>
+        <p style="font-size:15px;line-height:1.75"><span class="mono">picked == 3</span> 이 되는 순간 <b>for 문을 돌지 않고</b> 합이 3의 배수인지만 확인하고 <span class="mono">return</span> 한다.<br>
+        이 조건이 없으면 함수가 계속 더 고르려 해서 <b>끝나지 않는다</b>.</p>
+      </div>
+      <div class="callout" style="margin-top:14px">
+        <b>한 줄 정리</b> — “하나 고르고, 남은 것 중에서 나머지를 마저 고르기”를 반복해 35가지를 전부 만들고, 그중 3의 배수만 센다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11-2 문제5 start의 역할 -->
+<section class="slide" data-name="문제 5 · start가 하는 일">
+  <div class="eyebrow">문제 5 · 핵심</div>
+  <h1 class="title">왜 <span class="mono">start</span> 가 꼭 필요할까</h1>
+  <p class="sub">규칙은 하나다 — <b>이미 고른 수보다 뒤에 있는 수만 고를 수 있다.</b> 이 규칙을 지키는 코드가 <span class="mono">range(start, N)</span> 과 재귀에 넘기는 <span class="mono">i + 1</span> 이다.</p>
+  <div class="body grid2">
+    <div>
+      <div class="card coral">
+        <h4>start 가 없다면</h4>
+        <p style="font-size:15px;line-height:1.75">매번 <span class="mono">0</span> 번부터 다시 고르게 되어
+        <span class="mono">(1, 3, 6)</span> · <span class="mono">(3, 1, 6)</span> · <span class="mono">(6, 3, 1)</span> 을
+        <b>전부 다른 경우</b>로 센다.<br>
+        순서만 다를 뿐 <b>같은 세 수</b>인데도 말이다. 그러면 답이 실제보다 훨씬 커진다.</p>
+      </div>
+      <table class="tbl" style="margin-top:14px">
+        <tr><th style="width:92px">넘기는 값</th><th>무슨 일이 벌어지나</th><th style="width:132px">이런 것까지 센다</th></tr>
+        <tr><td class="mono">f(<b>0</b>, …)</td>
+            <td>늘 <b>맨 앞부터</b> 다시 고른다. 같은 수도, 순서만 다른 것도 전부 다른 경우 → <b>343가지</b></td>
+            <td class="mono" style="font-size:12.5px;line-height:1.6">1+3+6<br>3+1+6<br>6+3+1<br><span style="color:var(--coral)">1+1+1</span></td></tr>
+        <tr><td class="mono">f(<b>i</b>, …)</td>
+            <td>고른 수를 <b>다시 고를 수</b> 있다. 순서 중복은 없지만 같은 수가 겹친다 → <b>84가지</b></td>
+            <td class="mono" style="font-size:12.5px;line-height:1.6"><span style="color:var(--coral)">1+1+3</span><br><span style="color:var(--coral)">6+6+6</span><br>1+3+6</td></tr>
+        <tr style="background:var(--moss-soft)"><td class="mono">f(<b>i + 1</b>, …)</td>
+            <td><b>고른 수 다음</b>부터만 고른다. 겹침도 순서 중복도 없다 → <b>35가지</b></td>
+            <td class="mono" style="font-size:12.5px;line-height:1.6">1+3+6<br>1+3+7<br>…<br>11+15+18</td></tr>
+      </table>
+      <p style="font-size:14px;color:var(--ink-soft);margin-top:9px;line-height:1.7">
+        같은 코드에서 <b>한 글자</b>만 달라졌을 뿐인데 답은 <span class="mono">121</span> · <span class="mono">33</span> · <span class="mono">12</span> 로 완전히 달라진다.
+      </p>
+    </div>
+    <div>
+      <div class="vizstage"><svg id="p5WhySvg" viewBox="0 0 620 230"></svg></div>
+      <p style="font-size:14.5px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
+        작은 예 — <span class="mono">1, 3, 6</span> 중에서 <b>2개</b> 고르기.<br>
+        <b>1 아래</b>에는 3과 6이 남아 두 갈래, <b>3 아래</b>에는 6 하나만 남아 한 갈래,
+        <b>6 아래</b>에는 뒤에 남은 수가 없어 <b>가지가 뻗지 않는다</b>.
+      </p>
+      <div class="callout moss" style="margin-top:12px">
+        지나간 수로 <b>되돌아가지 못하게</b> 막기 때문에, 나뭇가지 끝까지 가도 같은 조합이 두 번 나오지 않는다.<br>
+        실제 문제(7개 중 3개)로 넓히면 가지 수만 늘 뿐 <b>원리는 똑같다</b>.
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 12 문제5 코드 -->
 <section class="slide" data-name="문제 5 · 코드">
   <div class="eyebrow">문제 5 · 풀이</div>
-  <h1 class="title">교과서 코드 — <span class="mono">f(k, s, j)</span></h1>
+  <h1 class="title">코드 — <span class="mono">f(start, sum, picked)</span></h1>
   <div class="body grid2">
     <div>
             <div class="codebox">
               <div class="revealbtn"><button class="toggle">코드 보기</button><span class="hint">먼저 스스로 생각해 본 뒤 눌러 보세요</span></div>
-              <div class="codewrap"><pre class="code">A = [<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">3</span>, <span class="nm">6</span>, <span class="nm">7</span>, <span class="nm">11</span>, <span class="nm">15</span>, <span class="nm">18</span>]
-ans = <span class="nm">0</span>
+              <div class="codewrap"><pre class="code">A = [<span class="nm">1</span>, <span class="nm">3</span>, <span class="nm">6</span>, <span class="nm">7</span>, <span class="nm">11</span>, <span class="nm">15</span>, <span class="nm">18</span>]
+N = <span class="fn">len</span>(A)
+count = <span class="nm">0</span>
 
-<span class="kw">def</span> <span class="fn">f</span>(k, s, j) :
-  <span class="kw">if</span> j==<span class="nm">3</span>:
-    <span class="kw">if</span> (s%<span class="nm">3</span>)==<span class="nm">0</span>:
-      <span class="kw">global</span> ans
-      ans = ans+<span class="nm">1</span>
-    <span class="kw">return</span>
 
-  <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(k+<span class="nm">1</span>, <span class="nm">8</span>):
-    <span class="fn">f</span>(i, s+A[i], j+<span class="nm">1</span>)
-  <span class="kw">return</span>
+<span class="kw">def</span> <span class="fn">f</span>(start, sum, picked):
+    <span class="kw">global</span> count
+
+    <span class="kw">if</span> picked == <span class="nm">3</span>:                  <span class="cm"># ① 3개를 다 골랐다</span>
+        <span class="kw">if</span> sum % <span class="nm">3</span> == <span class="nm">0</span>:
+            count = count + <span class="nm">1</span>
+        <span class="kw">return</span>
+
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(start, N):        <span class="cm"># ② 다음은 i 다음 수부터 고른다</span>
+        <span class="fn">f</span>(i + <span class="nm">1</span>, sum + A[i], picked + <span class="nm">1</span>)
+
 
 <span class="fn">f</span>(<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>)
-<span class="fn">print</span>(ans)</pre></div>
+<span class="fn">print</span>(<span class="st">'3의 배수인 수의 개수 :'</span>, count)</pre></div>
             </div>
       <div class="io" style="margin-top:12px">
-        <div>실행 결과</div><div>12</div>
+        <div>실행 결과</div><div>3의 배수인 수의 개수 : 12</div>
       </div>
     </div>
     <div>
       <table class="tbl">
         <tr><th style="width:70px">매개변수</th><th>뜻</th></tr>
-        <tr><td class="mono"><b>k</b></td><td>다음에 고를 수의 <b>시작 인덱스</b>. 중복 선택을 막는다.</td></tr>
-        <tr><td class="mono"><b>s</b></td><td>지금까지 고른 수들의 <b>합</b></td></tr>
-        <tr><td class="mono"><b>j</b></td><td>지금까지 <b>고른 개수</b>. 3이 되면 판정한다.</td></tr>
+        <tr><td class="mono"><b>start</b></td><td>다음에 고를 수의 <b>시작 인덱스</b>. 중복 선택을 막는다.</td></tr>
+        <tr><td class="mono"><b>sum</b></td><td>지금까지 고른 수들의 <b>합</b></td></tr>
+        <tr><td class="mono"><b>picked</b></td><td>지금까지 <b>고른 개수</b>. 3이 되면 판정한다.</td></tr>
       </table>
       <div class="callout" style="margin-top:14px">
-        <b>A 앞에 0을 넣은 이유</b> — 1번 인덱스부터 실제 데이터가 오게 하여 <span class="mono">range(k+1, 8)</span> 로 깔끔하게 돌기 위해서다.<br>
-        0번부터 쓰고 싶다면 <span class="mono">f(0, 0, 0)</span> 대신 <span class="mono">range(start, 7)</span> 형태로 바꾸면 된다.
+        <b>①</b> 3개를 다 골랐으면 더 고르지 않고 합만 판정하고 <span class="mono">return</span> — 이 줄이 없으면 재귀가 끝나지 않는다.<br>
+        <b>②</b> <span class="mono">range(start, N)</span> 으로 <b>앞으로만</b> 진행하고, 재귀에 <span class="mono">i + 1</span> 을 넘겨 <b>고른 수 다음부터</b> 고르게 한다.
       </div>
       <div class="card amber" style="margin-top:14px">
-        <h4>흔한 실수 두 가지</h4>
+        <h4>흔한 실수 세 가지</h4>
         <ul class="clean coral" style="font-size:15px">
           <li><span class="mono">f(i, …)</span> 로 넘긴다 → <b>같은 수를 여러 번</b> 고른다</li>
-          <li><span class="mono">global ans</span> 를 빠뜨린다 → <b>UnboundLocalError</b></li>
+          <li><span class="mono">f(0, …)</span> 로 넘긴다 → 순서만 다른 <b>중복</b>까지 센다</li>
+          <li><span class="mono">global count</span> 를 빠뜨린다 → <b>UnboundLocalError</b></li>
         </ul>
       </div>
     </div>
@@ -1107,20 +1551,113 @@ function initP1(){
     const c=comps(n);
     ans.innerHTML=fmt(c.length)+'<small>순열의 개수</small>';
     list.innerHTML='';
-    if(n<=5){
-      c.forEach(t=>{const s=document.createElement('span');s.className='chip on';
-        s.textContent=t.join('+');list.appendChild(s);});
-    }else{
-      list.innerHTML='<span class="empty">n이 5를 넘으면 개수만 표시합니다 ('+fmt(c.length)+'가지)</span>';
+    /* 마지막 수가 n-i 인 것들을 모으면 그 앞은 i 를 만드는 모든 방법 = f(i) */
+    const terms=[];
+    for(let i=0;i<n;i++){
+      const g=comps(i).map(t=>t.concat([n-i]));
+      terms.push(g.length);
+      if(n>5)continue;
+      const row=document.createElement('div');row.className='grp';
+      const k=document.createElement('span');k.className='grpk';
+      k.textContent='f('+i+')='+g.length;row.appendChild(k);
+      g.forEach(t=>{const s=document.createElement('span');s.className='chip on';
+        s.innerHTML=t.slice(0,-1).map(v=>v+'+').join('')+'<span class="lp">'+(n-i)+'</span>';
+        row.appendChild(s);});
+      list.appendChild(row);
     }
-    msg.innerHTML='f('+n+') = <b>'+fmt(c.length)+'</b> = 2<sup>'+(n-1)+'</sup> &nbsp; '+
-      (n>1?('f('+n+') 는 f('+(n-1)+') 의 <b>두 배</b>다.'):'n = 1 은 &ldquo;1&rdquo; 한 가지뿐이다.');
+    if(n>5)list.innerHTML='<span class="empty">n이 5를 넘으면 개수만 표시합니다 ('+fmt(c.length)+'가지)</span>';
+    const fs=[],ns=[];
+    for(let i=0;i<n;i++){fs.push('f('+i+')');ns.push(fmt(terms[i]));}
+    msg.innerHTML='f('+n+') = '+fs.join(' + ')+'<br>&nbsp;&nbsp;&nbsp;&nbsp; = '+ns.join(' + ')+
+      ' = <b>'+fmt(c.length)+'</b> = 2<sup>'+(n-1)+'</sup>'+
+      (n>1?'<br>노란 숫자가 <b>마지막에 더한 수</b>다. 그 앞은 f(i) 그대로다.':'');
   };
   rg.oninput=upd;upd();
 }
 
-/* ===== 문제 2 : 계단 트리 (n=4) ===== */
-function initP2Tree(){
+/* ===== 문제 1 : 호출 스택 추적 ===== */
+function initP1Stack(){
+  const rg=document.getElementById('stN'),vv=document.getElementById('stNv');
+  const box=document.getElementById('stStack'),rowsEl=document.getElementById('stRows');
+  const msg=document.getElementById('stMsg'),stepEl=document.getElementById('stStep');
+  const bPrev=document.getElementById('stPrev'),bNext=document.getElementById('stNext'),bRe=document.getElementById('stReset');
+  let steps=[],cur=0;
+
+  /* 교과서 코드를 그대로 따라가며 장면을 기록한다 */
+  function build(n){
+    const out=[],stack=[],rows=[];
+    const snap=(ln,m)=>out.push({m:m,ln:ln,
+      stack:stack.map(f=>({n:f.n,i:f.i,cnt:f.cnt})),
+      rows:rows.map(r=>({d:r.d,n:r.n,val:r.val,live:stack.some(f=>f.r===r.id),id:r.id}))});
+    let seq=0;
+    function f(k,d){
+      const row={id:seq++,d:d,n:k,val:null};rows.push(row);
+      const fr={n:k,i:null,cnt:0,r:row.id};stack.push(fr);
+      snap(k===0?1:3,'<b>f('+k+')</b> \ud638\ucd9c \u2014 \uc2a4\ud0dd\uc5d0 \uc0c8 \uce78\uc774 \uc313\uc778\ub2e4. cnt = 0 \uc73c\ub85c \uc2dc\uc791.');
+      if(k===0){
+        row.val=1;
+        snap(2,'<b>f(0)</b> \uc740 \uae30\uc800 \u2014 for \ubb38 \uc5c6\uc774 \ubc14\ub85c <b>1</b> \uc744 \ub3cc\ub824\uc900\ub2e4.');
+        stack.pop();
+        snap(2,'f(0) \uc885\ub8cc \u2014 \uc2a4\ud0dd\uc5d0\uc11c <b>\ub0b4\ub824\uc628\ub2e4</b>. \ub3cc\ub824\ubc1b\uc740 \uac12\uc740 <b>1</b>.');
+        return 1;
+      }
+      for(let i=0;i<k;i++){
+        fr.i=i;
+        snap(5,'f('+k+') \uc758 for\ubb38: i = <b>'+i+'</b> \u2014 \uc5ec\uae30\uc11c <b>f('+i+')</b> \ub97c \ubd80\ub978\ub2e4. f('+k+') \ub294 \uc774 \uc0c1\ud0dc\ub85c <b>\uba48\ucdb0 \uae30\ub2e4\ub9b0\ub2e4</b>.');
+        const v=f(i,d+1);
+        fr.cnt+=v;
+        snap(5,'f('+k+') \uc7ac\uac1c: cnt = cnt + f('+i+') = <b>'+fr.cnt+'</b>');
+      }
+      row.val=fr.cnt;
+      stack.pop();
+      snap(6,'f('+k+') \uc758 for\ubb38\uc774 \ub05d \u2014 <b>'+fr.cnt+'</b> \uc744 \ub3cc\ub824\uc8fc\uace0 \uc2a4\ud0dd\uc5d0\uc11c \ub0b4\ub824\uc628\ub2e4.');
+      return fr.cnt;
+    }
+    f(n,0);
+    return out;
+  }
+
+  function draw(){
+    const st=steps[cur];
+    stepEl.textContent=(cur+1)+' / '+steps.length;
+    msg.innerHTML=st.m;
+    [...document.querySelectorAll('#stCode .ln')].forEach((e,k)=>e.classList.toggle('hl',k===st.ln));
+    box.innerHTML='';
+    if(!st.stack.length){
+      box.innerHTML='<div class="empty">\uc2a4\ud0dd\uc774 \ube44\uc5c8\ub2e4 \u2014 \ubaa8\ub4e0 \ud638\ucd9c\uc774 \ub05d\ub0ac\ub2e4.</div>';
+    }else{
+      const b=document.createElement('div');b.className='stackbase';
+      b.textContent='\u2191 \uc704\ub85c \uc313\uc778\ub2e4 \u00b7 \uc544\ub798\uac00 \uba3c\uc800 \ubd80\ub978 \ucabd';
+      box.appendChild(b);
+      st.stack.forEach((f,k)=>{
+        const d=document.createElement('div');
+        d.className='frm'+(k===st.stack.length-1?' top':'');
+        d.innerHTML='<b>f('+f.n+')</b><span class="sep"></span>i = '+(f.i===null?'\u2013':f.i)+' &nbsp; cnt = '+f.cnt;
+        box.appendChild(d);
+      });
+    }
+    rowsEl.innerHTML='';
+    st.rows.forEach(r=>{
+      const tr=document.createElement('tr');
+      tr.className=r.val!==null?'doneR':(r.live?'live':'');
+      const pad='&nbsp;'.repeat(r.d*3)+(r.d?'\u2514 ':'');
+      const expr=r.n===0?'1 <span style="font-family:\'IBM Plex Sans KR\';font-size:12px;color:#8a94a6">(\uae30\uc800)</span>'
+        :Array.from({length:r.n},(_,j)=>'f('+j+')').join('+');
+      tr.innerHTML='<td class="k">'+pad+'f('+r.n+')</td><td>= '+expr+
+        '</td><td class="k">= '+(r.val===null?'<span class="q">?</span>':'<span class="v">'+r.val+'</span>')+'</td>';
+      rowsEl.appendChild(tr);
+    });
+    bPrev.disabled=(cur===0);bNext.disabled=(cur===steps.length-1);
+  }
+  const reset=()=>{steps=build(+rg.value);cur=0;vv.textContent=rg.value;draw();};
+  rg.oninput=reset;bRe.onclick=reset;
+  bPrev.onclick=()=>{if(cur>0){cur--;draw();}};
+  bNext.onclick=()=>{if(cur<steps.length-1){cur++;draw();}};
+  reset();
+}
+
+/* ===== 문제 2 : 계단 트리 (n=4) — remain=true 이면 노드를 남은 칸 수(N−c)로 ===== */
+function initP2Tree(svgId,remain){
   const N=4;
   const nodes={},edges=[];
   let leaf=0;const GAP=54,TOP=32,DY=66,LX=60;
@@ -1138,11 +1675,11 @@ function initP2Tree(){
     o.y=TOP+o.depth*DY;
   })(list[0]);
   list.forEach(o=>{
-    nodes[o.id]={x:o.x,y:o.y,label:String(o.c),r:17,fs:13,
+    nodes[o.id]={x:o.x,y:o.y,label:String(remain?N-o.c:o.c),r:17,fs:13,
       st:(o.c===N?'sol':(o.c>N?'wait':(o.depth===0?'cur':'idle')))};
-    if(o.parent)edges.push({a:o.parent.id,b:o.id,cls:(o.c>N?'dim':''),label:'+'+(o.c-o.parent.c)});
+    if(o.parent)edges.push({a:o.parent.id,b:o.id,cls:(o.c>N?'dim':''),label:(remain?'\u2212':'+')+(o.c-o.parent.c)});
   });
-  paint(document.getElementById('p2Svg'),nodes,edges,17);
+  paint(document.getElementById(svgId),nodes,edges,17);
 }
 
 /* ===== 문제 2 : 계산기 ===== */
@@ -1289,6 +1826,41 @@ function initP5Tree(){
   t2.textContent='보라색 경로 : 3 → 6 을 고른 뒤 남은 후보';svg.appendChild(t2);
 }
 
+/* ===== 문제 5 : start 의 역할 (1,3,6 중 2개) ===== */
+function initP5Why(){
+  const nodes={},edges=[];
+  nodes.root={x:52,y:112,label:'( )',r:20,fs:12,st:'cur'};
+  /* 1단계 : 1, 3, 6 */
+  const L1=[{v:1,y:46},{v:3,y:112},{v:6,y:178}];
+  L1.forEach((o,i)=>{
+    nodes['a'+i]={x:210,y:o.y,label:String(o.v),r:17,fs:13,st:'idle'};
+    edges.push({a:'root',b:'a'+i});
+  });
+  /* 2단계 : 앞에서 고른 수보다 뒤에 있는 수만 */
+  const L2=[{p:0,v:3,y:22},{p:0,v:6,y:70},{p:1,v:6,y:112}];
+  L2.forEach((o,i)=>{
+    const sum=L1[o.p].v+o.v;
+    nodes['b'+i]={x:390,y:o.y,label:String(o.v),r:17,fs:13,st:(sum%3===0?'sol':'idle')};
+    edges.push({a:'a'+o.p,b:'b'+i});
+  });
+  const svg=document.getElementById('p5WhySvg');
+  if(!svg)return;
+  paint(svg,nodes,edges,17);
+  L2.forEach((o,i)=>{
+    const sum=L1[o.p].v+o.v,ok=sum%3===0;
+    const t=mk('text',{x:420,y:o.y+5,class:'elabel',
+      style:'font-size:12.5px;fill:'+(ok?'#137a5e':'#8794a6')});
+    t.textContent='합 '+sum+(ok?'  ✓ 3의 배수':'');
+    svg.appendChild(t);
+  });
+  const stop=mk('text',{x:238,y:183,class:'elabel',style:'font-size:12.5px;fill:#e0533d'});
+  stop.textContent='뒤에 남은 수가 없다 → 그만';
+  svg.appendChild(stop);
+  const cap=mk('text',{x:52,y:222,class:'elabel',style:'font-size:12.5px;fill:#4a5a70'});
+  cap.textContent='화살표는 언제나 오른쪽으로만 — 지나간 수로는 되돌아가지 않는다';
+  svg.appendChild(cap);
+}
+
 /* ===== 문제 5 : 35가지 표 ===== */
 function initP5(){
   const A=[1,3,6,7,11,15,18],N=7;
@@ -1334,8 +1906,8 @@ function initCodeToggle(){
 
 function initAll(){
   initCodeToggle();
-  initP1Tree();initP1();initP2Tree();initP2();
-  initP3();initP3b();initP4();initP5Tree();initP5();
+  initP1Tree();initP1();initP1Stack();initP2Tree('p2Svg',false);initP2Tree('p2kSvg',true);initP2();
+  initP3();initP3b();initP4();initP5Tree();initP5Why();initP5();
 }
 
 /* 슬라이드 엔진 */
@@ -1366,6 +1938,344 @@ window.addEventListener('DOMContentLoaded',()=>{
   show(0);
   initAll();
 });
+</script>
+<script>
+/* ── 4c 슬라이드: 스택이 그리는 탐색 트리 ─────────────────────── */
+(function(){
+  "use strict";
+
+  var CODE = {
+    dfs: [
+      [['kw','def '],['fn','count_dfs'],['','(n):']],
+      [['','    stack = [n]']],
+      [['','    cnt = '],['nm','0']],
+      [['kw','    while '],['','stack:']],
+      [['','        node = stack.'],['fn','pop'],['','()          '],['cm','# 맨 뒤 (LIFO)']],
+      [['kw','        if '],['','node == '],['nm','0'],['',':']],
+      [['','            cnt = cnt + '],['nm','1']],
+      [['kw','            continue']],
+      [['kw','        for '],['','x '],['kw','in '],['fn','range'],['','('],['nm','1'],['',', node + '],['nm','1'],['','):']],
+      [['','            stack.'],['fn','append'],['','(node - x)']],
+      [['kw','    return '],['','cnt']]
+    ],
+    bfs: [
+      [['kw','def '],['fn','count_bfs'],['','(n):']],
+      [['','    q = '],['fn','deque'],['','([n])']],
+      [['','    cnt = '],['nm','0']],
+      [['kw','    while '],['','q:']],
+      [['','        node = q.'],['fn','popleft'],['','()        '],['cm','# 맨 앞 (FIFO)']],
+      [['kw','        if '],['','node == '],['nm','0'],['',':']],
+      [['','            cnt = cnt + '],['nm','1']],
+      [['kw','            continue']],
+      [['kw','        for '],['','x '],['kw','in '],['fn','range'],['','('],['nm','1'],['',', node + '],['nm','1'],['','):']],
+      [['','            q.'],['fn','append'],['','(node - x)']],
+      [['kw','    return '],['','cnt']]
+    ]
+  };
+
+  var el = function(id){ return document.getElementById(id); };
+  var SVGNS = 'http://www.w3.org/2000/svg';
+
+  function buildTree(n){
+    var nodes = [];
+    function make(val, parent, edge){
+      var id = nodes.length;
+      nodes.push({id:id, val:val, parent:parent, edge:edge,
+                  depth: parent === null ? 0 : nodes[parent].depth + 1, kids:[]});
+      if(parent !== null) nodes[parent].kids.push(id);
+      return id;
+    }
+    var root = make(n, null, null);
+    (function expand(id){
+      var v = nodes[id].val;
+      for(var x = 1; x <= v; x++) expand(make(v - x, id, x));
+    })(root);
+
+    var slot = 0;
+    (function place(id){
+      var nd = nodes[id];
+      if(nd.kids.length === 0){ nd.col = slot++; return; }
+      nd.kids.forEach(place);
+      nd.col = (nodes[nd.kids[0]].col + nodes[nd.kids[nd.kids.length-1]].col) / 2;
+    })(root);
+
+    return {nodes:nodes, root:root, leaves:slot, depth:n};
+  }
+
+  function pathOf(tree, id){
+    var parts = [], nd = tree.nodes[id];
+    while(nd.parent !== null){ parts.unshift(nd.edge); nd = tree.nodes[nd.parent]; }
+    return parts.join('+');
+  }
+
+  function simulate(tree, mode){
+    var isDfs = mode === 'dfs';
+    var box = [tree.root];
+    var cnt = 0, steps = [];
+    var revealed = {}, opened = {}, hit = {}, found = [];
+    revealed[tree.root] = true;
+
+    function snap(o){
+      o.box = box.slice();
+      o.cnt = cnt;
+      o.revealed = Object.keys(revealed).map(Number);
+      o.opened = Object.keys(opened).map(Number);
+      o.hit = Object.keys(hit).map(Number);
+      o.found = found.slice();
+      steps.push(o);
+    }
+
+    var boxName = isDfs ? '스택' : '큐';
+    snap({line:[1], cur:null, tone:'', badge:'시작',
+      text:'뿌리 노드 하나만 ' + boxName + '에 넣고 시작한다. 남은 합 <b class="mono">' +
+           tree.nodes[tree.root].val + '</b> 을 어떻게 쪼갤지는 아직 아무것도 정해지지 않았다.'});
+
+    while(box.length){
+      var id = isDfs ? box.pop() : box.shift();
+      var nd = tree.nodes[id];
+      snap({line:[4], cur:id, tone:'pop', badge:'꺼냄',
+        text: (isDfs ? '맨 뒤' : '맨 앞') + '에서 <b class="mono">' + nd.val +
+              '</b> 을 꺼냈다. 여기까지 오면서 <b class="mono">' +
+              (nd.parent === null ? '아직 아무것도' : pathOf(tree, id)) + '</b> 를 골라 놓은 상태다.'});
+
+      if(nd.val === 0){
+        cnt++; hit[id] = true;
+        var p = pathOf(tree, id);
+        found.push(p);
+        snap({line:[6,7], cur:id, tone:'hit', badge:'성공',
+          text:'남은 합이 <b>0</b> — 더 채울 것이 없다. 순열 <b class="mono">' + p +
+               '</b> 하나 완성. <b>cnt = ' + cnt + '</b>'});
+      } else {
+        opened[id] = true;
+        nd.kids.forEach(function(k){ box.push(k); revealed[k] = true; });
+        var vals = nd.kids.map(function(k){ return tree.nodes[k].val; });
+        snap({line:[8,9], cur:id, fresh:nd.kids.slice(), tone:'', badge:'펼침',
+          text:'다음 항 <b class="mono">x</b> 로 <b class="mono">1…' + nd.val +
+               '</b> 을 하나씩 고를 수 있다. 남은 합 <b class="mono">' + vals.join(', ') +
+               '</b> 을 ' + boxName + '에 넣는다.'});
+      }
+    }
+
+    snap({line:[10], cur:null, tone:'fin', badge:'끝',
+      text: boxName + '이 비었다 — 더 볼 상태가 없다. <b>cnt = ' + cnt +
+            '</b> 를 돌려준다. 잎(초록 노드)의 개수가 그대로 답이다.'});
+    return steps;
+  }
+
+  var state = {n:3, mode:'dfs', i:0, ghost:false, playing:false, timer:null};
+  var tree, steps, nodeEls = {}, edgeEls = {}, labelEls = {};
+
+  var NR = 19, LEVEL = 78, GAP = 52, PADX = 30, PADY = 28;
+
+  function drawTree(){
+    var svg = el('dvTree');
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    nodeEls = {}; edgeEls = {}; labelEls = {};
+
+    var w = Math.max(360, (tree.leaves - 1) * GAP + PADX * 2);
+    var h = tree.depth * LEVEL + PADY * 2;
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+
+    function px(nd){ return PADX + nd.col * GAP; }
+    function py(nd){ return PADY + nd.depth * LEVEL; }
+
+    var gEdge = document.createElementNS(SVGNS, 'g');
+    var gLabel = document.createElementNS(SVGNS, 'g');
+    var gNode = document.createElementNS(SVGNS, 'g');
+    svg.appendChild(gEdge); svg.appendChild(gLabel); svg.appendChild(gNode);
+
+    tree.nodes.forEach(function(nd){
+      if(nd.parent !== null){
+        var pa = tree.nodes[nd.parent];
+        var line = document.createElementNS(SVGNS, 'line');
+        line.setAttribute('x1', px(pa)); line.setAttribute('y1', py(pa) + NR);
+        line.setAttribute('x2', px(nd)); line.setAttribute('y2', py(nd) - NR);
+        line.setAttribute('class', 'ed hidden');
+        gEdge.appendChild(line);
+        edgeEls[nd.id] = line;
+
+        var lab = document.createElementNS(SVGNS, 'text');
+        lab.setAttribute('x', (px(pa) + px(nd)) / 2 + (px(nd) >= px(pa) ? 9 : -9));
+        lab.setAttribute('y', (py(pa) + py(nd)) / 2 + 4);
+        lab.setAttribute('class', 'elabel hidden');
+        lab.textContent = 'x=' + nd.edge;
+        gLabel.appendChild(lab);
+        labelEls[nd.id] = lab;
+      }
+
+      var g = document.createElementNS(SVGNS, 'g');
+      g.setAttribute('class', 'nd hidden');
+      var c = document.createElementNS(SVGNS, 'circle');
+      c.setAttribute('cx', px(nd)); c.setAttribute('cy', py(nd)); c.setAttribute('r', NR);
+      var t = document.createElementNS(SVGNS, 'text');
+      t.setAttribute('x', px(nd)); t.setAttribute('y', py(nd));
+      t.textContent = nd.val;
+      g.appendChild(c); g.appendChild(t);
+      gNode.appendChild(g);
+      nodeEls[nd.id] = g;
+    });
+  }
+
+  function has(arr, v){ return arr.indexOf(v) !== -1; }
+
+  function render(){
+    var s = steps[state.i];
+
+    var lines = CODE[state.mode];
+    var html = '';
+    lines.forEach(function(parts, idx){
+      var body = parts.map(function(p){
+        var txt = p[1].replace(/&/g,'&amp;').replace(/</g,'&lt;');
+        return p[0] ? '<span class="' + p[0] + '">' + txt + '</span>' : txt;
+      }).join('');
+      html += '<span class="ln' + (has(s.line, idx) ? ' on' : '') + '">' + (body || ' ') + '</span>';
+    });
+    el('dvCode').innerHTML = html;
+
+    el('dvNarrate').className = 'narrate ' + s.tone;
+    el('dvBadge').textContent = s.badge;
+    el('dvText').innerHTML = s.text;
+
+    var isDfs = state.mode === 'dfs';
+    el('dvBoxTitle').textContent = isDfs ? '스택' : '큐';
+    el('dvBoxHint').textContent = isDfs
+      ? '넣는 곳과 꺼내는 곳이 같다 (LIFO).'
+      : '뒤로 넣고 앞에서 꺼낸다 (FIFO).';
+    el('dvMouth').textContent = isDfs ? '↑ 맨 뒤 — 여기서 꺼낸다' : '↑ 맨 앞 — 여기서 꺼낸다';
+
+    var order = isDfs ? s.box.slice().reverse() : s.box.slice();
+    var cells = el('dvCells');
+    cells.innerHTML = '';
+    if(order.length === 0){
+      var e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = '비어 있음';
+      cells.appendChild(e);
+    } else {
+      order.forEach(function(id, k){
+        var d = document.createElement('div');
+        d.className = 'cell' + (k === 0 ? ' head' : '') +
+                      (s.fresh && has(s.fresh, id) ? ' fresh' : '');
+        d.innerHTML = '<span class="idx">' + (k + 1) + '</span><span>' +
+                      tree.nodes[id].val + '</span>';
+        cells.appendChild(d);
+      });
+    }
+
+    el('dvCnt').textContent = s.cnt;
+    var foundBox = el('dvFound');
+    foundBox.innerHTML = '';
+    if(s.found.length === 0){
+      foundBox.innerHTML = '<span class="none">아직 없음</span>';
+    } else {
+      s.found.forEach(function(p){
+        var sp = document.createElement('span');
+        sp.textContent = p;
+        foundBox.appendChild(sp);
+      });
+    }
+
+    tree.nodes.forEach(function(nd){
+      var id = nd.id, cls;
+      if(s.cur === id) cls = 'nd cur';
+      else if(has(s.hit, id)) cls = 'nd hit';
+      else if(has(s.opened, id)) cls = 'nd open';
+      else if(has(s.revealed, id)) cls = 'nd wait';
+      else cls = state.ghost ? 'nd ghost' : 'nd hidden';
+      nodeEls[id].setAttribute('class', cls);
+
+      if(id !== tree.root){
+        var shown = has(s.revealed, id);
+        var ec = 'ed', lc = 'elabel';
+        if(!shown){ ec += state.ghost ? ' ghosted' : ' hidden'; lc += state.ghost ? ' ghosted' : ' hidden'; }
+        else if(has(s.hit, id) || has(s.hit, nd.parent)) ec += ' trail';
+        else ec += ' live';
+        edgeEls[id].setAttribute('class', ec);
+        labelEls[id].setAttribute('class', lc);
+      }
+    });
+
+    el('dvStepCount').textContent = (state.i + 1) + ' / ' + steps.length;
+    el('dvPrev').disabled = state.i === 0;
+    el('dvFirst').disabled = state.i === 0;
+    el('dvNext').disabled = state.i === steps.length - 1;
+  }
+
+  function reset(){
+    tree = buildTree(state.n);
+    steps = simulate(tree, state.mode);
+    state.i = 0;
+    el('dvTarget').innerHTML = '목표 2<sup>n-1</sup> = ' + Math.pow(2, state.n - 1);
+    drawTree();
+    render();
+  }
+
+  function go(d){
+    var next = Math.min(steps.length - 1, Math.max(0, state.i + d));
+    if(next === state.i && d > 0) stop();
+    state.i = next;
+    render();
+  }
+
+  function stop(){
+    state.playing = false;
+    if(state.timer){ clearInterval(state.timer); state.timer = null; }
+    el('dvPlay').textContent = '자동 재생';
+  }
+
+  function play(){
+    if(state.playing){ stop(); return; }
+    if(state.i === steps.length - 1) state.i = 0;
+    state.playing = true;
+    el('dvPlay').textContent = '멈춤';
+    state.timer = setInterval(function(){ go(1); }, 850);
+    render();
+  }
+
+  var nSeg = el('dvNSeg');
+  [2,3,4,5].forEach(function(v){
+    var b = document.createElement('button');
+    b.textContent = v;
+    b.setAttribute('aria-pressed', v === state.n ? 'true' : 'false');
+    b.addEventListener('click', function(){
+      stop();
+      state.n = v;
+      Array.prototype.forEach.call(nSeg.children, function(x){
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      reset();
+    });
+    nSeg.appendChild(b);
+  });
+
+  function setMode(m){
+    stop();
+    state.mode = m;
+    el('dvDfs').setAttribute('aria-pressed', m === 'dfs' ? 'true' : 'false');
+    el('dvBfs').setAttribute('aria-pressed', m === 'bfs' ? 'true' : 'false');
+    reset();
+  }
+  el('dvDfs').addEventListener('click', function(){ setMode('dfs'); });
+  el('dvBfs').addEventListener('click', function(){ setMode('bfs'); });
+
+  el('dvNext').addEventListener('click', function(){ stop(); go(1); });
+  el('dvPrev').addEventListener('click', function(){ stop(); go(-1); });
+  el('dvFirst').addEventListener('click', function(){ stop(); state.i = 0; render(); });
+  el('dvPlay').addEventListener('click', play);
+  el('dvGhost').addEventListener('change', function(e){
+    state.ghost = e.target.checked;
+    render();
+  });
+
+  /* 슬라이드를 벗어나면 자동 재생을 멈춘다 */
+  document.addEventListener('keydown', function(){ if(state.playing) stop(); });
+  var navBox = document.getElementById('nav');
+  if(navBox) navBox.addEventListener('click', function(){ if(state.playing) stop(); });
+
+  reset();
+})();
 </script>
 </body>
 </html>

@@ -13,6 +13,7 @@
 ## 최근 업데이트
 
 <!--changelog-->
+- **2026-10-17** · 4차시 — 풀이 슬라이드 보완, 학생용 변수명 정리, DFS 트리 보조자료 추가
 - **2026-09-07** · 1차시 · 3차시 · 4차시 — 학생 배포용 README와 다운로드 페이지 구성
 <!--/changelog-->
 
@@ -22,7 +23,7 @@
 |---|---|---|---|---|
 | 1차시 실습 | 순차 탐색 · 이분 탐색 · 스택 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/1%EC%B0%A8%EC%8B%9C_%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:1차시_선형탐색_실습_학생용.ipynb-->2026-09-07 업데이트</sub> | 없음 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/1%EC%B0%A8%EC%8B%9C_%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%EB%8B%B5.ipynb)<br><sub><!--date:1차시_선형탐색_실습_답.ipynb-->2026-09-07 업데이트</sub> |
 | 3차시 실습 | 트리에서의 DFS와 BFS | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/3%EC%B0%A8%EC%8B%9C_%EB%B9%84%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:3차시_비선형탐색_실습_학생용.ipynb-->2026-09-07 업데이트</sub> | [보기](https://sejong-truelightn.github.io/information-science-2026/3%EC%B0%A8%EC%8B%9C_%EB%B9%84%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%ED%92%80%EC%9D%B4.html) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/3%EC%B0%A8%EC%8B%9C_%EB%B9%84%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%EB%8B%B5.ipynb)<br><sub><!--date:3차시_비선형탐색_실습_답.ipynb-->2026-09-07 업데이트</sub> |
-| 4차시 실습 | 교과서 문제 풀어 보기 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:4차시_교과서문제_학생용.ipynb-->2026-09-07 업데이트</sub> | [보기](https://sejong-truelightn.github.io/information-science-2026/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%92%80%EC%9D%B4.html) | _수업 후 공개_ |
+| 4차시 실습 | 교과서 문제 풀어 보기 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:4차시_교과서문제_학생용.ipynb-->2026-10-17 업데이트</sub> | [보기](https://sejong-truelightn.github.io/information-science-2026/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%92%80%EC%9D%B4.html) | _수업 후 공개_ |
 
 ## 보조자료
 
