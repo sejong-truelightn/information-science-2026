@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5차시 · 상태 공간의 배제 — 분기 한정법과 탐욕법</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202e;
+  --ink-soft:#4a5a70;
+  --line:#dfe5ee;
+  --paper:#f7f9fc;
+  --white:#ffffff;
+  --sea:#1d5fd0;        /* 주 강조 */
+  --sea-soft:#e8f0ff;
+  --coral:#e0533d;      /* 현재 위치 / 배제 */
+  --coral-soft:#fdece8;
+  --moss:#137a5e;       /* 확정 / 해 */
+  --moss-soft:#e2f4ee;
+  --amber:#c98a09;      /* 대기 / 주의 */
+  --amber-soft:#fdf3dc;
+  --violet:#6b4bc4;
+  --violet-soft:#efeaff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden;}
+code,kbd,pre,.mono{font-family:'JetBrains Mono','IBM Plex Sans KR',monospace;}
+
+#deck{position:relative;width:100vw;height:100vh;}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:38px 60px 74px;background:var(--white);overflow-y:auto;overflow-x:hidden;}
+.slide.active{display:flex;animation:fade .32s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}}
+.slide::-webkit-scrollbar,.scrollbox::-webkit-scrollbar{width:9px;height:9px}
+.slide::-webkit-scrollbar-thumb,.scrollbox::-webkit-scrollbar-thumb{background:#c8d2e0;border-radius:9px}
+.slide::-webkit-scrollbar-track{background:transparent}
+
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--sea);text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line);}
+h1.title{font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-bottom:6px;}
+h1.title small{display:block;font-size:17px;font-weight:400;color:var(--ink-soft);margin-top:8px;letter-spacing:0}
+.sub{font-size:16px;color:var(--ink-soft);margin-bottom:20px;line-height:1.6}
+
+.body{flex:1 0 auto;min-height:0;}
+p{line-height:1.75;font-size:16px;color:var(--ink);}
+.lead{font-size:18px;line-height:1.8}
+ul.clean{list-style:none}
+ul.clean li{position:relative;padding-left:20px;line-height:1.8;font-size:16px;margin-bottom:6px}
+ul.clean li::before{content:"";position:absolute;left:2px;top:.75em;width:7px;height:7px;border-radius:2px;background:var(--sea);}
+ul.clean.moss li::before{background:var(--moss)}
+ul.clean.coral li::before{background:var(--coral)}
+ul.clean.amber li::before{background:var(--amber)}
+ol.num{padding-left:22px}
+ol.num li{line-height:1.8;font-size:16px;margin-bottom:6px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid-1-2{display:grid;grid-template-columns:1fr 1.6fr;gap:22px}
+.grid-2-1{display:grid;grid-template-columns:1.6fr 1fr;gap:22px}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:20px 22px;}
+.card h3{font-size:18px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card h4{font-size:15px;font-weight:700;margin-bottom:8px}
+.card.sea{background:var(--sea-soft);border-color:#c6dbff}
+.card.moss{background:var(--moss-soft);border-color:#bfe6d8}
+.card.coral{background:var(--coral-soft);border-color:#f7cec4}
+.card.amber{background:var(--amber-soft);border-color:#f0dfae}
+.card.violet{background:var(--violet-soft);border-color:#d8ccff}
+.card.flat{background:var(--paper)}
+
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--sea-soft);color:var(--sea);letter-spacing:.02em}
+.tag.moss{background:var(--moss-soft);color:var(--moss)}
+.tag.coral{background:var(--coral-soft);color:var(--coral)}
+.tag.amber{background:var(--amber-soft);color:#8a5f04}
+.tag.violet{background:var(--violet-soft);color:var(--violet)}
+.tag.gray{background:#eef1f6;color:var(--ink-soft)}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:15px}
+table.tbl th,table.tbl td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;line-height:1.6}
+table.tbl th{background:var(--paper);font-weight:600;font-size:14px}
+table.tbl td.c,table.tbl th.c{text-align:center}
+table.tbl td.r,table.tbl th.r{text-align:right;font-family:'JetBrains Mono'}
+table.tbl tr:hover td{background:#fbfcfe}
+table.tbl.sm{font-size:13.5px}
+table.tbl.sm th,table.tbl.sm td{padding:6px 9px}
+
+pre.code{background:#111a26;color:#dbe6f4;border-radius:12px;padding:16px 18px;font-size:14.5px;line-height:1.65;overflow:auto;font-family:'JetBrains Mono',monospace;}
+pre.code.sm{font-size:13px;line-height:1.6;padding:13px 15px}
+pre.code .kw{color:#ff9d7a}
+pre.code .fn{color:#7fd3ff}
+pre.code .st{color:#9be59b}
+pre.code .cm{color:#7e93ab;font-style:italic}
+pre.code .nm{color:#e2c07d}
+pre.code .hl{background:#3a2530;display:inline-block;width:100%;border-left:3px solid var(--coral);margin-left:-18px;padding-left:15px}
+pre.code .blank{background:#2b3d55;color:#ffd9a0;border:1px dashed #6d829e;border-radius:4px;padding:0 10px}
+
+.scrollbox{overflow-y:auto;max-height:100%;padding-right:6px}
+.body.scrollbox{overflow:visible;max-height:none;padding-right:0}
+
+.callout{border-left:4px solid var(--sea);background:var(--sea-soft);padding:14px 18px;border-radius:0 10px 10px 0;font-size:15.5px;line-height:1.75}
+.callout.coral{border-color:var(--coral);background:var(--coral-soft)}
+.callout.moss{border-color:var(--moss);background:var(--moss-soft)}
+.callout.amber{border-color:var(--amber);background:var(--amber-soft)}
+.callout.violet{border-color:var(--violet);background:var(--violet-soft)}
+.callout b{font-weight:700}
+
+.kbdkey{display:inline-block;border:1px solid #c9d3e0;border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:13px;background:#fff;font-family:'JetBrains Mono'}
+
+#nav{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;background:rgba(255,255,255,.94);border-top:1px solid var(--line);backdrop-filter:blur(8px);z-index:50;}
+#nav .left{display:flex;align-items:center;gap:12px}
+#nav .chip{font-size:13px;color:var(--ink-soft);font-weight:500}
+.navbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit;transition:.15s;}
+.navbtn:hover{background:var(--sea);color:#fff;border-color:var(--sea)}
+.navbtn:disabled{opacity:.35;cursor:default}
+.navbtn:disabled:hover{background:#fff;color:var(--ink);border-color:var(--line)}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--sea);z-index:60;transition:width .3s}
+#slidename{font-size:13px;color:var(--ink-soft);max-width:44vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.viz{display:grid;grid-template-columns:1.45fr 1fr;gap:20px;align-items:start}
+.vizstage{border:1px solid var(--line);border-radius:14px;background:#fcfdff;padding:6px}
+.vizstage svg{width:100%;display:block}
+.vizpanel{display:flex;flex-direction:column;gap:12px}
+.ctrlbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.btn{border:none;border-radius:9px;padding:9px 16px;font-size:14.5px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--sea);color:#fff;transition:.15s;}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--paper)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.coral{background:var(--coral)}
+.btn.moss{background:var(--moss)}
+
+.statebox{border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.statebox h4{font-size:13px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:8px;text-transform:uppercase}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;min-height:32px;align-items:center}
+.nodechip{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 9px;border-radius:8px;font-weight:700;font-size:15px;font-family:'JetBrains Mono';background:var(--paper);border:1px solid var(--line);}
+.nodechip.top{background:var(--coral);color:#fff;border-color:var(--coral)}
+.nodechip.done{background:var(--moss);color:#fff;border-color:var(--moss)}
+.nodechip.cut{background:#eef1f6;color:#9aa7b8;border-color:#dde3ec;text-decoration:line-through}
+.empty{color:#a9b5c6;font-size:14px}
+
+.msg{font-size:15px;line-height:1.65;padding:12px 14px;border-radius:11px;background:var(--sea-soft);border:1px solid #cfe0ff;min-height:66px}
+.msg b{color:var(--sea)}
+.msg.cut{background:var(--coral-soft);border-color:#f7cec4}
+.msg.cut b{color:var(--coral)}
+.msg.ok{background:var(--moss-soft);border-color:#bfe6d8}
+.msg.ok b{color:var(--moss)}
+.msg.warn{background:var(--amber-soft);border-color:#f0dfae}
+.msg.warn b{color:#8a5f04}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);align-items:center}
+.legend i{display:inline-block;width:13px;height:13px;border-radius:4px;margin-right:5px;vertical-align:-2px;border:1px solid rgba(0,0,0,.12)}
+
+.gnode text{font-family:'JetBrains Mono';font-weight:700;font-size:15px;pointer-events:none}
+.gedge{stroke:#c3cedd;stroke-width:2.5;transition:stroke .25s,stroke-width .25s}
+.gedge.act{stroke:var(--coral);stroke-width:4}
+.gedge.path{stroke:var(--moss);stroke-width:4.5}
+.gedge.best{stroke:var(--violet);stroke-width:4.5;stroke-dasharray:7 4}
+.gedge.dim{stroke:#e9eef4}
+.elabel{font-family:'JetBrains Mono';font-size:12px;font-weight:700;fill:#57687e}
+
+/* 계산기 / 비교 막대 */
+.calcrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.calcrow input[type=number],.calcrow input[type=text]{font-family:'JetBrains Mono';font-size:16px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;width:150px;background:#fff;color:var(--ink)}
+.calcrow input[type=range]{width:260px}
+.bar{height:34px;border-radius:8px;display:flex;align-items:center;padding:0 12px;color:#fff;font-family:'JetBrains Mono';font-weight:700;font-size:14px;min-width:60px;transition:width .35s ease;white-space:nowrap}
+.barwrap{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;margin-bottom:10px}
+.barwrap .lb{font-size:14.5px;font-weight:600;text-align:right;color:var(--ink-soft)}
+.bar.a{background:var(--coral)}
+.bar.b{background:var(--amber)}
+.bar.c{background:var(--moss)}
+.bignum{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--sea);line-height:1.2}
+.bignum small{display:block;font-size:13px;font-weight:500;color:var(--ink-soft);font-family:'IBM Plex Sans KR'}
+
+/* 퀴즈 */
+.q{border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin-bottom:14px;background:#fff}
+.q .qh{font-weight:600;font-size:16.5px;margin-bottom:12px;line-height:1.6}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opt{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 15px;cursor:pointer;font-size:14.5px;font-family:inherit;transition:.15s;text-align:left}
+.opt:hover{border-color:var(--sea);background:var(--sea-soft)}
+.opt.ok{background:var(--moss);color:#fff;border-color:var(--moss)}
+.opt.no{background:var(--coral);color:#fff;border-color:var(--coral)}
+.fb{margin-top:11px;font-size:14.5px;line-height:1.7;display:none;padding:11px 14px;border-radius:9px;background:var(--paper);border-left:3px solid var(--sea)}
+.fb.show{display:block}
+
+/* 정답 토글 */
+.reveal{border:1px dashed #c9d3e0;border-radius:11px;padding:0;overflow:hidden;background:var(--paper)}
+.reveal>button{width:100%;text-align:left;background:none;border:none;padding:11px 15px;font-family:inherit;font-size:14.5px;font-weight:600;color:var(--sea);cursor:pointer}
+.reveal>div{display:none;padding:0 15px 14px;font-size:14.5px;line-height:1.75}
+.reveal.open>div{display:block}
+
+.cover{justify-content:center;align-items:flex-start;background:linear-gradient(140deg,#f7f9fc 0%,#fdf1ec 50%,#eaf1fe 100%);}
+.cover .num{font-family:'JetBrains Mono';font-size:15px;font-weight:700;color:var(--sea);letter-spacing:.2em}
+.cover h1{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1.15;margin:14px 0 18px}
+.cover .kws{display:flex;gap:9px;flex-wrap:wrap;margin-top:26px}
+
+.footnote{font-size:13px;color:#8494a8;margin-top:12px;line-height:1.6}
+.tt{font-family:'JetBrains Mono';font-size:14.5px;background:#eef2f8;padding:1px 6px;border-radius:5px;color:#33445c}
+.notes{margin-top:26px;padding-top:20px;border-top:1px dashed var(--line)}
+.notes::before{content:"↓ 아래는 자세한 설명";display:block;font-size:12.5px;font-weight:600;letter-spacing:.1em;color:#a9b5c6;margin-bottom:14px;}
+
+@media (max-width:1100px){
+  .slide{padding:26px 26px 70px}
+  h1.title{font-size:30px}
+  .viz{grid-template-columns:1fr}
+  .grid-1-2,.grid-2-1,.grid2,.grid3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+
+<!-- ============ 1. 표지 ============ -->
+<section class="slide cover" data-name="표지">
+  <div class="num">5차시 · 탐색기반 알고리즘</div>
+  <h1>상태 공간의 배제<br>분기 한정법 · 탐욕법</h1>
+  <p class="lead" style="max-width:760px;color:var(--ink-soft)">
+    전체 탐색은 <b style="color:var(--ink)">언젠가는 반드시</b> 해를 찾는다. 문제는 그 &lsquo;언젠가&rsquo;가 20분, 30분, 혹은 우주의 나이라는 것.<br>
+    이제 우리는 <b style="color:var(--ink)">보지 않아도 되는 곳을 보지 않는 법</b>을 배운다.
+  </p>
+  <div class="kws">
+    <span class="tag">상태 공간의 배제</span>
+    <span class="tag gray">부분 탐색</span>
+    <span class="tag coral">분기 한정법</span>
+    <span class="tag amber">가지치기 · 백트랙</span>
+    <span class="tag moss">탐욕법</span>
+  </div>
+  <p class="footnote" style="margin-top:40px">
+    세종과학고등학교 1학년 정보과학 &nbsp;|&nbsp; Ⅲ. 알고리즘 &gt; 02. 탐색기반 알고리즘 &gt; 3. 상태 공간의 배제와 문제 해결 (교과서 pp.185~201)<br>
+    <span class="kbdkey">←</span> <span class="kbdkey">→</span> 로 슬라이드를 넘기고, 시각화 화면에서는 <b>[다음 단계]</b> 버튼을 눌러 진행하세요.
+  </p>
+</section>
+
+<!-- ============ 2. 학습 목표 ============ -->
+<section class="slide" data-name="학습 목표">
+  <div class="eyebrow">Learning Goals</div>
+  <h1 class="title">오늘 도착할 지점</h1>
+  <div class="body grid2" style="margin-top:14px">
+    <div class="card sea">
+      <h3>🎯 학습 목표</h3>
+      <ul class="clean">
+        <li><b>상태 공간의 배제</b>가 무엇이며 왜 필요한지 설명할 수 있다.</li>
+        <li>문제의 상태 공간 일부를 배제하는 알고리즘을 설계할 수 있다.</li>
+        <li><b>분기 한정법</b>이 DFS의 어느 지점에서 백트랙을 일으키는지 설명할 수 있다.</li>
+        <li><b>탐욕법</b>의 동작 원리와, 최적해를 보장하지 못하는 까닭을 설명할 수 있다.</li>
+        <li>전체 탐색 · 분기 한정법 · 탐욕법을 <b>비교·분석</b>할 수 있다.</li>
+      </ul>
+    </div>
+    <div class="card flat">
+      <h3>📘 성취기준</h3>
+      <ul class="clean moss">
+        <li>문제의 상태 공간 일부를 배제하는 알고리즘을 설계할 수 있다.</li>
+        <li>기존의 탐색기반 알고리즘과 상태 공간 일부를 배제하는 알고리즘을 비교·분석할 수 있다.</li>
+      </ul>
+      <h3 style="margin-top:20px">🧭 오늘의 흐름</h3>
+      <ol class="num">
+        <li>왜 배제가 필요한가 — 지수의 벽</li>
+        <li>이미 해 본 배제 — 4차시 돌아보기</li>
+        <li>분기 한정법 — 조건 위반과 한계로 가지를 자른다</li>
+        <li>탐욕법 — 한 갈래만 남긴다</li>
+        <li>탐욕법이 옳으려면 — 선택 기준의 근거</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. 다시 만난 벽 ============ -->
+<section class="slide" data-name="다시 만난 벽">
+  <div class="eyebrow">Motivation</div>
+  <h1 class="title">전체 탐색은 옳다. 다만 끝나지 않을 뿐이다.<small>2·3차시에서 우리는 상태 공간을 &lsquo;전부&rsquo; 훑었다. 그 대가를 이제 계산해 본다.</small></h1>
+  <div class="body">
+    <div class="grid-2-1">
+      <div>
+        <p class="lead" style="margin-bottom:16px">
+          전체 탐색기반 알고리즘은 <b>해가 될 수 있는 모든 경우</b>를 탐색한다. 컴퓨터의 계산 능력을 빌리면 빠르고 정확하게 해를 찾을 수 있다.
+          그러나 <b>상태 공간의 크기가 매우 클 경우</b>에는 해결이 어렵다.
+        </p>
+        <p style="margin-bottom:16px">
+          특히 <span class="tt">O(2ⁿ)</span>, <span class="tt">O(3ⁿ)</span> 같은 <b>지수 형태</b>의 시간 복잡도를 가지는 알고리즘은,
+          입력 n이 조금만 커져도 수행 시간이 기하급수적으로 늘어난다.
+        </p>
+        <table class="tbl sm">
+          <tr><th class="c">n</th><th class="r">2ⁿ (경우의 수)</th><th class="r">1초에 1,000만 번 계산하는 컴퓨터로</th></tr>
+          <tr><td class="c">10</td><td class="r">1,024</td><td class="r">즉시</td></tr>
+          <tr><td class="c">20</td><td class="r">1,048,576</td><td class="r">0.1초</td></tr>
+          <tr><td class="c">30</td><td class="r">약 10억</td><td class="r">약 1분 47초</td></tr>
+          <tr><td class="c">40</td><td class="r">약 1조</td><td class="r">약 1.3일</td></tr>
+          <tr><td class="c">50</td><td class="r">약 1,126조</td><td class="r">약 3.6년</td></tr>
+          <tr><td class="c">60</td><td class="r">약 115경</td><td class="r">약 3,657년</td></tr>
+        </table>
+        <p class="footnote">n이 10 커질 때마다 시간은 약 1,000배가 된다. &lsquo;컴퓨터가 더 빨라지면 되지 않나?&rsquo;라는 기대가 통하지 않는 영역이다.</p>
+      </div>
+      <div class="vizpanel">
+        <div class="card coral">
+          <h3>🎯 바둑의 상태 공간</h3>
+          <p style="font-size:15px">
+            19×19 = 361개의 자리에 각각 <b>흑·백·빈칸</b> 세 가지 상태가 가능하다.<br><br>
+            <span class="bignum" style="color:var(--coral)">3<sup>361</sup> ≈ 10<sup>172</sup><small>규칙상 불가능한 배치를 빼도 약 10<sup>170</sup></small></span>
+          </p>
+          <p class="footnote" style="color:#a05a4a">참고: 관측 가능한 우주의 원자 수는 약 10<sup>80</sup>개다. 바둑판 하나의 상태 공간이 우주보다 크다.</p>
+        </div>
+        <div class="callout amber">
+          <b>그래서 무엇을 해야 하는가?</b><br>
+          컴퓨터를 더 빠르게 만드는 대신 <b>탐색 전략을 최적화</b>한다.<br>
+          &ldquo;더 이상 탐색을 진행하지 않아도 해를 구하는 데 문제가 없는 부분&rdquo;을 판단해, <b>그 부분은 아예 보지 않는다.</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. 상태 공간의 배제란 ============ -->
+<section class="slide" data-name="상태 공간의 배제란">
+  <div class="eyebrow">Concept</div>
+  <h1 class="title">상태 공간의 배제<small>탐색 전략을 효율적으로 설계함으로써 상태 공간의 크기를 줄이는 알고리즘 설계 방법. <b>부분 탐색</b>이라고도 한다.</small></h1>
+  <div class="body">
+    <div class="callout" style="margin-bottom:22px">
+      백화점에 갔다. 사야 할 것은 <b>양말</b> 하나뿐이다.<br>
+      &ldquo;<b>가구 구역에는 내가 사야 할 물건이 없으니, 이곳은 그냥 통과!</b>&rdquo;<br>
+      — 가구 구역을 <b>둘러본 뒤 없다고 판단한 것이 아니다.</b> 들어가 보지도 않고 없다고 <b>판단할 수 있었기</b> 때문에 통과한 것이다.
+    </div>
+    <div class="grid3">
+      <div class="card flat">
+        <h3>❌ 무엇이 배제가 아닌가</h3>
+        <ul class="clean coral">
+          <li>다 탐색한 뒤 <b>답만 골라내는 것</b> — 시간은 그대로다.</li>
+          <li>&ldquo;아마 없을 것 같으니&rdquo; 하고 <b>근거 없이 버리는 것</b> — 정답을 잃는다.</li>
+          <li>코드를 짧게 쓰는 것 — 배제는 <b>실행 횟수</b>를 줄이는 일이다.</li>
+        </ul>
+      </div>
+      <div class="card sea">
+        <h3>⭕ 배제의 조건</h3>
+        <ul class="clean">
+          <li>탐색을 <b>진행하기 전에</b> 판단할 수 있어야 한다.</li>
+          <li>판단의 <b>논리적 근거</b>가 분명해야 한다.</li>
+          <li>버린 영역에 <b>답이 없음이 보장</b>되어야 한다. (분기 한정법)</li>
+          <li>보장이 없다면 &mdash; 답이 아니라 <b>&lsquo;괜찮은 답&rsquo;</b>을 얻는다. (탐욕법)</li>
+        </ul>
+      </div>
+      <div class="card moss">
+        <h3>🔑 오늘의 두 가지 방법</h3>
+        <p style="font-size:15px;margin-bottom:12px"><span class="tag coral">분기 한정법</span><br>
+        DFS로 전체 탐색을 하다가, <b>이 아래에는 답이 없다</b>고 판단되면 그 가지를 잘라내고 백트랙한다. <b>최적해를 보장한다.</b></p>
+        <p style="font-size:15px"><span class="tag moss">탐욕법</span><br>
+        다음 상태를 고를 때 <b>지금 가장 좋아 보이는 하나</b>만 남기고 나머지를 전부 버린다. <b>빠르지만 최적해를 보장하지 못한다.</b></p>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="grid2">
+        <div class="card">
+          <h3>🧠 한 문장으로</h3>
+          <p class="lead">전체 탐색이 <b>&ldquo;모든 곳을 본다&rdquo;</b>였다면, 상태 공간의 배제는 <b>&ldquo;볼 필요가 없는 곳을 논리로 증명하고 지운다&rdquo;</b>이다.</p>
+        </div>
+        <div class="card flat">
+          <h3>📎 3차시와의 연결</h3>
+          <p>3차시에서 배운 <b>백트랙</b>은 &ldquo;더 갈 곳이 없어서 되돌아오는&rdquo; 동작이었다.<br>
+          오늘의 <b>분기 한정</b>은 <b>갈 곳이 남아 있는데도 스스로 되돌아오는</b> 백트랙이다. 같은 동작, 다른 이유.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. 이미 해 본 배제 ============ -->
+<section class="slide" data-name="이미 해 본 배제">
+  <div class="eyebrow">Recap</div>
+  <h1 class="title">우리는 이미 배제를 해 보았다<small>4차시 교과서 문제 풀이 속에 오늘의 아이디어가 숨어 있었다. 이번 시간에는 그것에 <b>이름</b>을 붙이고 <b>원리</b>를 정리한다.</small></h1>
+  <div class="body">
+    <div class="grid3">
+      <div class="card sea">
+        <h3>① 소수 판정 — √n까지만</h3>
+        <p>약수는 <b>짝</b>으로 나온다. 짝의 작은 쪽은 언제나 √n 이하이므로, 그 위는 <b>보지 않아도</b> 결론이 같다.</p>
+        <p class="footnote">선형 구조에서의 배제 — 탐색 <b>범위</b>를 줄인다.</p>
+      </div>
+      <div class="card coral">
+        <h3>② 계단 오르기 — 지나치면 버린다</h3>
+        <p><span class="tt">c &gt; n</span> 이 된 순간, 그 아래 어떤 경로도 n번 칸에 <b>정확히</b> 도착할 수 없다. 그래서 더 내려가지 않는다.</p>
+        <p class="footnote">비선형 구조에서의 배제 — <b>가지</b>를 자른다.</p>
+      </div>
+      <div class="card moss">
+        <h3>③ BFS — 처음 찾은 답이 최소</h3>
+        <p>레벨 순으로 훑으면 처음 도착한 답이 곧 최소 횟수다. <b>나머지 상태는 볼 필요가 없다.</b></p>
+        <p class="footnote">탐색 <b>순서</b>를 바꿔 배제를 얻는다.</p>
+      </div>
+    </div>
+    <div class="callout amber" style="margin-top:22px">
+      <b>세 경우의 공통점</b> — 버린 영역에 답이 없다는 것을 <b>탐색하기 전에, 논리로</b> 알 수 있었다.<br>
+      이 판단을 <b>체계적으로</b> 세우는 방법이 분기 한정법이고, 판단을 <b>과감하게</b> 세우는 방법이 탐욕법이다.
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. 분기 한정법 · 개념 ============ -->
+<section class="slide" data-name="분기 한정법 · 개념">
+  <div class="eyebrow">Branch and Bound</div>
+  <h1 class="title">분기 한정법 <small>탐색 과정에서 <b>더 이상 탐색할 필요가 없다고 판단되는 경로</b>에 대해 탐색을 진행하지 않고 백트랙을 수행하는 방식</small></h1>
+  <div class="body">
+    <div class="viz">
+      <div class="vizstage">
+        <svg id="bbSvg" viewBox="0 0 520 380"></svg>
+      </div>
+      <div class="vizpanel">
+        <div class="statebox">
+          <h4>탐색 진행</h4>
+          <div class="chiprow" id="bbOrder"><span class="empty">아직 없음</span></div>
+        </div>
+        <div class="msg" id="bbMsg"></div>
+        <div class="ctrlbar">
+          <button class="btn" id="bbNext">다음 단계 ▶</button>
+          <button class="btn ghost" id="bbPrevBtn">◀ 이전</button>
+          <button class="btn ghost sm" id="bbReset">처음으로</button>
+          <span class="tt" id="bbStep">1 / 1</span>
+        </div>
+        <div class="ctrlbar">
+          <button class="btn ghost sm" id="bbMode">전체 탐색으로 보기 ⇄</button>
+          <span class="tt" id="bbCount"></span>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--coral)"></i>현재 노드</span>
+          <span><i style="background:var(--moss)"></i>탐색 완료</span>
+          <span><i style="background:#eef1f6"></i>배제된 영역</span>
+        </div>
+        <div class="callout amber">
+          <b>2번에서 3번으로 진행하려 할 때, &ldquo;3번 아래에는 답이 없다&rdquo;고 판단할 방법이 있다면?</b><br>
+          3~8번을 통째로 건너뛰고 바로 9번으로 갈 수 있다. <b>탐색 11회 → 6회.</b>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="grid3">
+        <div class="card sea">
+          <h3>🔍 정의</h3>
+          <p>탐색을 제한하는 <b>규칙을 정확하게 수립</b>하여 최적해를 구하는 알고리즘. 일반적으로 <b>DFS 형태로 전체 탐색을 진행</b>하다가, 탐색이 불필요한 노드가 발견되면 <b>백트랙</b>을 수행한다.</p>
+        </div>
+        <div class="card moss">
+          <h3>👍 장점</h3>
+          <ul class="clean moss">
+            <li>해를 구할 때까지 <b>모든 가능성을 탐색하지 않아도</b> 된다.</li>
+            <li>규칙이 옳다면 <b>최적해를 그대로 보장</b>한다. (버린 곳에 답이 없음이 증명되어 있으므로)</li>
+          </ul>
+        </div>
+        <div class="card coral">
+          <h3>👎 단점 · 주의</h3>
+          <ul class="clean coral">
+            <li>배제 규칙을 <b>잘못 세우면 정답을 잃는다.</b></li>
+            <li>최악의 경우 <b>아무것도 잘리지 않아</b> 전체 탐색과 같아질 수 있다. (시간 복잡도의 상한은 그대로)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:18px">
+        <b>노드가 뻗어 나가는 간선을 제거하는 방법</b>이므로, 분기 한정 알고리즘 설계 방법은 일종의 <b>가지치기(pruning)</b>라고 할 수 있다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. 분기 한정법 · 두 가지 가지치기 ============ -->
+<section class="slide" data-name="분기 한정법 · 두 가지 가지치기">
+  <div class="eyebrow">Branch and Bound</div>
+  <h1 class="title">무엇을 근거로 자르는가<small>분기 한정법의 가지치기 규칙은 크게 두 종류다.</small></h1>
+  <div class="body">
+    <div class="grid2">
+      <div class="card coral">
+        <h3>✂️ ① 조건 위반 — &ldquo;이 길은 답이 될 수 없다&rdquo;</h3>
+        <p>지금 상태가 이미 문제의 <b>조건을 어겼다</b>면, 아래로 무엇을 더 붙여도 조건을 회복할 수 없다.</p>
+        <ul class="clean coral" style="margin-top:10px">
+          <li>합이 목표를 넘었다 (더하는 수가 모두 양수)</li>
+          <li>무게가 가방 용량을 넘었다</li>
+          <li>퀸끼리 서로 공격한다</li>
+        </ul>
+        <p class="footnote">해의 <b>존재 여부</b>를 묻는 문제에서도 쓸 수 있다. 백트래킹이라고도 부른다.</p>
+      </div>
+      <div class="card amber">
+        <h3>📏 ② 한계(bound) — &ldquo;이 길은 더 좋아질 수 없다&rdquo;</h3>
+        <p>조건은 지키고 있지만, 이 아래에서 얻을 수 있는 <b>가장 좋은 값(상한)</b>조차 <b>지금까지 찾은 최선</b>을 넘지 못한다면 볼 필요가 없다.</p>
+        <p class="lead" style="text-align:center;margin:12px 0"><span class="tt">지금 값 + 남은 것으로 얻을 수 있는 최대 ≤ 최선</span> → 자른다</p>
+        <p class="footnote"><b>최적화 문제</b>(최대·최소)에서 쓴다. 분기 <b>한정</b>(bound)이라는 이름이 여기서 나왔다.</p>
+      </div>
+    </div>
+    <div class="grid3" style="margin-top:20px">
+      <div class="card flat">
+        <h4>🔁 최선값은 계속 바뀐다</h4>
+        <p style="font-size:15px">더 좋은 해를 찾을 때마다 최선값이 갱신되고, 그만큼 <b>잘리는 가지가 늘어난다.</b></p>
+      </div>
+      <div class="card flat">
+        <h4>🧭 탐색 순서가 성능을 정한다</h4>
+        <p style="font-size:15px"><b>좋은 해를 일찍 찾을수록</b> 한계가 빨리 높아져 더 많이 자른다. 그래서 유망해 보이는 쪽부터 탐색한다.</p>
+      </div>
+      <div class="card flat">
+        <h4>⚖️ 상한은 낙관적이어야 한다</h4>
+        <p style="font-size:15px">상한은 실제 최댓값보다 <b>작으면 안 된다.</b> 작게 어림하면 답이 있는 가지까지 잘라 <b>정답을 잃는다.</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. 분기 한정법 · 배낭 문제 ============ -->
+<section class="slide" data-name="분기 한정법 · 배낭 문제">
+  <div class="eyebrow">Example — 0/1 배낭 문제</div>
+  <h1 class="title">가방에 담을 수 있는 가장 큰 가치는?<small>용량 <b>9kg</b>인 가방에 물건 A~D를 <b>넣거나 넣지 않거나</b> 정한다. 각 물건은 한 번만 넣을 수 있다.</small></h1>
+  <div class="body">
+    <div class="viz">
+      <div>
+        <div class="vizstage">
+          <svg id="knSvg" viewBox="0 0 680 330"></svg>
+        </div>
+        <div class="legend" style="margin-top:10px">
+          <span><i style="background:var(--coral)"></i>현재 노드</span>
+          <span><i style="background:var(--moss)"></i>방문</span>
+          <span><i style="background:#efeaff;border-color:#6b4bc4"></i>최선 갱신</span>
+          <span><i style="background:#eef1f6"></i>잘려서 보지 않음</span>
+          <span>왼쪽 간선 = 넣는다 · 오른쪽 = 넣지 않는다 · 노드 숫자 = 지금까지의 가치</span>
+        </div>
+      </div>
+      <div class="vizpanel">
+        <table class="tbl sm">
+          <tr><th class="c">물건</th><th class="c">A</th><th class="c">B</th><th class="c">C</th><th class="c">D</th></tr>
+          <tr><th class="c">무게</th><td class="c">6</td><td class="c">5</td><td class="c">4</td><td class="c">1</td></tr>
+          <tr><th class="c">가치</th><td class="c">12</td><td class="c">9</td><td class="c">8</td><td class="c">1</td></tr>
+        </table>
+        <div class="statebox">
+          <h4>지금 상태</h4>
+          <div class="chiprow" id="knState"><span class="empty">아직 없음</span></div>
+          <div style="margin-top:8px;font-size:14px;color:var(--ink-soft)">최선 <b class="tt" id="knBest">0</b> &nbsp; 방문 <b class="tt" id="knVisit">0</b> / 31</div>
+        </div>
+        <div class="msg" id="knMsg"></div>
+        <div class="ctrlbar">
+          <button class="btn" id="knNext">다음 단계 ▶</button>
+          <button class="btn ghost" id="knPrevBtn">◀ 이전</button>
+          <button class="btn ghost sm" id="knReset">처음으로</button>
+          <span class="tt" id="knStep">1 / 1</span>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="grid-1-2">
+        <div>
+          <div class="card sea">
+            <h3>🔍 무엇을 확인했나</h3>
+            <ul class="clean">
+              <li>전체 탐색이라면 노드 <b>31개</b>를 모두 본다.</li>
+              <li>분기 한정법은 <b>15개</b>만 보고 같은 답 <b>17</b>(B + C)을 찾는다.</li>
+              <li><b>무게 초과</b>로 3번, <b>한계</b>로 2번 잘랐다.</li>
+            </ul>
+          </div>
+          <div class="callout coral" style="margin-top:14px">
+            <b>&lsquo;--&rsquo; 노드가 잘린 이유</b><br>A, B를 모두 빼면 남은 C, D를 다 넣어도 8 + 1 = 9. 이미 17을 찾았으므로 볼 필요가 없다.
+          </div>
+        </div>
+        <pre class="code sm">W = <span class="nm">9</span>
+w = [<span class="nm">6</span>, <span class="nm">5</span>, <span class="nm">4</span>, <span class="nm">1</span>]       <span class="cm"># 무게</span>
+v = [<span class="nm">12</span>, <span class="nm">9</span>, <span class="nm">8</span>, <span class="nm">1</span>]      <span class="cm"># 가치</span>
+best = <span class="nm">0</span>
+
+<span class="kw">def</span> <span class="fn">f</span>(i, cw, cv):           <span class="cm"># i번째 물건을 정할 차례</span>
+    <span class="kw">global</span> best
+<span class="hl">    <span class="kw">if</span> cw &gt; W:                 <span class="cm"># ① 조건 위반 — 무게 초과</span></span>
+<span class="hl">        <span class="kw">return</span></span>
+    <span class="kw">if</span> i == <span class="fn">len</span>(w):            <span class="cm"># 모든 물건을 정했다</span>
+        best = <span class="fn">max</span>(best, cv)
+        <span class="kw">return</span>
+<span class="hl">    <span class="kw">if</span> cv + <span class="fn">sum</span>(v[i:]) &lt;= best: <span class="cm"># ② 한계 — 다 넣어도 최선 이하</span></span>
+<span class="hl">        <span class="kw">return</span></span>
+    <span class="fn">f</span>(i+<span class="nm">1</span>, cw+w[i], cv+v[i])  <span class="cm"># 넣는다</span>
+    <span class="fn">f</span>(i+<span class="nm">1</span>, cw, cv)            <span class="cm"># 넣지 않는다</span>
+
+<span class="fn">f</span>(<span class="nm">0</span>, <span class="nm">0</span>, <span class="nm">0</span>)
+<span class="fn">print</span>(best)                   <span class="cm"># 17</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. 탐욕법 · 개념 ============ -->
+<section class="slide" data-name="탐욕법 · 개념">
+  <div class="eyebrow">Greedy</div>
+  <h1 class="title">탐욕법 <small>현재 상태에서 다음 상태를 탐색할 때, 모든 가능한 상태를 고려하지 않고 <b>최선의 상태만을 선택</b>한다.</small></h1>
+  <div class="body">
+    <div class="grid3">
+      <div class="card moss">
+        <h3>🔍 정의</h3>
+        <p>주어진 문제에서 <b>전체 상태 공간 중 일부를 배제</b>하여 문제를 해결하는 알고리즘.<br><br>
+        여러 개의 해가 존재하는 <b>최적화 문제</b>에서 <b>탐욕적 선택</b>을 통하여 가장 적절한 해를 찾는다.</p>
+        <p class="footnote">욕심쟁이 알고리즘 · 그리디 알고리즘(greedy algorithm)이라고도 부른다.</p>
+      </div>
+      <div class="card coral">
+        <h3>✂️ 무엇을 배제하는가</h3>
+        <p>갈림길에서 선택지가 <b>b개</b>일 때,<br>
+        분기 한정법은 &ldquo;답이 없음이 증명된&rdquo; 가지만 자른다.<br><br>
+        탐욕법은 <b>가장 좋아 보이는 하나만 남기고 나머지 b−1개를 전부 자른다.</b></p>
+        <p class="footnote" style="color:#a05a4a">그래서 탐색 경로는 <b>단 하나의 줄기</b>가 되고, 백트랙이 일어나지 않는다.</p>
+      </div>
+      <div class="card sea">
+        <h3>⚡ 그 대가로 얻는 것</h3>
+        <p>깊이가 n인 이진 트리에서<br>
+        전체 탐색: <span class="tt">O(2ⁿ)</span><br>
+        탐욕법: <span class="tt">O(n)</span></p>
+        <p style="margin-top:10px">대신 <b>그 답이 최적해라는 보장은 사라진다.</b></p>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:20px">
+      <div class="card flat">
+        <h3>🧩 탐욕법을 설계하는 순서</h3>
+        <ol class="num">
+          <li><b>선택 기준</b>을 정한다. &mdash; &ldquo;무엇이 지금 가장 좋은가?&rdquo;</li>
+          <li>기준에 따라 하나를 고르고, 조건을 어기면 버린다.</li>
+          <li>남은 부분 문제에 같은 기준을 반복한다.</li>
+          <li><b>이 기준이 최적해를 주는지 확인한다.</b> &mdash; 가장 중요하고, 가장 자주 빠뜨리는 단계</li>
+        </ol>
+      </div>
+      <div class="callout violet">
+        <b>앞의 배낭 문제에 탐욕법을 쓰면?</b><br>
+        기준: &ldquo;가치가 큰 물건부터 넣는다&rdquo;<br>
+        A(12) 넣음 → 남은 용량 3 → B, C는 못 넣음 → D(1) 넣음 → <b>13</b><br><br>
+        비교는 4번이면 끝나지만, 최적해 <b>17</b>보다 나쁘다.<br>
+        &ldquo;무게당 가치가 큰 것부터&rdquo;로 바꿔도 A가 먼저 들어가 <b>13</b>이다.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. 탐욕법 · 회의실 배정 ============ -->
+<section class="slide" data-name="탐욕법 · 회의실 배정">
+  <div class="eyebrow">Example — 회의실 배정</div>
+  <h1 class="title">기준만 잘 고르면 탐욕법이 정답이다<small>회의실 하나에 회의 8개가 신청되었다. 시간이 겹치지 않게 <b>가장 많은 회의</b>를 배정해 보자. (끝나는 시각에 다음 회의가 바로 시작할 수 있다)</small></h1>
+  <div class="body">
+    <div class="viz">
+      <div>
+        <div class="vizstage">
+          <svg id="mtSvg" viewBox="0 0 640 330"></svg>
+        </div>
+        <div class="ctrlbar">
+          <span style="font-size:14.5px;font-weight:600">선택 기준</span>
+          <button class="btn sm" data-mt="end">끝나는 시각이 빠른 것부터</button>
+          <button class="btn ghost sm" data-mt="start">시작 시각이 빠른 것부터</button>
+          <button class="btn ghost sm" data-mt="short">회의 시간이 짧은 것부터</button>
+        </div>
+      </div>
+      <div class="vizpanel">
+        <div class="statebox">
+          <h4>배정된 회의</h4>
+          <div class="chiprow" id="mtPick"><span class="empty">아직 없음</span></div>
+        </div>
+        <div class="msg" id="mtMsg"></div>
+        <div class="ctrlbar">
+          <button class="btn" id="mtNext">다음 단계 ▶</button>
+          <button class="btn ghost" id="mtPrevBtn">◀ 이전</button>
+          <button class="btn ghost sm" id="mtReset">처음으로</button>
+          <span class="tt" id="mtStep">1 / 1</span>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--coral)"></i>지금 보는 회의</span>
+          <span><i style="background:var(--moss)"></i>배정</span>
+          <span><i style="background:#eef1f6"></i>겹쳐서 버림</span>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="grid-1-2">
+        <div>
+          <div class="card moss">
+            <h3>✅ 왜 &lsquo;끝나는 시각&rsquo;인가</h3>
+            <p style="font-size:15px">최적의 배정 하나를 생각하자. 그 첫 회의를 <b>가장 먼저 끝나는 회의</b>로 바꿔도 뒤의 회의와 겹치지 않는다(더 일찍 끝나므로). 개수는 그대로다.</p>
+            <p style="font-size:15px;margin-top:8px">즉, <b>탐욕적 선택을 해도 최적해를 잃지 않는다.</b> 남은 시간에 같은 논리를 반복하면 끝까지 최적이다.</p>
+          </div>
+          <div class="callout coral" style="margin-top:14px">
+            시작이 빠른 순으로 고르면 긴 회의 A가 0~6시를 다 차지한다. 짧은 순으로 고르면 C가 먼저 들어가서 B와 D를 둘 다 못 쓴다. 두 방법 모두 <b>2개</b>밖에 배정하지 못한다.
+          </div>
+        </div>
+        <pre class="code sm">meetings = [(<span class="nm">0</span>,<span class="nm">6</span>), (<span class="nm">1</span>,<span class="nm">4</span>), (<span class="nm">3</span>,<span class="nm">5</span>), (<span class="nm">4</span>,<span class="nm">7</span>),
+            (<span class="nm">5</span>,<span class="nm">9</span>), (<span class="nm">6</span>,<span class="nm">10</span>), (<span class="nm">8</span>,<span class="nm">11</span>), (<span class="nm">9</span>,<span class="nm">12</span>)]
+
+<span class="cm"># 탐욕적 선택 기준 — 끝나는 시각이 빠른 것부터</span>
+<span class="kw">def</span> <span class="fn">end_time</span>(m):
+    <span class="kw">return</span> m[<span class="nm">1</span>]                <span class="cm"># m = (시작, 끝) → 끝나는 시각</span>
+
+<span class="hl">meetings.sort(key=end_time)</span>
+
+cnt = <span class="nm">0</span>
+end = <span class="nm">0</span>                       <span class="cm"># 마지막으로 배정한 회의가 끝나는 시각</span>
+<span class="kw">for</span> s, e <span class="kw">in</span> meetings:
+    <span class="kw">if</span> s &gt;= end:               <span class="cm"># 겹치지 않으면 배정</span>
+        cnt = cnt + <span class="nm">1</span>
+        end = e
+
+<span class="fn">print</span>(cnt)                    <span class="cm"># 3</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11. 탐욕법의 한계 ============ -->
+<section class="slide" data-name="탐욕법의 한계">
+  <div class="eyebrow">Limitation</div>
+  <h1 class="title">탐욕법의 논리적 비약<small>&ldquo;지금 가장 좋아 보이는 것을 고르면 전체도 가장 좋아진다&rdquo; — 이 문장에는 <b>논리적 근거가 없다.</b></small></h1>
+  <div class="body">
+    <div class="grid-2-1">
+      <div>
+        <div class="callout coral" style="margin-bottom:18px;font-size:16px">
+          현재 상태에서 가장 좋아 보이는 다음 상태를 고르는 것이, <b>전체 공간에서의 최적해를 보장한다는 논리적 근거는 없다.</b> 배낭 문제가 그 예다.<br>
+          따라서 최적의 결과를 얻기 위해서는 <b>더욱 체계적이고 논리적인 방식의 알고리즘 개발</b>이 필요하다.
+        </div>
+        <table class="tbl">
+          <tr><th style="width:130px"></th><th class="c">전체 탐색</th><th class="c">분기 한정법</th><th class="c">탐욕법</th></tr>
+          <tr><th>버리는 가지</th><td class="c">없음</td><td class="c">답이 없음이<br><b>증명된</b> 가지</td><td class="c"><b>최선 하나를 빼고</b><br>전부</td></tr>
+          <tr><th>버리는 근거</th><td class="c">—</td><td class="c" style="color:var(--moss);font-weight:700">논리적 증명</td><td class="c" style="color:var(--coral);font-weight:700">직관 (비약)</td></tr>
+          <tr><th>최적해 보장</th><td class="c" style="color:var(--moss);font-weight:700">O</td><td class="c" style="color:var(--moss);font-weight:700">O</td><td class="c" style="color:var(--coral);font-weight:700">X (문제에 따라 O)</td></tr>
+          <tr><th>속도 (트리 높이 n)</th><td class="c">O(2ⁿ)</td><td class="c">최악 O(2ⁿ)<br>평균적으로 훨씬 빠름</td><td class="c" style="color:var(--moss);font-weight:700">O(n)</td></tr>
+          <tr><th>백트랙</th><td class="c">일어남</td><td class="c">일어남 (더 자주)</td><td class="c">일어나지 않음</td></tr>
+        </table>
+        <div class="grid2" style="margin-top:18px">
+          <div class="card flat">
+            <h4>① 탐욕적 선택 속성</h4>
+            <p style="font-size:15px">지금 탐욕적으로 고른 것을 포함하는 <b>최적해가 반드시 존재한다.</b> 회의실 배정의 &lsquo;가장 먼저 끝나는 회의&rsquo;가 그렇다.</p>
+          </div>
+          <div class="card flat">
+            <h4>② 최적 부분 구조</h4>
+            <p style="font-size:15px">하나를 고르고 남은 <b>부분 문제의 최적해</b>를 붙이면 <b>전체의 최적해</b>가 된다.</p>
+          </div>
+        </div>
+        <p class="footnote">두 성질을 모두 보일 수 있을 때 탐욕법은 정답을 준다. 하나라도 무너지면 &lsquo;괜찮은 답&rsquo;일 뿐이다.</p>
+      </div>
+      <div class="vizpanel">
+        <div class="card moss">
+          <h3>✅ 탐욕법이 최적해를 주는 경우</h3>
+          <p style="font-size:15px">탐욕적 선택이 최적해로 이어진다는 것을 <b>증명할 수 있을 때</b>만 탐욕법은 정당하다.</p>
+          <h4 style="margin-top:14px">1. 다익스트라 알고리즘</h4>
+          <p style="font-size:14.5px;color:var(--ink-soft)">단일 출발점에서 다른 모든 정점으로의 최단 경로를 찾는 알고리즘.</p>
+          <h4 style="margin-top:12px">2. 허프만 알고리즘</h4>
+          <p style="font-size:14.5px;color:var(--ink-soft)">데이터 압축에 사용된다. 가장 낮은 빈도로 나타나는 문자부터 차례대로 두 개씩 묶어 나가며 새로운 이진 트리를 구성한다.</p>
+          <h4 style="margin-top:12px">3. 최소 신장 트리 (크루스칼 · 프림)</h4>
+          <p style="font-size:14.5px;color:var(--ink-soft)">싼 간선부터 고르는 탐욕적 선택이 최소 비용을 보장한다.</p>
+        </div>
+        <div class="callout amber">
+          <b>기억할 것</b><br>
+          탐욕법을 이용하여 <b>최적해를 구하기 위해서는</b>, 탐색할 다음 상태를 선택할 때 <b>논리적 근거가 필요하다.</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12. 세 전략 한 장 정리 ============ -->
+<section class="slide" data-name="세 전략 한 장 정리">
+  <div class="eyebrow">Summary</div>
+  <h1 class="title">세 가지 전략, 한 장으로<small>같은 상태 공간을 서로 다른 태도로 대하는 세 가지 방법</small></h1>
+  <div class="body">
+    <table class="tbl">
+      <tr>
+        <th style="width:120px"></th>
+        <th class="c" style="background:var(--coral-soft)">전체 탐색</th>
+        <th class="c" style="background:var(--amber-soft)">분기 한정법</th>
+        <th class="c" style="background:var(--moss-soft)">탐욕법</th>
+      </tr>
+      <tr><th>태도</th>
+        <td class="c">전부 본다</td>
+        <td class="c">답이 없는 곳은<br>증명하고 지운다</td>
+        <td class="c">가장 좋아 보이는<br>하나만 본다</td></tr>
+      <tr><th>탐색 방식</th>
+        <td class="c">DFS / BFS</td>
+        <td class="c">DFS + 조건부 백트랙</td>
+        <td class="c">한 줄기 하강<br>(백트랙 없음)</td></tr>
+      <tr><th>배제 근거</th>
+        <td class="c">—</td>
+        <td class="c">논리적 증명<br>조건 위반 · 한계</td>
+        <td class="c">선택 기준<br>(근거가 있어야 정답)</td></tr>
+      <tr><th>최적해</th>
+        <td class="c" style="font-weight:700;color:var(--moss)">항상 보장</td>
+        <td class="c" style="font-weight:700;color:var(--moss)">항상 보장</td>
+        <td class="c" style="font-weight:700;color:var(--coral)">보장 못 함</td></tr>
+      <tr><th>속도</th>
+        <td class="c">가장 느림</td>
+        <td class="c">문제에 따라 극적으로 빨라짐</td>
+        <td class="c" style="font-weight:700;color:var(--moss)">가장 빠름</td></tr>
+      <tr><th>오늘의 예</th>
+        <td class="c">배낭 노드 31개</td>
+        <td class="c">배낭 노드 15개<br>같은 답 17</td>
+        <td class="c">배낭 13 (최적 아님)<br>회의실 3 (최적)</td></tr>
+      <tr><th>쓸 때</th>
+        <td class="c">상태 공간이 작을 때<br>정답의 기준을 만들 때</td>
+        <td class="c">최적해가 꼭 필요하고<br>좋은 배제 규칙이 있을 때</td>
+        <td class="c">탐욕적 선택의<br><b>정당성을 증명</b>했을 때<br>또는 근사해로 충분할 때</td></tr>
+    </table>
+    <div class="grid3" style="margin-top:22px">
+      <div class="card sea">
+        <h3>💬 정리하기</h3>
+        <p><b>상태 공간의 배제</b>는 탐색 전략을 효율적으로 설계하여 상태 공간을 축소하는 알고리즘 설계 방법이며, 이를 통하여 <b>부분 탐색</b>이 가능해진다.</p>
+      </div>
+      <div class="card amber">
+        <h3>💬 정리하기</h3>
+        <p><b>분기 한정법</b>은 상태 공간을 배제하여 탐색기반 알고리즘의 효율을 향상시키는 방법 중 하나이다.</p>
+      </div>
+      <div class="card moss">
+        <h3>💬 정리하기</h3>
+        <p><b>탐욕법</b>은 전체 상태 공간 중 일부를 배제하여 문제를 해결하는 알고리즘으로, 현재 상태에서 <b>최선의 상태만을 선택</b>하여 다음 상태로 이동하는 방식을 사용한다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13. 확인 퀴즈 ============ -->
+<section class="slide" data-name="확인 퀴즈">
+  <div class="eyebrow">Check</div>
+  <h1 class="title">스스로 확인하기<small>선택지를 눌러 정답과 해설을 확인해 보자.</small></h1>
+  <div class="body scrollbox">
+    <div class="grid2">
+      <div>
+        <div class="q">
+          <div class="qh">Q1. 분기 한정법과 탐욕법의 가장 큰 차이는?</div>
+          <div class="opts" data-a="1">
+            <button class="opt">분기 한정법은 BFS, 탐욕법은 DFS를 쓴다</button>
+            <button class="opt">분기 한정법은 최적해를 보장하지만 탐욕법은 보장하지 못한다</button>
+            <button class="opt">탐욕법은 상태 공간을 배제하지 않는다</button>
+          </div>
+          <div class="fb">분기 한정법은 <b>답이 없음이 증명된</b> 가지만 자르므로 최적해가 그대로 남는다. 탐욕법은 <b>증명 없이</b> 나머지를 전부 버리므로, 버린 쪽에 더 좋은 답이 있을 수 있다. 둘 다 상태 공간을 배제한다는 점은 <b>같다</b>.</div>
+        </div>
+        <div class="q">
+          <div class="qh">Q2. 배낭 문제 코드에서 ② 한계 조건 <span class="tt">if cv + sum(v[i:]) &lt;= best</span> 를 지우면?</div>
+          <div class="opts" data-a="0">
+            <button class="opt">답은 그대로지만 보는 노드가 늘어난다</button>
+            <button class="opt">무게를 넘는 답이 나온다</button>
+            <button class="opt">답이 더 작아진다</button>
+          </div>
+          <div class="fb"><b>배제는 답을 바꾸지 않고 시간을 바꾼다.</b> 무게 초과는 ① 조건이 따로 막고 있으므로 답은 17 그대로다. 다만 한계로 잘라 내던 가지까지 모두 내려가 보게 된다.</div>
+        </div>
+        <div class="q">
+          <div class="qh">Q3. 한계(상한)를 실제로 얻을 수 있는 값보다 <b>작게</b> 어림하면?</div>
+          <div class="opts" data-a="2">
+            <button class="opt">더 많이 잘라서 더 빠르고, 답도 같다</button>
+            <button class="opt">아무 일도 일어나지 않는다</button>
+            <button class="opt">답이 있는 가지까지 잘라 정답을 잃을 수 있다</button>
+          </div>
+          <div class="fb">한계는 &ldquo;이 아래에서 <b>아무리 잘해도</b> 이 값을 넘지 못한다&rdquo;는 약속이다. 실제보다 작게 잡으면 그 약속이 거짓이 되어, 최적해가 있는 가지를 버릴 수 있다. 상한은 <b>낙관적으로</b> 잡아야 한다.</div>
+        </div>
+      </div>
+      <div>
+        <div class="q">
+          <div class="qh">Q4. 회의 (0~5), (4~7), (6~11) 이 있다. &lsquo;짧은 회의부터&rsquo; 고르면 몇 개를 배정하는가?</div>
+          <div class="opts" data-a="1">
+            <button class="opt">2개 — 최적해와 같다</button>
+            <button class="opt">1개 — 최적해(2개)보다 나쁘다</button>
+            <button class="opt">3개 — 모두 배정된다</button>
+          </div>
+          <div class="fb">가장 짧은 (4~7)을 먼저 고르면 나머지 둘과 모두 겹쳐 <b>1개</b>로 끝난다. 끝나는 시각 기준이라면 (0~5) → (6~11) 로 <b>2개</b>. 그럴듯한 기준이라도 <b>근거가 없으면</b> 최적해를 놓친다.</div>
+        </div>
+        <div class="q">
+          <div class="qh">Q5. 분기 한정법에서 <b>좋은 해를 일찍 찾으면</b> 어떻게 되는가?</div>
+          <div class="opts" data-a="0">
+            <button class="opt">최선값이 빨리 높아져 더 많은 가지가 잘린다</button>
+            <button class="opt">탐색을 그 자리에서 끝내도 된다</button>
+            <button class="opt">잘리는 가지의 수는 순서와 상관없다</button>
+          </div>
+          <div class="fb">한계 가지치기는 <b>지금까지의 최선</b>과 비교한다. 최선이 높을수록 &ldquo;더 좋아질 수 없는&rdquo; 가지가 많아진다. 다만 남은 가지에 더 좋은 해가 있을 수 있으므로 <b>바로 끝내서는 안 된다.</b> 그래서 유망한 쪽부터 탐색한다.</div>
+        </div>
+        <div class="q">
+          <div class="qh">Q6. 다음 중 <b>상태 공간의 배제</b>라고 할 수 <b>없는</b> 것은?</div>
+          <div class="opts" data-a="2">
+            <button class="opt">약수를 √n까지만 찾고 짝을 이용해 나머지를 얻는다</button>
+            <button class="opt">합이 목표를 넘으면 그 아래를 탐색하지 않는다</button>
+            <button class="opt">모든 경우를 탐색한 뒤 조건에 맞는 것만 출력한다</button>
+          </div>
+          <div class="fb">③은 <b>탐색을 다 한 뒤</b>에 걸러내는 것이므로 수행 시간이 전혀 줄지 않는다. 배제는 <b>탐색을 시작하기 전에</b> 판단해서 <b>실행 자체를 하지 않는</b> 것이다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14. 정리 · 자기 평가 ============ -->
+<section class="slide" data-name="정리 · 자기 평가">
+  <div class="eyebrow">Wrap-up</div>
+  <h1 class="title">오늘 배운 내용<small>탐색기반 알고리즘(02단원)이 여기서 마무리된다. 다음은 <b>03. 관계기반 알고리즘</b>이다.</small></h1>
+  <div class="body">
+    <div class="grid2">
+      <div class="card sea">
+        <h3>📌 정리하기</h3>
+        <ul class="clean">
+          <li>탐색기반 알고리즘은 가능한 해의 집합을 <b>체계적으로 탐색</b>하여 문제의 최적해를 찾는 방법이다.</li>
+          <li><b>선형 구조</b>는 상태 공간을 탐색하는 순서를 유일하게 결정할 수 있다. <span class="tag gray">2차시</span></li>
+          <li><b>비선형 구조</b>는 특정 원소를 탐색한 후, 그 원소와 연결된 여러 개의 다른 원소 중 다음에 탐색할 원소를 선택하는 탐색 구조를 뜻한다. <span class="tag gray">3차시</span></li>
+          <li><b>상태 공간의 배제</b>는 탐색 전략을 효율적으로 설계하여 상태 공간을 축소하는 알고리즘 설계 방법이며, 이를 통하여 <b>부분 탐색</b>이 가능해진다.</li>
+          <li><b>분기 한정법</b>은 상태 공간을 배제하여 탐색기반 알고리즘의 효율을 향상시키는 방법 중 하나이다.</li>
+          <li><b>탐욕법</b>은 현재 상태에서 <b>최선의 상태만을 선택</b>하여 다음 상태로 이동하는 방식을 사용한다.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="card flat">
+          <h3>✅ 자기 평가</h3>
+          <table class="tbl sm">
+            <tr><th style="width:90px">범주</th><th>평가 항목</th><th class="c" style="width:120px">성취도</th></tr>
+            <tr><td>지식·이해</td><td>탐색기반 알고리즘을 작성할 수 있다.</td><td class="c">☆ ☆ ☆</td></tr>
+            <tr><td>과정·기능</td><td>문제 상태 공간을 탐색하는 알고리즘을 설계할 수 있다.</td><td class="c">☆ ☆ ☆</td></tr>
+            <tr><td>가치·태도</td><td>문제 해결 상황에 적절한 알고리즘을 적용할 수 있다.</td><td class="c">☆ ☆ ☆</td></tr>
+          </table>
+        </div>
+        <div class="card violet" style="margin-top:18px">
+          <h3>🔭 다음 시간 예고 — 관계기반 알고리즘</h3>
+          <p>오늘 우리는 <b>보지 않아도 되는 곳</b>을 지웠다.<br>
+          다음에는 큰 문제를 해결 가능한 <b>작은 단위로 나눈 뒤</b>, 작은 문제들 사이의 <b>&lsquo;관계&rsquo;</b>를 이용해 문제를 푼다.</p>
+          <p style="margin-top:10px"><span class="tag violet">분할 정복법</span> <span class="tag violet">동적 계획법</span></p>
+          <p class="footnote">힌트: 배낭 문제를 <b>분기 한정법 없이</b>, 그러나 <b>훨씬 빠르게</b> 푸는 방법이 남아 있다.</p>
+        </div>
+        <div class="callout amber" style="margin-top:18px">
+          <b>한 문장으로 남기기</b><br>
+          &ldquo;<b>배제는 답을 바꾸지 않는다. 시간을 바꾼다.</b> 단, 그 배제에 <b>논리적 근거</b>가 있을 때만.&rdquo;
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div id="nav">
+  <div class="left">
+    <span class="chip" id="counter">1 / 1</span>
+    <span id="slidename"></span>
+  </div>
+  <div class="left">
+    <span class="chip" style="opacity:.7"><span class="kbdkey">←</span> <span class="kbdkey">→</span> 이동</span>
+    <button class="navbtn" id="prev">이전</button>
+    <button class="navbtn" id="next">다음</button>
+  </div>
+</div>
+
+<script>
+/* ================= 공통 SVG 유틸 ================= */
+const NS='http://www.w3.org/2000/svg';
+function mk(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+const STY={
+  idle:{f:'#ffffff',s:'#c3cedd',t:'#4a5a70'},
+  cur :{f:'#e0533d',s:'#e0533d',t:'#ffffff'},
+  done:{f:'#137a5e',s:'#137a5e',t:'#ffffff'},
+  cut :{f:'#eef1f6',s:'#dde3ec',t:'#b3bfcd'},
+  sol :{f:'#e2f4ee',s:'#137a5e',t:'#137a5e'},
+  best:{f:'#efeaff',s:'#6b4bc4',t:'#6b4bc4'},
+  wait:{f:'#fdf3dc',s:'#c98a09',t:'#8a5f04'}
+};
+function paint(svg,nodes,edges,r){
+  svg.innerHTML='';
+  edges.forEach(e=>{
+    const a=nodes[e.a],b=nodes[e.b];
+    svg.appendChild(mk('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'gedge '+(e.cls||'')}));
+  });
+  Object.keys(nodes).forEach(k=>{
+    const n=nodes[k],st=STY[n.st||'idle'];
+    const g=mk('g',{class:'gnode'});
+    g.appendChild(mk('circle',{cx:n.x,cy:n.y,r:n.r||r||18,fill:st.f,stroke:st.s,'stroke-width':2.5}));
+    const t=mk('text',{x:n.x,y:n.y+5.5,'text-anchor':'middle',fill:st.t,style:'font-size:'+(n.fs||15)+'px'});
+    t.textContent=n.label;g.appendChild(t);
+    if(n.badge!==undefined){
+      g.appendChild(mk('circle',{cx:n.x+(n.r||r||18)-2,cy:n.y-(n.r||r||18)+2,r:9,fill:'#16202e'}));
+      const b=mk('text',{x:n.x+(n.r||r||18)-2,y:n.y-(n.r||r||18)+6,'text-anchor':'middle',fill:'#fff',style:'font-size:11px'});
+      b.textContent=n.badge;g.appendChild(b);
+    }
+    svg.appendChild(g);
+  });
+}
+function chips(box,arr,cls){
+  box.innerHTML='';
+  arr.forEach((v,i)=>{const s=document.createElement('span');
+    s.className='nodechip '+(cls?cls(i,arr.length,v):'');s.textContent=v;box.appendChild(s);});
+}
+function bindPlayer(o){
+  let i=0;const steps=o.steps;
+  const upd=()=>{o.render(steps[i],i);
+    if(o.stepLabel)o.stepLabel.textContent=(i+1)+' / '+steps.length;
+    o.nextBtn.disabled=(i>=steps.length-1);
+    o.prevBtn.disabled=(i<=0);};
+  o.nextBtn.onclick=()=>{if(i<steps.length-1){i++;upd();}};
+  o.prevBtn.onclick=()=>{if(i>0){i--;upd();}};
+  if(o.resetBtn)o.resetBtn.onclick=()=>{i=0;upd();};
+  upd();
+  return {reload(steps2){const cp=steps2.slice();o.steps.length=0;cp.forEach(s=>o.steps.push(s));i=0;upd();}};
+}
+function initQuiz(){
+  document.querySelectorAll('.opts').forEach(box=>{
+    const ans=+box.dataset.a;
+    const fb=box.parentElement.querySelector('.fb');
+    [...box.children].forEach((b,i)=>{
+      b.onclick=()=>{
+        [...box.children].forEach((x,j)=>{x.classList.remove('ok','no');if(j===ans)x.classList.add('ok');});
+        if(i!==ans)b.classList.add('no');
+        fb.classList.add('show');
+      };
+    });
+  });
+}
+function initReveal(){
+  document.querySelectorAll('.reveal').forEach(r=>{
+    r.querySelector('button').onclick=()=>r.classList.toggle('open');
+  });
+}
+const fmt=n=>n.toLocaleString('ko-KR');
+
+/* ================= 6. 분기 한정 트리 (교과서 그림) ================= */
+function initBB(){
+  const P={A:[260,42],B:[150,112],J:[390,112],C:[80,182],I:[218,182],K:[390,182],
+           D:[42,252],G:[132,252],E:[24,322],F:[86,322],H:[150,322]};
+  const EDG=[['A','B'],['A','J'],['B','C'],['B','I'],['J','K'],
+             ['C','D'],['C','G'],['D','E'],['D','F'],['G','H']];
+  const SUB=['C','D','E','F','G','H'];         /* 3번 이하 서브트리 */
+  const FULL=['A','B','C','D','E','F','G','H','I','J','K'];
+  const PRUNE=['A','B','C','I','J','K'];
+  const svg=document.getElementById('bbSvg'),ordBox=document.getElementById('bbOrder'),
+        msgEl=document.getElementById('bbMsg'),cntEl=document.getElementById('bbCount');
+  let mode='prune';
+
+  function steps(){
+    const seq=mode==='prune'?PRUNE:FULL;
+    const out=[{visited:[],cur:null,cut:false,
+      msg:'루트에서 시작한다. 모드: <b>'+(mode==='prune'?'분기 한정법':'전체 탐색')+'</b>'}];
+    seq.forEach((id,i)=>{
+      const isCut=(mode==='prune'&&id==='C');
+      out.push({visited:seq.slice(0,i),cur:id,cut:isCut,
+        msg:isCut
+          ? '<b>3번 노드에 도착.</b> 여기서 &ldquo;이 아래에는 답이 없다&rdquo;고 <b>판단할 근거</b>가 있다. → 자식으로 내려가지 않고 <b>백트랙</b>. 4~8번(5개 노드)이 통째로 배제된다.'
+          : '<b>'+(i+1)+'번째 방문</b> — 노드 '+id+'. '+(mode==='prune'?'':'모든 자식을 빠짐없이 내려간다.')});
+    });
+    out.push({visited:seq,cur:null,cut:false,done:true,
+      msg:'탐색 종료. 방문한 노드 수 <b>'+seq.length+'회</b>.'+
+          (mode==='prune'?' 전체 탐색의 11회 대비 <b>5회를 아꼈다.</b>':' 아무것도 배제하지 않았다.')});
+    return out;
+  }
+  const state={steps:steps()};
+  const render=s=>{
+    const nodes={},edges=[];
+    const idx=id=>{const seq=mode==='prune'?PRUNE:FULL;return seq.indexOf(id);};
+    Object.keys(P).forEach(id=>{
+      const [x,y]=P[id];
+      let st='idle',label='';
+      const vi=s.visited.indexOf(id);
+      const pruned=(mode==='prune'&&SUB.includes(id)&&id!=='C');
+      if(pruned&&(s.cur==='C'||s.visited.includes('C')))st='cut';
+      if(vi>=0){st='done';label=vi+1;}
+      if(s.cur===id){st='cur';label=s.visited.length+1;}
+      if(st==='idle'||st==='cut')label=st==='cut'?'×':'';
+      nodes[id]={x,y,st,label:String(label),fs:14};
+    });
+    EDG.forEach(([a,b])=>{
+      let cls='';
+      const pruned=(mode==='prune'&&SUB.includes(b)&&b!=='C');
+      if(pruned&&(s.cur==='C'||s.visited.includes('C')))cls='dim';
+      if(s.cur===b)cls='act';
+      edges.push({a,b,cls});
+    });
+    paint(svg,nodes,edges,17);
+    const seq=mode==='prune'?PRUNE:FULL;
+    if(!s.visited.length&&!s.cur)ordBox.innerHTML='<span class="empty">아직 없음</span>';
+    else chips(ordBox,s.visited.concat(s.cur?[s.cur]:[]),(i,n)=>i===n-1&&s.cur?'top':'done');
+    const m=document.getElementById('bbMsg');
+    m.className='msg '+(s.cut?'cut':(s.done?'ok':''));
+    m.innerHTML=s.msg;
+    cntEl.textContent='전체 탐색 11회 / 분기 한정 6회';
+  };
+  const player=bindPlayer({steps:state.steps,
+    nextBtn:document.getElementById('bbNext'),prevBtn:document.getElementById('bbPrevBtn'),
+    resetBtn:document.getElementById('bbReset'),stepLabel:document.getElementById('bbStep'),
+    render});
+  document.getElementById('bbMode').onclick=e=>{
+    mode=(mode==='prune')?'full':'prune';
+    e.target.textContent=(mode==='prune')?'전체 탐색으로 보기 ⇄':'분기 한정으로 보기 ⇄';
+    player.reload(steps());
+  };
+}
+
+/* ================= 8. 배낭 문제 분기 한정 ================= */
+function initKnap(){
+  const NAME=['A','B','C','D'],WT=[6,5,4,1],VAL=[12,9,8,1],CAP=9,D=NAME.length;
+  const svg=document.getElementById('knSvg');
+  /* 노드 id = 선택 문자열 ('1' 넣음, '0' 안 넣음). 리프 순서로 x, 깊이로 y */
+  const pos={},SP=40,TOP=28,DY=70,X0=(680-15*SP)/2+10;
+  (function lay(id){
+    if(id.length===D){const k=parseInt(id.replace(/1/g,'x').replace(/0/g,'1').replace(/x/g,'0'),2);
+      pos[id]={x:X0+k*SP,y:TOP+D*DY};return;}
+    lay(id+'1');lay(id+'0');
+    pos[id]={x:(pos[id+'1'].x+pos[id+'0'].x)/2,y:TOP+id.length*DY};
+  })('');
+  const ALL=Object.keys(pos);
+  const wOf=id=>[...id].reduce((s,c,i)=>s+(c==='1'?WT[i]:0),0);
+  const vOf=id=>[...id].reduce((s,c,i)=>s+(c==='1'?VAL[i]:0),0);
+  const desc=id=>ALL.filter(x=>x.length>id.length&&x.startsWith(id));
+  const pick=id=>[...id].map((c,i)=>c==='1'?NAME[i]:null).filter(Boolean);
+
+  /* DFS 시뮬레이션 — 슬라이드의 파이썬 코드와 같은 순서 */
+  const steps=[{visited:[],cur:null,cut:[],roots:[],best:0,bestId:null,
+    msg:'루트에서 시작한다. 아직 아무것도 정하지 않았다. 왼쪽으로 가면 <b>넣는다</b>, 오른쪽은 <b>넣지 않는다</b>.',kind:''}];
+  let visited=[],cut=[],roots=[],best=0,bestId=null;
+  (function dfs(id){
+    const w=wOf(id),v=vOf(id),i=id.length;
+    const base={visited:visited.slice(),cur:id};
+    visited.push(id);
+    if(w>CAP){
+      cut=cut.concat(desc(id));roots.push(id);
+      steps.push({...base,cut:cut.slice(),roots:roots.slice(),best,bestId,kind:'cut',
+        msg:'<b>무게 '+w+'kg &gt; 9kg.</b> ① 조건 위반 — 아래에 무엇을 더해도 회복할 수 없다. <b>자른다.</b>'});
+      return;
+    }
+    if(i===D){
+      const better=v>best;
+      if(better){best=v;bestId=id;}
+      steps.push({...base,cut:cut.slice(),roots:roots.slice(),best,bestId,kind:better?'ok':'',
+        msg:'모든 물건을 정했다 — {'+(pick(id).join(', ')||'없음')+'}, 무게 '+w+', 가치 <b>'+v+'</b>. '+
+          (better?'<b>최선을 '+v+'(으)로 갱신</b>한다.':'최선 '+best+'보다 좋지 않다.')});
+      return;
+    }
+    const rest=VAL.slice(i).reduce((a,b)=>a+b,0);
+    if(v+rest<=best){
+      cut=cut.concat(desc(id));roots.push(id);
+      steps.push({...base,cut:cut.slice(),roots:roots.slice(),best,bestId,kind:'cut',
+        msg:'지금 가치 '+v+' + 남은 물건 전부 '+rest+' = <b>'+(v+rest)+' ≤ 최선 '+best+'</b>. ② 한계 — 더 좋아질 수 없다. <b>자른다.</b>'});
+      return;
+    }
+    steps.push({...base,cut:cut.slice(),roots:roots.slice(),best,bestId,kind:'',
+      msg:(i===0?'루트':'{'+(pick(id).join(', ')||'없음')+'}')+' — 무게 '+w+', 가치 '+v+
+        '. 상한 '+v+' + '+rest+' = '+(v+rest)+(best?' &gt; 최선 '+best:'')+' → <b>'+NAME[i]+'를 정하러 내려간다.</b>'});
+    dfs(id+'1');dfs(id+'0');
+  })('');
+  steps.push({visited:visited.slice(),cur:null,cut:cut.slice(),roots:roots.slice(),best,bestId,kind:'ok',done:true,
+    msg:'탐색 종료. 최댓값은 <b>'+best+'</b> {'+pick(bestId).join(', ')+'}. 노드 <b>31개 중 '+visited.length+'개</b>만 보았다.'});
+
+  const render=s=>{
+    const nodes={},edges=[];
+    ALL.forEach(id=>{
+      const p=pos[id];let st='idle',label='';
+      if(s.visited.includes(id)){st='done';label=String(vOf(id));}
+      if(s.cut.includes(id))st='cut';
+      if(id===s.bestId)st='best';
+      if(s.roots.includes(id)){st='cut';label='×';}
+      if(id===s.cur){st='cur';label=s.roots.includes(id)?'×':String(vOf(id));}
+      nodes[id]={x:p.x,y:p.y,st,label,r:14,fs:12};
+      if(id.length)edges.push({a:id.slice(0,-1),b:id,
+        cls:s.cut.includes(id)?'dim':(id===s.cur?'act':(s.visited.includes(id)?'path':''))});
+    });
+    paint(svg,nodes,edges,14);
+    for(let d=0;d<D;d++){
+      const t=mk('text',{x:8,y:TOP+d*DY+DY/2+4,class:'elabel'});t.textContent=NAME[d];svg.appendChild(t);
+    }
+    const box=document.getElementById('knState');
+    if(s.cur===null&&!s.done)box.innerHTML='<span class="empty">아직 없음</span>';
+    else{const id=s.done?s.bestId:s.cur;
+      const items=pick(id);
+      box.innerHTML='';
+      chips(box,items.length?items:['없음'],()=>s.done?'done':'top');
+      const t=document.createElement('span');t.className='tt';t.style.marginLeft='6px';
+      t.textContent=wOf(id)+'kg · 가치 '+vOf(id);box.appendChild(t);}
+    document.getElementById('knBest').textContent=s.best;
+    document.getElementById('knVisit').textContent=s.visited.length+(s.cur!==null&&!s.done?1:0);
+    const m=document.getElementById('knMsg');m.className='msg '+(s.kind||'');m.innerHTML=s.msg;
+  };
+  bindPlayer({steps,
+    nextBtn:document.getElementById('knNext'),prevBtn:document.getElementById('knPrevBtn'),
+    resetBtn:document.getElementById('knReset'),stepLabel:document.getElementById('knStep'),render});
+}
+
+/* ================= 10. 회의실 배정 ================= */
+function initMeet(){
+  const M=[['A',0,6],['B',1,4],['C',3,5],['D',4,7],['E',5,9],['F',6,10],['G',8,11],['H',9,12]];
+  const KEY={end:m=>[m[2],m[1]],start:m=>[m[1],m[2]],short:m=>[m[2]-m[1],m[1]]};
+  const LABEL={end:'끝나는 시각이 빠른 것부터',start:'시작 시각이 빠른 것부터',short:'회의 시간이 짧은 것부터'};
+  const svg=document.getElementById('mtSvg');
+  const X=t=>40+t*48,RY=i=>12+i*36;
+  const cmp=(a,b)=>{for(let k=0;k<a.length;k++)if(a[k]!==b[k])return a[k]-b[k];return 0;};
+  const over=(a,b)=>a[1]<b[2]&&b[1]<a[2];
+
+  function build(mode){
+    const order=M.slice().sort((a,b)=>cmp(KEY[mode](a),KEY[mode](b)));
+    const out=[{picked:[],rejected:[],cur:null,kind:'',
+      msg:'기준: <b>'+LABEL[mode]+'</b>. 순서는 '+order.map(m=>m[0]).join(' → ')+'.'}];
+    const picked=[],rejected=[];
+    order.forEach(m=>{
+      const hit=picked.find(p=>over(p,m));
+      if(hit)rejected.push(m[0]);else picked.push(m);
+      out.push({picked:picked.map(p=>p[0]),rejected:rejected.slice(),cur:m[0],kind:hit?'cut':'',
+        msg:'<b>'+m[0]+'('+m[1]+'~'+m[2]+')</b> '+(hit?'— '+hit[0]+'와 겹친다. <b>버린다.</b>':'— 겹치는 회의가 없다. <b>배정한다.</b>')});
+    });
+    const ok=picked.length===3;
+    out.push({picked:picked.map(p=>p[0]),rejected:rejected.slice(),cur:null,kind:ok?'ok':'warn',
+      msg:'배정한 회의 <b>'+picked.length+'개</b>. '+(ok
+        ?'가능한 최댓값 3개와 같다 — <b>최적해</b>.'
+        :'최댓값은 3개(B, D, G)인데 <b>'+picked.length+'개</b>밖에 못 넣었다. 이 기준에는 <b>근거가 없다.</b>')});
+    return out;
+  }
+  const render=s=>{
+    svg.innerHTML='';
+    for(let t=0;t<=12;t++){
+      svg.appendChild(mk('line',{x1:X(t),y1:6,x2:X(t),y2:298,stroke:t%3?'#f0f3f8':'#dfe5ee','stroke-width':1}));
+      const tx=mk('text',{x:X(t),y:318,'text-anchor':'middle',class:'elabel'});tx.textContent=t;svg.appendChild(tx);
+    }
+    M.forEach((m,i)=>{
+      let f='#ffffff',st='#c3cedd',tc='#4a5a70';
+      if(s.picked.includes(m[0])){f='#137a5e';st='#137a5e';tc='#ffffff';}
+      if(s.rejected.includes(m[0])){f='#eef1f6';st='#dde3ec';tc='#b3bfcd';}
+      if(s.cur===m[0]){st='#e0533d';if(!s.rejected.includes(m[0])){f='#e0533d';tc='#ffffff';}}
+      svg.appendChild(mk('rect',{x:X(m[1]),y:RY(i),width:X(m[2])-X(m[1]),height:26,rx:7,fill:f,stroke:st,'stroke-width':2.5}));
+      const t=mk('text',{x:X(m[1])+10,y:RY(i)+18,fill:tc,style:"font-family:'JetBrains Mono';font-weight:700;font-size:13px"});
+      t.textContent=m[0]+'  '+m[1]+'~'+m[2];svg.appendChild(t);
+    });
+    const box=document.getElementById('mtPick');
+    if(!s.picked.length)box.innerHTML='<span class="empty">아직 없음</span>';
+    else chips(box,s.picked,()=>'done');
+    const msg=document.getElementById('mtMsg');msg.className='msg '+(s.kind||'');msg.innerHTML=s.msg;
+  };
+  const player=bindPlayer({steps:build('end'),
+    nextBtn:document.getElementById('mtNext'),prevBtn:document.getElementById('mtPrevBtn'),
+    resetBtn:document.getElementById('mtReset'),stepLabel:document.getElementById('mtStep'),render});
+  document.querySelectorAll('[data-mt]').forEach(b=>{
+    b.onclick=()=>{
+      document.querySelectorAll('[data-mt]').forEach(x=>x.classList.add('ghost'));
+      b.classList.remove('ghost');
+      player.reload(build(b.dataset.mt));
+    };
+  });
+}
+
+function initAll(){
+  initQuiz();initReveal();
+  initBB();initKnap();initMeet();
+}
+</script>
+<script>
+/* 슬라이드 엔진 */
+let SLIDES=[],idx=0;
+function mount(){
+  const deck=document.getElementById('deck');
+  SLIDES=[...deck.querySelectorAll('.slide')];
+  show(0);
+}
+function show(i){
+  if(i<0||i>=SLIDES.length)return;
+  SLIDES.forEach(s=>s.classList.remove('active'));
+  SLIDES[i].classList.add('active');
+  SLIDES[i].scrollTop=0;
+  idx=i;
+  document.getElementById('counter').textContent=(i+1)+' / '+SLIDES.length;
+  document.getElementById('slidename').textContent=SLIDES[i].dataset.name||'';
+  document.getElementById('progress').style.width=((i+1)/SLIDES.length*100)+'%';
+  document.getElementById('prev').disabled=(i===0);
+  document.getElementById('next').disabled=(i===SLIDES.length-1);
+}
+document.addEventListener('keydown',e=>{
+  const t=e.target.tagName;
+  if(t==='INPUT'||t==='TEXTAREA')return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){show(idx+1);e.preventDefault();}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){show(idx-1);e.preventDefault();}
+  if(e.key==='Home'){show(0);e.preventDefault();}
+  if(e.key==='End'){show(SLIDES.length-1);e.preventDefault();}
+});
+window.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('prev').onclick=()=>show(idx-1);
+  document.getElementById('next').onclick=()=>show(idx+1);
+  mount();
+  initAll();
+});
+</script>
+</body>
+</html>
