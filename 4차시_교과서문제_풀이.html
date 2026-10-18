@@ -1428,6 +1428,49 @@ count = <span class="nm">0</span>
   </div>
 </section>
 
+<!-- 12-1 문제5 호출 따라가기 -->
+<section class="slide" data-name="문제 5 · 호출 따라가기">
+  <div class="eyebrow">문제 5 · 풀이</div>
+  <h1 class="title"><span class="mono">f(0, 0, 0)</span> 이 부르는 함수들</h1>
+  <p class="sub">괄호 안은 <span class="mono">(start, sum, picked)</span> 다. 하나 고를 때마다 <span class="mono">start</span> 는 고른 수 다음 칸으로, <span class="mono">sum</span> 은 그 수만큼, <span class="mono">picked</span> 는 1씩 늘어난다.</p>
+  <div class="body grid-2-1">
+    <div>
+      <pre class="code" style="font-size:15.5px;line-height:1.7">f(0, 0, 0)
+├─ 1 고름 → f(1, 1, 1)
+│   ├─ 3 고름 → f(2, 4, 2)
+│   │   ├─ 6 고름  → f(3, 10, 3)   <span class="kw">10 ✗</span>
+│   │   ├─ 7 고름  → f(4, 11, 3)   <span class="kw">11 ✗</span>
+│   │   ├─ 11 고름 → f(5, 15, 3)   <span class="st">15 ✓ count = 1</span>
+│   │   ├─ 15 고름 → f(6, 19, 3)   <span class="kw">19 ✗</span>
+│   │   └─ 18 고름 → f(7, 22, 3)   <span class="kw">22 ✗</span>
+│   ├─ 6 고름 → f(3, 7, 2)
+│   │   └─ <span class="cm">…</span>
+│   └─ <span class="cm">…</span>
+├─ 3 고름 → f(2, 3, 1)
+│   └─ <span class="cm">…</span>
+├─ <span class="cm">…</span>
+├─ 15 고름 → f(6, 15, 1)
+│   └─ 18 고름 → f(7, 33, 2)      <span class="cm">더 고를 수가 없다</span>
+└─ 18 고름 → f(7, 18, 1)          <span class="cm">더 고를 수가 없다</span></pre>
+    </div>
+    <div>
+      <div class="card sea">
+        <h4>읽는 법</h4>
+        <p style="font-size:15px;line-height:1.75"><b>1 → 3</b> 까지 고르면 <span class="mono">f(2, 4, 2)</span> 다. 세 번째 수는 <span class="mono">A[2]</span> 인 6부터 고른다.<br>
+        <span class="mono">picked</span> 가 3이 된 칸에서 합을 보고, 3의 배수면 <span class="mono">count</span> 를 1 늘린다.</p>
+      </div>
+      <div class="card amber" style="margin-top:14px">
+        <h4>끝까지 못 가는 갈래</h4>
+        <p style="font-size:15px;line-height:1.75">15를 첫 수로 고르면 뒤에 18 하나만 남는다. 2개를 고른 채 <span class="mono">range(7, 7)</span> 이 비어서 그냥 끝난다.<br>
+        이런 갈래는 세지 않으므로 답에 영향이 없다.</p>
+      </div>
+      <div class="callout moss" style="margin-top:14px">
+        <span class="mono">picked</span> 가 3이 되는 칸이 <b>35개</b>, 그중 ✓ 가 <b>12개</b>다.
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 13 정리 -->
 <section class="slide" data-name="정리">
   <div class="eyebrow">SUMMARY</div>
