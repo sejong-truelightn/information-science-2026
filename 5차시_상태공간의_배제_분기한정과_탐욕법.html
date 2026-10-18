@@ -191,6 +191,16 @@ pre.code .blank{background:#2b3d55;color:#ffd9a0;border:1px dashed #6d829e;borde
 .reveal>button{width:100%;text-align:left;background:none;border:none;padding:11px 15px;font-family:inherit;font-size:14.5px;font-weight:600;color:var(--sea);cursor:pointer}
 .reveal>div{display:none;padding:0 15px 14px;font-size:14.5px;line-height:1.75}
 .reveal.open>div{display:block}
+.card.clickable{cursor:pointer;transition:box-shadow .2s,border-color .2s}
+.card.clickable:hover{box-shadow:0 4px 14px rgba(19,122,94,.15)}
+.card.clickable.on{border-color:var(--moss);box-shadow:0 0 0 2px var(--moss)}
+.card .more-hint{font-size:13px;font-weight:600;color:var(--moss);margin-top:10px}
+.more-panel{display:none;margin-top:18px;border:1px solid #bfe6d8;border-radius:14px;background:#fff;padding:18px 20px}
+.more-panel.open{display:block}
+.more-panel h4{font-size:15.5px;font-weight:700;margin-bottom:8px}
+.more-panel .cap{font-size:14px;color:var(--ink-soft);line-height:1.7;margin-top:8px}
+.more-panel .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);margin-top:12px}
+.more-panel .legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px;vertical-align:-1px;border:2px solid}
 
 .cover{justify-content:center;align-items:flex-start;background:linear-gradient(140deg,#f7f9fc 0%,#fdf1ec 50%,#eaf1fe 100%);}
 .cover .num{font-family:'JetBrains Mono';font-size:15px;font-weight:700;color:var(--sea);letter-spacing:.2em}
@@ -361,7 +371,7 @@ pre.code .blank{background:#2b3d55;color:#ffd9a0;border:1px dashed #6d829e;borde
 <!-- ============ 5. 이미 해 본 배제 ============ -->
 <section class="slide" data-name="이미 해 본 배제">
   <div class="eyebrow">Recap</div>
-  <h1 class="title">우리는 이미 배제를 해 보았다<small>4차시 교과서 문제 풀이 속에 오늘의 아이디어가 숨어 있었다. 이번 시간에는 그것에 <b>이름</b>을 붙이고 <b>원리</b>를 정리한다.</small></h1>
+  <h1 class="title">우리는 이미 배제를 해 보았다</h1>
   <div class="body">
     <div class="grid3">
       <div class="card sea">
@@ -374,10 +384,35 @@ pre.code .blank{background:#2b3d55;color:#ffd9a0;border:1px dashed #6d829e;borde
         <p><span class="tt">c &gt; n</span> 이 된 순간, 그 아래 어떤 경로도 n번 칸에 <b>정확히</b> 도착할 수 없다. 그래서 더 내려가지 않는다.</p>
         <p class="footnote">비선형 구조에서의 배제 — <b>가지</b>를 자른다.</p>
       </div>
-      <div class="card moss">
+      <div class="card moss clickable" id="bfsCard" role="button" tabindex="0" aria-expanded="false" aria-controls="bfsMore">
         <h3>③ BFS — 처음 찾은 답이 최소</h3>
+        <p style="font-size:14.5px;background:rgba(255,255,255,.6);border-radius:8px;padding:8px 11px;margin-bottom:8px"><b>문제를 바꾸면</b> — 한 번에 1칸 또는 2칸씩 오를 때, n번째 칸까지 <b>가장 적은 횟수</b>로 오르려면 몇 번 올라야 할까?</p>
         <p>레벨 순으로 훑으면 처음 도착한 답이 곧 최소 횟수다. <b>나머지 상태는 볼 필요가 없다.</b></p>
+        <p style="font-size:14px;color:var(--ink-soft);margin-top:6px">방법의 수를 셀 때는 전부 봐야 한다. n = 20이면 35,421개 → 처음 찾은 답에서 멈추면 2,047개.</p>
         <p class="footnote">탐색 <b>순서</b>를 바꿔 배제를 얻는다.</p>
+        <p class="more-hint" id="bfsHint">▼ 눌러서 DFS · BFS 그림 보기</p>
+      </div>
+    </div>
+    <div class="more-panel" id="bfsMore">
+      <h4 style="font-size:17px;margin-bottom:4px">n = 5 — 가장 적은 횟수로 5번째 칸까지 오르기</h4>
+      <p class="cap" style="margin-top:0">동그라미 안의 수는 <b>지금 서 있는 칸</b>, 위의 작은 번호는 <b>몇 번째로 방문했는지</b>다. 한 줄 내려갈 때마다 한 번 더 오른 것이다(왼쪽 갈래 +1칸, 오른쪽 갈래 +2칸).</p>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <h4>DFS (스택) — 한 갈래를 끝까지 판다</h4>
+          <div class="vizstage"><svg id="bfsDfsSvg" viewBox="0 0 640 330"></svg></div>
+          <p class="cap">처음 찾는 답은 6번째로 방문한 <b>1+1+1+1+1 (5번)</b>이다. 3번짜리는 16번째에야 나오고, 그게 최소라는 건 <b>25개를 전부</b> 방문해야 안다.</p>
+        </div>
+        <div>
+          <h4>BFS (큐) — 한 줄씩 훑는다</h4>
+          <div class="vizstage"><svg id="bfsBfsSvg" viewBox="0 0 640 330"></svg></div>
+          <p class="cap">2번 오를 때까지는 5번째 칸에 닿은 것이 없다. 3번 오른 줄에서 <b>11번째로 방문한 1+2+2</b>가 처음 도착하는 순간, 답은 <b>3번</b>이고 멈춘다. 회색 <b>14개</b>는 볼 필요가 없다.</p>
+        </div>
+      </div>
+      <div class="legend">
+        <span><i style="background:#137a5e;border-color:#137a5e"></i>최소 횟수(3번)로 도착</span>
+        <span><i style="background:#e2f4ee;border-color:#137a5e"></i>도착했지만 횟수가 더 많음</span>
+        <span><i style="background:#fff;border-color:#c3cedd"></i>방문한 칸 (6은 지나친 칸)</span>
+        <span><i style="background:#eef1f6;border-color:#dde3ec"></i>방문하지 않음 — 배제된 영역</span>
       </div>
     </div>
     <div class="callout amber" style="margin-top:22px">
@@ -541,7 +576,7 @@ pre.code .blank{background:#2b3d55;color:#ffd9a0;border:1px dashed #6d829e;borde
             </ul>
           </div>
           <div class="callout coral" style="margin-top:14px">
-            <b>&lsquo;--&rsquo; 노드가 잘린 이유</b><br>A, B를 모두 빼면 남은 C, D를 다 넣어도 8 + 1 = 9. 이미 17을 찾았으므로 볼 필요가 없다.
+            <b>A도 B도 넣지 않은 노드가 잘린 이유</b><br>A, B를 모두 빼면 남은 C, D를 다 넣어도 8 + 1 = 9. 이미 17을 찾았으므로 볼 필요가 없다.
           </div>
         </div>
         <pre class="code sm">W = <span class="nm">9</span>
@@ -725,8 +760,6 @@ end = <span class="nm">0</span>                       <span class="cm"># 마지�
           <p style="font-size:14.5px;color:var(--ink-soft)">단일 출발점에서 다른 모든 정점으로의 최단 경로를 찾는 알고리즘.</p>
           <h4 style="margin-top:12px">2. 허프만 알고리즘</h4>
           <p style="font-size:14.5px;color:var(--ink-soft)">데이터 압축에 사용된다. 가장 낮은 빈도로 나타나는 문자부터 차례대로 두 개씩 묶어 나가며 새로운 이진 트리를 구성한다.</p>
-          <h4 style="margin-top:12px">3. 최소 신장 트리 (크루스칼 · 프림)</h4>
-          <p style="font-size:14.5px;color:var(--ink-soft)">싼 간선부터 고르는 탐욕적 선택이 최소 비용을 보장한다.</p>
         </div>
         <div class="callout amber">
           <b>기억할 것</b><br>
@@ -863,8 +896,8 @@ end = <span class="nm">0</span>                       <span class="cm"># 마지�
   </div>
 </section>
 
-<!-- ============ 14. 정리 · 자기 평가 ============ -->
-<section class="slide" data-name="정리 · 자기 평가">
+<!-- ============ 14. 정리 ============ -->
+<section class="slide" data-name="정리">
   <div class="eyebrow">Wrap-up</div>
   <h1 class="title">오늘 배운 내용<small>탐색기반 알고리즘(02단원)이 여기서 마무리된다. 다음은 <b>03. 관계기반 알고리즘</b>이다.</small></h1>
   <div class="body">
@@ -881,23 +914,7 @@ end = <span class="nm">0</span>                       <span class="cm"># 마지�
         </ul>
       </div>
       <div>
-        <div class="card flat">
-          <h3>✅ 자기 평가</h3>
-          <table class="tbl sm">
-            <tr><th style="width:90px">범주</th><th>평가 항목</th><th class="c" style="width:120px">성취도</th></tr>
-            <tr><td>지식·이해</td><td>탐색기반 알고리즘을 작성할 수 있다.</td><td class="c">☆ ☆ ☆</td></tr>
-            <tr><td>과정·기능</td><td>문제 상태 공간을 탐색하는 알고리즘을 설계할 수 있다.</td><td class="c">☆ ☆ ☆</td></tr>
-            <tr><td>가치·태도</td><td>문제 해결 상황에 적절한 알고리즘을 적용할 수 있다.</td><td class="c">☆ ☆ ☆</td></tr>
-          </table>
-        </div>
-        <div class="card violet" style="margin-top:18px">
-          <h3>🔭 다음 시간 예고 — 관계기반 알고리즘</h3>
-          <p>오늘 우리는 <b>보지 않아도 되는 곳</b>을 지웠다.<br>
-          다음에는 큰 문제를 해결 가능한 <b>작은 단위로 나눈 뒤</b>, 작은 문제들 사이의 <b>&lsquo;관계&rsquo;</b>를 이용해 문제를 푼다.</p>
-          <p style="margin-top:10px"><span class="tag violet">분할 정복법</span> <span class="tag violet">동적 계획법</span></p>
-          <p class="footnote">힌트: 배낭 문제를 <b>분기 한정법 없이</b>, 그러나 <b>훨씬 빠르게</b> 푸는 방법이 남아 있다.</p>
-        </div>
-        <div class="callout amber" style="margin-top:18px">
+        <div class="callout amber">
           <b>한 문장으로 남기기</b><br>
           &ldquo;<b>배제는 답을 바꾸지 않는다. 시간을 바꾼다.</b> 단, 그 배제에 <b>논리적 근거</b>가 있을 때만.&rdquo;
         </div>
@@ -1131,7 +1148,7 @@ function initKnap(){
     });
     paint(svg,nodes,edges,14);
     for(let d=0;d<D;d++){
-      const t=mk('text',{x:8,y:TOP+d*DY+DY/2+4,class:'elabel'});t.textContent=NAME[d];svg.appendChild(t);
+      const t=mk('text',{x:8,y:TOP+(d+1)*DY+4,class:'elabel'});t.textContent=NAME[d];svg.appendChild(t);   // A를 정한 층 = 깊이 1
     }
     const box=document.getElementById('knState');
     if(s.cur===null&&!s.done)box.innerHTML='<span class="empty">아직 없음</span>';
@@ -1210,8 +1227,65 @@ function initMeet(){
   });
 }
 
+/* ================= 5. 이미 해 본 배제 — DFS·BFS 트리 (n=5) ================= */
+function initBfsMore(){
+  const N=5,card=document.getElementById('bfsCard'),panel=document.getElementById('bfsMore');
+  // 트리 만들기: 칸이 N 이상이면 더 내려가지 않는다
+  let id=0;
+  function build(c,d){
+    const nd={id:id++,c,d,kids:[]};
+    if(c<N)nd.kids=[build(c+1,d+1),build(c+2,d+1)];
+    return nd;
+  }
+  const root=build(0,0);
+  // 잎을 왼쪽부터 늘어놓고, 부모는 자식들의 가운데에 둔다
+  const all=[];let leaf=0;
+  (function lay(nd){
+    all.push(nd);
+    if(!nd.kids.length){nd.x=leaf++;return;}
+    nd.kids.forEach(lay);
+    nd.x=(nd.kids[0].x+nd.kids[1].x)/2;
+  })(root);
+  const W=640,X=i=>62+i*(W-92)/(leaf-1),Y=d=>30+d*56;
+  // 방문 순서
+  const dfs=[];(function go(nd){dfs.push(nd);nd.kids.forEach(go);})(root);
+  const bfs=[],q=[root];
+  while(q.length){const nd=q.shift();bfs.push(nd);if(nd.c===N)break;q.push(...nd.kids);}
+  const minD=bfs[bfs.length-1].d;
+
+  function draw(svg,order){
+    const seen=new Map(order.map((nd,i)=>[nd.id,i+1]));
+    const nodes={},edges=[];
+    all.forEach(nd=>{
+      const k=seen.get(nd.id);
+      let st='idle';
+      if(k===undefined)st='cut';
+      else if(nd.c===N)st=(nd.d===minD?'done':'sol');
+      nodes[nd.id]={x:X(nd.x),y:Y(nd.d),label:String(nd.c),st,r:15,fs:14,badge:k};
+      nd.kids.forEach(ch=>edges.push({a:nd.id,b:ch.id,cls:seen.has(ch.id)?'':'dim'}));
+    });
+    paint(svg,nodes,edges,15);
+    for(let d=1;d<=N;d++){
+      const t=mk('text',{x:4,y:Y(d)+4,fill:'#8494a8',style:'font-size:11px;font-family:IBM Plex Sans KR'});
+      t.textContent=d+'번';svg.appendChild(t);
+    }
+  }
+  draw(document.getElementById('bfsDfsSvg'),dfs);
+  draw(document.getElementById('bfsBfsSvg'),bfs);
+
+  const hint=document.getElementById('bfsHint');
+  function toggle(){
+    const open=panel.classList.toggle('open');
+    card.classList.toggle('on',open);
+    card.setAttribute('aria-expanded',open);
+    hint.textContent=open?'▲ 그림 접기':'▼ 눌러서 DFS · BFS 그림 보기';
+    if(open)panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  card.addEventListener('click',toggle);
+  card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+}
 function initAll(){
-  initQuiz();initReveal();
+  initQuiz();initReveal();initBfsMore();
   initBB();initKnap();initMeet();
 }
 </script>
