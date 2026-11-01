@@ -9,12 +9,14 @@
 | 3차시 | 비선형 탐색 — DFS · BFS | [열기](https://sejong-truelightn.github.io/information-science-2026/3%EC%B0%A8%EC%8B%9C_%EB%B9%84%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_DFS_BFS.html) | [다운로드](https://sejong-truelightn.github.io/information-science-2026/dl/3.html)<br><sub><!--date:3차시_비선형탐색_DFS_BFS.html-->2026-09-07 업데이트</sub> |
 | 4차시 | 교과서 문제 풀이 | [열기](https://sejong-truelightn.github.io/information-science-2026/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%92%80%EC%9D%B4.html) | [다운로드](https://sejong-truelightn.github.io/information-science-2026/dl/4.html)<br><sub><!--date:4차시_교과서문제_풀이.html-->2026-10-19 업데이트</sub> |
 | 5차시 | 상태 공간의 배제 — 분기 한정법 · 탐욕법 | [열기](https://sejong-truelightn.github.io/information-science-2026/5%EC%B0%A8%EC%8B%9C_%EC%83%81%ED%83%9C%EA%B3%B5%EA%B0%84%EC%9D%98_%EB%B0%B0%EC%A0%9C_%EB%B6%84%EA%B8%B0%ED%95%9C%EC%A0%95%EA%B3%BC_%ED%83%90%EC%9A%95%EB%B2%95.html) | [다운로드](https://sejong-truelightn.github.io/information-science-2026/dl/5.html)<br><sub><!--date:5차시_상태공간의_배제_분기한정과_탐욕법.html-->2026-10-19 업데이트</sub> |
+| 6차시 | 관계기반 알고리즘 — 부분 문제 · 분할 정복법 · 동적 계획법 | [열기](https://sejong-truelightn.github.io/information-science-2026/6%EC%B0%A8%EC%8B%9C_%EA%B4%80%EA%B3%84%EA%B8%B0%EB%B0%98_%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98.html) | [다운로드](https://sejong-truelightn.github.io/information-science-2026/dl/6.html)<br><sub><!--date:6차시_관계기반_알고리즘.html-->2026-11-01 업데이트</sub> |
 
 전체 자료를 한 번에 받으려면 → [**ZIP으로 내려받기**](https://github.com/sejong-truelightn/information-science-2026/archive/refs/heads/main.zip)
 
 ## 최근 업데이트
 
 <!--changelog-->
+- **2026-11-01** · 6차시 — 슬라이드와 학생용 노트북 정리, README에 6차시 추가
 - **2026-10-19** · 4차시 — 교과서 문제 답 노트북 공개
 - **2026-10-19** · 5차시 — BFS 카드에 최소 횟수 문제와 DFS·BFS 트리 추가, 불필요한 카드 정리
 - **2026-10-19** · 5차시 — '3차시와의 연결' 카드 제거
@@ -32,6 +34,7 @@
 | 3차시 실습 | 트리에서의 DFS와 BFS | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/3%EC%B0%A8%EC%8B%9C_%EB%B9%84%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:3차시_비선형탐색_실습_학생용.ipynb-->2026-09-07 업데이트</sub> | [보기](https://sejong-truelightn.github.io/information-science-2026/3%EC%B0%A8%EC%8B%9C_%EB%B9%84%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%ED%92%80%EC%9D%B4.html) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/3%EC%B0%A8%EC%8B%9C_%EB%B9%84%EC%84%A0%ED%98%95%ED%83%90%EC%83%89_%EC%8B%A4%EC%8A%B5_%EB%8B%B5.ipynb)<br><sub><!--date:3차시_비선형탐색_실습_답.ipynb-->2026-09-07 업데이트</sub> |
 | 4차시 실습 | 교과서 문제 풀어 보기 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:4차시_교과서문제_학생용.ipynb-->2026-10-17 업데이트</sub> | [보기](https://sejong-truelightn.github.io/information-science-2026/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%92%80%EC%9D%B4.html) | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/4%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%EB%8B%B5.ipynb)<br><sub><!--date:4차시_교과서문제_답.ipynb-->2026-10-19 업데이트</sub> |
 | 5차시 실습 | 교과서 문제 — 최소 동전 개수 · 약수의 합 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/5%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:5차시_교과서문제_학생용.ipynb-->2026-10-19 업데이트</sub> | _수업 후 공개_ | _수업 후 공개_ |
+| 6차시 실습 | 교과서 문제 — 합병 정렬 · 퀵 정렬 · 별 그리기 · 동적 계획법 · 대단원 마무리 | [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/sejong-truelightn/information-science-2026/blob/main/6%EC%B0%A8%EC%8B%9C_%EA%B5%90%EA%B3%BC%EC%84%9C%EB%AC%B8%EC%A0%9C_%ED%95%99%EC%83%9D%EC%9A%A9.ipynb)<br><sub><!--date:6차시_교과서문제_학생용.ipynb-->2026-11-01 업데이트</sub> | _수업 후 공개_ | _수업 후 공개_ |
 
 ## 보조자료
 

@@ -260,8 +260,7 @@ pre.code .blank{background:#2b3d55;color:#ffd9a0;border:1px dashed #6d829e;borde
     <span class="tag moss">동적 계획법</span>
   </div>
   <p class="footnote" style="margin-top:40px">
-    세종과학고등학교 1학년 정보과학 &nbsp;|&nbsp; Ⅲ. 알고리즘 &gt; 03. 관계기반 알고리즘 (교과서 pp.202~235)<br>
-    <span class="kbdkey">←</span> <span class="kbdkey">→</span> 로 슬라이드를 넘기고, 시각화 화면에서는 <b>[다음 단계]</b> 버튼을 눌러 진행하세요.
+    세종과학고등학교 1학년 정보과학 &nbsp;|&nbsp; Ⅲ. 알고리즘 &gt; 03. 관계기반 알고리즘 (교과서 pp.202~235)
   </p>
 </section>
 
@@ -291,7 +290,7 @@ pre.code .blank{background:#2b3d55;color:#ffd9a0;border:1px dashed #6d829e;borde
       <h3 style="margin-top:20px">🧭 오늘의 흐름</h3>
       <ol class="num">
         <li>관계기반 알고리즘의 개념과 부분 문제 <span class="tag gray">pp.202~207</span></li>
-        <li>분할 정복법 — 합병 정렬 · 퀵 정렬 · 격자판 · 별 그리기 <span class="tag gray">pp.208~217</span></li>
+        <li>분할 정복법 — 합병 정렬 · 퀵 정렬 · 별 그리기 <span class="tag gray">pp.208~217</span></li>
         <li>동적 계획법 — 중복 계산 없애기 <span class="tag gray">pp.218~231</span></li>
         <li>대단원 마무리 — 엄지와 지수 · 문어 · 동전 줍기 <span class="tag gray">pp.232~235</span></li>
       </ol>
@@ -486,37 +485,6 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
   </div>
 </section>
 
-<!-- ============ 12. subproblem과 partial problem ============ -->
-<section class="slide" data-name="subproblem과 partial problem">
-  <div class="eyebrow">더 알아보기 · 교과서 207쪽</div>
-  <h1 class="title">subproblem과 partial problem<small>우리말로는 둘 다 &lsquo;부분 문제&rsquo;지만, 쓰임새가 다르다.</small></h1>
-  <div class="body">
-    <div class="grid2">
-      <div class="card moss">
-        <h3>subproblem</h3>
-        <p>큰 문제를 여러 개의 <b>작은 문제로 분해</b>하는 방법을 나타낸다. 작은 문제들의 해결책이 <b>합쳐져 전체 문제의 해결책</b>이 된다.</p>
-        <ul class="clean moss" style="margin-top:10px">
-          <li>f(n−1), f(n−2)로 f(n)을 만든다</li>
-          <li>서울→대전 + 대전→부산</li>
-          <li>20장 정리 × 5 → 100장 정리</li>
-        </ul>
-        <p class="footnote">분할 정복법, 동적 계획법, 재귀적 설계에서 자주 볼 수 있다. 이 단원의 &lsquo;부분 문제&rsquo;는 이것이다.</p>
-      </div>
-      <div class="card coral">
-        <h3>partial problem</h3>
-        <p>원래 문제에 대한 완전한 해결책이 아닌 <b>일부분만을 해결</b>하는 문제를 나타낸다. 그 자체로는 <b>전체 문제의 해결책이 되지 않는다.</b></p>
-        <ul class="clean coral" style="margin-top:10px">
-          <li>카드 100장 중 &lsquo;짝수 카드만&rsquo; 정리하기</li>
-          <li>큰 계획을 실행하는 도중에 생길 수 있는 문제를 미리 예측하여 해결하기</li>
-        </ul>
-      </div>
-    </div>
-    <div class="callout" style="margin-top:20px">
-      구별하는 질문 하나 — &ldquo;<b>이 답들을 모으면 전체의 답이 되는가?</b>&rdquo; 그렇다면 subproblem이다.
-    </div>
-  </div>
-</section>
-
 <!-- ============ B1. 분할 정복법 · 개념 ============ -->
 <section class="slide" data-name="분할 정복법 · 개념">
   <div class="eyebrow">Divide and Conquer · 교과서 208쪽</div>
@@ -579,18 +547,18 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
 </section>
 
 <!-- ============ B3. 합병 정렬 · 코드 ============ -->
-<section class="slide" data-name="합병 정렬 · 결합과 코드">
+<section class="slide" data-name="합병 정렬 · 결합">
   <div class="eyebrow">Merge Sort · 교과서 210~211쪽</div>
-  <h1 class="title">정렬된 두 리스트를 하나로 합치기<small>두 리스트의 맨 앞끼리 비교해서 <b>더 작은 쪽</b>을 B에 옮긴다. 이것만 반복하면 된다.</small></h1>
+  <h1 class="title">정렬된 두 리스트를 하나로 합치기<small>두 리스트의 맨 앞끼리 비교해서 <b>더 작은 쪽</b>을 temp에 옮긴다. 이것만 반복하면 된다.</small></h1>
   <div class="body">
-    <div class="grid2">
+    <div>
       <div>
         <div class="statebox" style="margin-bottom:12px">
-          <h4>A[low..mid] &nbsp;·&nbsp; A[mid+1..high] &nbsp;→&nbsp; B</h4>
+          <h4>data[low..mid] &nbsp;·&nbsp; data[mid+1..high] &nbsp;→&nbsp; temp</h4>
           <div style="display:grid;grid-template-columns:70px 1fr;gap:8px;align-items:center;font-size:14px">
             <b style="color:var(--violet)">왼쪽 i</b><div class="chiprow" id="mgL"></div>
             <b style="color:#8a5f04">오른쪽 j</b><div class="chiprow" id="mgR"></div>
-            <b style="color:var(--moss)">B</b><div class="chiprow" id="mgB"></div>
+            <b style="color:var(--moss)">temp</b><div class="chiprow" id="mgB"></div>
           </div>
         </div>
         <div class="msg" id="mgMsg"></div>
@@ -601,75 +569,6 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
           <span class="chip" id="mgStep" style="font-size:13px;color:var(--ink-soft)"></span>
         </div>
       </div>
-      <div>
-<pre class="code sm"><span class="kw">def</span> <span class="fn">f</span>(low, high):
-    <span class="kw">if</span> low &gt;= high:              <span class="cm"># 길이 1 이하 → 이미 정렬됨</span>
-        <span class="kw">return</span>
-    mid = (low + high) // <span class="nm">2</span>
-    <span class="fn">f</span>(low, mid)                    <span class="cm"># 분할 · 정복 (왼쪽)</span>
-    <span class="fn">f</span>(mid + <span class="nm">1</span>, high)               <span class="cm"># 분할 · 정복 (오른쪽)</span>
-
-    i = low                         <span class="cm"># 결합</span>
-    j = mid + <span class="nm">1</span>
-    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(low, high + <span class="nm">1</span>):
-        <span class="kw">if</span> j &gt; high:                <span class="cm"># 오른쪽을 다 썼다</span>
-            B[k] = A[i]; i = i + <span class="nm">1</span>
-        <span class="kw">elif</span> i &gt; mid:               <span class="cm"># 왼쪽을 다 썼다</span>
-            B[k] = A[j]; j = j + <span class="nm">1</span>
-        <span class="kw">elif</span> A[i] &lt;= A[j]:
-            B[k] = A[i]; i = i + <span class="nm">1</span>
-        <span class="kw">else</span>:
-            B[k] = A[j]; j = j + <span class="nm">1</span>
-    <span class="kw">for</span> k <span class="kw">in</span> <span class="fn">range</span>(low, high + <span class="nm">1</span>):
-        A[k] = B[k]                 <span class="cm"># B를 A로 복사</span></pre>
-        <p class="footnote">교과서 코드에서 한 줄에 두 문장을 <span class="tt">;</span>로 붙였을 뿐, 동작은 같다. 입력 <span class="tt">5</span> / <span class="tt">5 3 1 4 2</span> → <span class="tt">[1, 2, 3, 4, 5]</span></p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ B3-1. 전체 탐색 vs 분할 정복 ============ -->
-<section class="slide" data-name="정렬 · 전체 탐색 vs 분할 정복">
-  <div class="eyebrow">Search vs Divide and Conquer</div>
-  <h1 class="title">정렬을 전체 탐색으로 하면?<small>둘 다 재귀 함수와 트리로 그려지지만, <b>트리가 뜻하는 것</b>이 다르다.</small></h1>
-  <div class="body">
-    <div class="grid2" style="gap:18px">
-      <div class="card coral" style="padding:14px 18px">
-        <h4>전체 탐색 — 가능한 순서를 모두 만들어 본다</h4>
-        <div style="background:var(--white);border-radius:10px;padding:6px 4px;margin-bottom:8px"><svg viewBox="0 0 360 206" style="display:block;height:200px;margin:0 auto"><line class="gedge" x1="180" y1="36" x2="60" y2="81"/><line class="gedge" x1="60" y1="109" x2="30" y2="154"/><line class="gedge" x1="60" y1="109" x2="90" y2="154"/><line class="gedge" x1="180" y1="36" x2="180" y2="81"/><line class="gedge" x1="180" y1="109" x2="150" y2="154"/><line class="gedge" x1="180" y1="109" x2="210" y2="154"/><line class="gedge" x1="180" y1="36" x2="300" y2="81"/><line class="gedge" x1="300" y1="109" x2="270" y2="154"/><line class="gedge" x1="300" y1="109" x2="330" y2="154"/><rect x="153.0" y="8" width="54" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="180" y="27" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">_ _ _</text><rect x="33.0" y="81" width="54" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="60" y="100" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">3 _ _</text><rect x="153.0" y="81" width="54" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="180" y="100" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">1 _ _</text><rect x="273.0" y="81" width="54" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="300" y="100" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">2 _ _</text><rect x="3.0" y="154" width="54" height="28" rx="7" fill="var(--paper)" stroke="#dfe5ee" stroke-width="2"/><text x="30" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink-soft)">3 1 2</text><text x="30" y="198" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--coral)">✗</text><rect x="63.0" y="154" width="54" height="28" rx="7" fill="var(--paper)" stroke="#dfe5ee" stroke-width="2"/><text x="90" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink-soft)">3 2 1</text><text x="90" y="198" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--coral)">✗</text><rect x="123.0" y="154" width="54" height="28" rx="7" fill="var(--paper)" stroke="#dfe5ee" stroke-width="2"/><text x="150" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink-soft)">1 3 2</text><text x="150" y="198" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--coral)">✗</text><rect x="183.0" y="154" width="54" height="28" rx="7" fill="var(--moss-soft)" stroke="var(--moss)" stroke-width="2"/><text x="210" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--moss)">1 2 3</text><text x="210" y="198" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--moss)">✓</text><rect x="243.0" y="154" width="54" height="28" rx="7" fill="var(--paper)" stroke="#dfe5ee" stroke-width="2"/><text x="270" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink-soft)">2 3 1</text><text x="270" y="198" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--coral)">✗</text><rect x="303.0" y="154" width="54" height="28" rx="7" fill="var(--paper)" stroke="#dfe5ee" stroke-width="2"/><text x="330" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink-soft)">2 1 3</text><text x="330" y="198" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--coral)">✗</text></svg></div>
-<pre class="code sm"><span class="kw">def</span> <span class="fn">dfs</span>(path):          <span class="cm"># 지금까지 놓은 순서</span>
-    <span class="kw">if</span> <span class="fn">len</span>(path) == n:
-        <span class="kw">if</span> 정렬되어_있으면(path): 출력
-        <span class="kw">return</span>
-    <span class="kw">for</span> x <span class="kw">in</span> 아직_안_쓴_수:
-        <span class="fn">dfs</span>(path + [x])     <span class="cm"># 다음 자리에 x를 놓아 본다</span></pre>
-        <ul class="clean coral" style="font-size:14px;margin-top:6px">
-          <li>트리의 갈래 = <b>선택</b> (다음 자리에 무엇을 놓을까)</li>
-          <li>답은 <b>잎에서 발견</b>한다 — 잎 n!개를 다 확인</li>
-        </ul>
-      </div>
-      <div class="card moss" style="padding:14px 18px">
-        <h4>분할 정복 — 반으로 나눠 정렬하고 합친다</h4>
-        <div style="background:var(--white);border-radius:10px;padding:6px 4px;margin-bottom:8px"><svg viewBox="0 0 360 206" style="display:block;height:200px;margin:0 auto"><line class="gedge" x1="180" y1="36" x2="90" y2="81"/><line class="gedge" x1="180" y1="36" x2="270" y2="81"/><line class="gedge" x1="270" y1="109" x2="225" y2="154"/><line class="gedge" x1="270" y1="109" x2="315" y2="154"/><rect x="153.0" y="8" width="54" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="180" y="27" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">3 1 2</text><rect x="73.0" y="81" width="34" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="90" y="100" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">3</text><rect x="248.0" y="81" width="44" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="270" y="100" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">1 2</text><rect x="208.0" y="154" width="34" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="225" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">1</text><rect x="298.0" y="154" width="34" height="28" rx="7" fill="var(--white)" stroke="#c3cedd" stroke-width="2"/><text x="315" y="173" text-anchor="middle" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--ink)">2</text><text x="214" y="27" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--moss)">→ 1 2 3</text><text x="297" y="100" style="font-family:'JetBrains Mono';font-weight:700;font-size:13px;fill:var(--moss)">→ 1 2</text></svg></div>
-<pre class="code sm"><span class="kw">def</span> <span class="fn">f</span>(low, high):
-    <span class="kw">if</span> low &gt;= high: <span class="kw">return</span>
-    mid = (low + high) // <span class="nm">2</span>
-    <span class="fn">f</span>(low, mid)              <span class="cm"># 왼쪽 절반 정렬</span>
-    <span class="fn">f</span>(mid + <span class="nm">1</span>, high)         <span class="cm"># 오른쪽 절반 정렬</span>
-    정렬된 두 절반을 합병        <span class="cm"># 결합</span></pre>
-        <ul class="clean moss" style="font-size:14px;margin-top:6px">
-          <li>트리의 갈래 = <b>분해</b> (같은 모양의 작은 문제)</li>
-          <li>답은 <b>결합하며 올라온다</b> — 단계마다 n번 비교, 단계는 log₂n개</li>
-        </ul>
-      </div>
-    </div>
-    <div class="grid-2-1" style="margin-top:12px;align-items:center">
-      <table class="tbl sm">
-        <tr><th class="c">n</th><th class="r">전체 탐색: 확인할 순서 n!</th><th class="r">합병 정렬: 약 n log₂n</th></tr>
-                        <tr><td class="c">10</td><td class="r">3,628,800</td><td class="r">33</td></tr>
-        <tr><td class="c">20</td><td class="r">2,432,902,008,176,640,000</td><td class="r">86</td></tr>
-      </table>
-      <div class="callout">전체 탐색은 <b>후보를 전부 만들어 보고</b> 조건에 맞는 것을 고른다. 분할 정복은 <b>작은 문제의 답을 받아 합쳐서</b> 큰 문제의 답을 만든다. n이 20만 돼도 차이는 이만큼 벌어진다.</div>
     </div>
   </div>
 </section>
@@ -681,7 +580,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
   <div class="body">
     <div class="grid2">
       <div>
-        <h4 style="margin-bottom:8px">피벗 50으로 두 부분 문제 만들기</h4>
+        <h4 style="margin-bottom:8px">피벗으로 나누며 끝까지 정렬하기</h4>
         <div class="statebox"><div class="chiprow" id="qsRow" style="gap:4px"></div><div class="chiprow" id="qsIJ" style="gap:4px;min-height:22px;font-size:12.5px;font-weight:700"></div></div>
         <div class="msg" id="qsMsg" style="margin-top:10px"></div>
         <div class="ctrlbar">
@@ -690,7 +589,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
           <button class="btn ghost sm" id="qsReset">처음으로</button>
           <span class="chip" id="qsStep" style="font-size:13px;color:var(--ink-soft)"></span>
         </div>
-        <p class="footnote">i는 왼쪽에서 <b>피벗보다 큰 값</b>을, j는 오른쪽에서 <b>피벗보다 작은 값</b>을 찾는다. 둘을 교환하고, 엇갈리면 피벗과 j를 교환한다.</p>
+        <p class="footnote">i는 왼쪽에서 <b>피벗보다 큰 값</b>을, j는 오른쪽에서 <b>피벗보다 작은 값</b>을 찾는다. 둘을 교환하고, 엇갈리면 피벗과 j를 교환한다. <span style="color:var(--amber);font-weight:700">노란 테두리</span>는 지금 피벗과 비교하는 값이다.</p>
       </div>
       <div>
         <h4 style="margin-bottom:8px">리스트의 가장 앞에 있는 값을 피벗으로 — 초록 칸에 알맞은 피벗은?</h4>
@@ -701,41 +600,77 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
   </div>
 </section>
 
-<!-- ============ B5. 2×n 격자판 채우기 ============ -->
-<section class="slide" data-name="2×n 격자판 채우기">
-  <div class="eyebrow">분할 정복법을 활용한 문제 해결 (1) · 교과서 212~214쪽</div>
-  <h1 class="title">2×n 격자판 채우기<small>2×n의 격자판을 1×2, 2×1의 도미노를 이용하여 채울 수 있는 서로 다른 경우의 수를 구해 보자.</small></h1>
+<!-- ============ B4-1. 퀵 정렬 · 분할과 정복 ============ -->
+<section class="slide" data-name="퀵 정렬 · 분할과 정복">
+  <div class="eyebrow">Quick Sort · 교과서 164쪽</div>
+  <h1 class="title">퀵 정렬의 분할과 정복<small>피벗을 제자리에 놓아 <b>두 부분 문제로 나눈 뒤</b>, 각각을 다시 퀵 정렬한다.</small></h1>
   <div class="body">
-    <div class="grid-2-1">
-      <div>
-        <div class="vizstage"><svg id="domSvg" viewBox="0 0 640 250"></svg></div>
-        <div class="ctrlbar">
-          <span style="font-size:14px;font-weight:600;color:var(--ink-soft)">n =</span>
-          <button class="btn ghost sm" data-dn="3">3</button>
-          <button class="btn sm" data-dn="4">4</button>
-          <button class="btn ghost sm" data-dn="5">5</button>
-        </div>
-        <p class="footnote">모든 방법을 <b>마지막 부분</b>의 모양으로 나누었다. 보라 — 세로 도미노 하나, 주황 — 가로 도미노 두 개.</p>
+    <div class="grid2">
+      <div class="card sea">
+        <h4>분할</h4>
+        <ul class="clean">
+          <li><span class="tt">left</span>는 왼쪽에서 <b>피벗보다 큰 값</b>을, <span class="tt">right</span>는 오른쪽에서 <b>피벗보다 작은 값</b>을 찾는다.</li>
+          <li>찾으면 <span class="tt">break</span>로 멈추고, 아니면 한 칸씩 옮긴다. 끝까지 못 찾으면 <span class="tt">left</span>는 <span class="tt">end+1</span>, <span class="tt">right</span>는 <span class="tt">start</span>에서 멈춘다.</li>
+          <li>둘이 엇갈리지 않았으면 두 값을 교환하고 계속 찾는다.</li>
+          <li>엇갈리면 피벗과 <span class="tt">data[right]</span>를 교환한다. 이제 피벗은 <b>right 자리</b>에 있고, 왼쪽은 모두 작고 오른쪽은 모두 크다.</li>
+        </ul>
       </div>
-      <div class="vizpanel">
-        <div class="callout violet" style="font-size:15px">마지막에 <b>세로 도미노 하나</b>를 놓으면 남은 것은 <b>2×(n−1)</b> 격자판 → f(n−1)가지</div>
-        <div class="callout amber" style="font-size:15px">마지막에 <b>가로 도미노 두 개</b>를 놓으면 남은 것은 <b>2×(n−2)</b> 격자판 → f(n−2)가지</div>
-        <div class="rec" style="font-size:17px">f(n) = <span class="brace"><span>1</span><span class="cond">n = 1</span><span>2</span><span class="cond">n = 2</span><span>f(n−1) + f(n−2)</span><span class="cond">n &gt; 2</span></span></div>
-<pre class="code sm"><span class="kw">def</span> <span class="fn">f</span>(k):
-    <span class="kw">if</span> k == <span class="nm">1</span>:
-        <span class="kw">return</span> <span class="nm">1</span>
-    <span class="kw">if</span> k == <span class="nm">2</span>:
-        <span class="kw">return</span> <span class="nm">2</span>
-    ans = <span class="fn">f</span>(k - <span class="nm">1</span>) + <span class="fn">f</span>(k - <span class="nm">2</span>)   <span class="cm"># 분할 및 합병</span>
-    <span class="kw">return</span> ans                 <span class="cm"># 입력 10 → 89</span></pre>
+      <div class="card moss">
+        <h4>정복 — 재귀 호출 두 줄</h4>
+        <ul class="clean moss">
+          <li>피벗 왼쪽 <span class="tt">start ~ right−1</span>과 오른쪽 <span class="tt">right+1 ~ end</span>를 각각 퀵 정렬한다.</li>
+          <li>피벗은 이미 제자리이므로 다시 볼 필요가 없다.</li>
+        </ul>
       </div>
+    </div>
+    <div class="callout amber" style="margin-top:16px">
+      합병 정렬과 달리 <b>결합 단계에서 할 일이 없다.</b> 두 쪽이 정렬되면 피벗을 사이에 둔 채로 전체가 이미 정렬되어 있다.
+    </div>
+  </div>
+</section>
+
+<!-- ============ B4-2. 재귀 호출의 위치 ============ -->
+<section class="slide" data-name="재귀 호출의 위치">
+  <div class="eyebrow">합병 정렬 vs 퀵 정렬</div>
+  <h1 class="title">재귀 호출은 어디에 두어야 할까?<small>합병 정렬은 재귀 호출이 <b>결합 앞</b>에, 퀵 정렬은 재귀 호출이 <b>분할 뒤</b>에 있다.</small></h1>
+  <div class="body">
+    <div class="grid2">
+      <div class="card moss">
+        <h4>합병 정렬 — 재귀 → 일</h4>
+<pre class="code sm"><span class="fn">merge_sort</span>(low, mid)       <span class="cm"># → 왼쪽 절반은 정렬돼 있다</span>
+<span class="fn">merge_sort</span>(mid + <span class="nm">1</span>, high)  <span class="cm"># → 오른쪽 절반도 정렬돼 있다</span>
+정렬된 두 절반을 합병           <span class="cm"># 위 두 줄 덕분에 가능</span></pre>
+        <p style="margin-top:10px">결합은 맨 앞끼리만 비교한다. <b>두 절반이 이미 정렬돼 있어야</b> 맞는 방법이다.</p>
+        <table class="tbl sm" style="margin-top:10px">
+          <tr><th>재귀 호출 위치</th><th class="c">입력 5 3 1 4 2의 결과</th></tr>
+          <tr><td>for 문(결합) <b>앞</b></td><td class="c">[1, 2, 3, 4, 5] ✓</td></tr>
+          <tr><td>for 문(결합) <b>뒤</b></td><td class="c">[2, 4, 5, 1, 3] ✗</td></tr>
+        </table>
+      </div>
+      <div class="card sea">
+        <h4>퀵 정렬 — 일 → 재귀</h4>
+<pre class="code sm">피벗을 기준으로 분할               <span class="cm"># 피벗 자리 right가 정해진다</span>
+<span class="fn">quick_sort</span>(start, right - <span class="nm">1</span>)  <span class="cm"># right를 알아야 부를 수 있다</span>
+<span class="fn">quick_sort</span>(right + <span class="nm">1</span>, end)</pre>
+        <p style="margin-top:10px">어디서 나눌지는 <b>분할을 해 봐야</b> 안다. 그래서 재귀 호출이 분할 뒤에 온다.</p>
+        <table class="tbl sm" style="margin-top:10px">
+          <tr><th>알고리즘</th><th>먼저 필요한 것</th><th class="c">재귀 위치</th></tr>
+          <tr><td>합병 정렬</td><td>합치려면 두 절반이 정렬돼 있어야</td><td class="c">일 앞</td></tr>
+          <tr><td>f(n) = f(n−1) + n</td><td>더하려면 f(n−1) 값이 있어야</td><td class="c">일 앞</td></tr>
+          <tr><td>퀵 정렬</td><td>나눠야 각 쪽을 정렬할 수 있어</td><td class="c">일 뒤</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:16px">
+      위치를 정하는 질문 하나 — &ldquo;<b>이 일을 하려면 재귀 호출의 결과가 필요한가?</b>&rdquo; 필요하면 재귀를 먼저, 재귀가 이 일의 결과를 필요로 하면 일을 먼저 한다.<br>
+      재귀 호출 줄은 안으로 따라 들어가지 말고 <b>&lsquo;이 줄이 끝나면 이 구간은 정렬돼 있다&rsquo;고 믿고</b> 다음 줄을 읽는다. 이 믿음이 맞는 이유가 수학적 귀납법이다.
     </div>
   </div>
 </section>
 
 <!-- ============ B6. 별 그리기 ============ -->
 <section class="slide" data-name="별 그리기">
-  <div class="eyebrow">분할 정복법을 활용한 문제 해결 (2) · 교과서 214~215쪽</div>
+  <div class="eyebrow">분할 정복법을 활용한 문제 해결 · 교과서 214~215쪽</div>
   <h1 class="title">별 그리기<small>한 정수 n을 입력받아서 패턴으로 출력하는 프로그램을 작성해 보자.</small></h1>
   <div class="body">
     <div class="grid2">
@@ -757,17 +692,8 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
             <li><span style="background:var(--amber-soft);color:#8a5f04;font-weight:700;padding:1px 6px;border-radius:5px">n개 별 출력하기</span></li>
             <li><span style="background:var(--violet-soft);color:var(--violet);font-weight:700;padding:1px 6px;border-radius:5px">f(n−1)</span></li>
           </ol>
+          <p style="font-size:15px;margin-top:10px">n = 1이면 별 하나를 찍고 끝낸다. 세 부분을 위에서부터 차례로 출력하므로 따로 합칠 일이 없다.</p>
         </div>
-<pre class="code sm"><span class="kw">def</span> <span class="fn">f</span>(n):
-    <span class="kw">if</span> n == <span class="nm">1</span>:
-        <span class="fn">print</span>(<span class="st">"*"</span>)
-        <span class="kw">return</span>
-    <span class="fn">f</span>(n - <span class="nm">1</span>)
-    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(n):
-        <span class="fn">print</span>(<span class="st">"*"</span>, end=<span class="st">''</span>)
-    <span class="fn">print</span>()
-    <span class="fn">f</span>(n - <span class="nm">1</span>)</pre>
-        <p class="footnote">교과서 코드는 <span class="tt">end=' '</span>라서 별 사이에 공백이 들어간다. 패턴 그림과 같게 하려면 <span class="tt">end=''</span>로 쓴다.</p>
       </div>
     </div>
   </div>
@@ -778,22 +704,9 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
   <div class="eyebrow">스스로 해 보기 6 · 교과서 216~217쪽</div>
   <h1 class="title">분할 정복법으로 프로그램 작성하기</h1>
   <div class="body">
-    <div class="grid2">
+    <div>
       <div class="card flat">
-        <h3>1. 타일 채우기</h3>
-        <p style="font-size:15px">1×n의 격자판을 <b>1×1, 1×2, 1×3</b>의 타일을 이용하여 채울 수 있는 서로 다른 경우의 수를 구해 보자.</p>
-        <div class="vizstage" style="margin:12px 0"><svg id="tileSvg" viewBox="0 0 520 150"></svg></div>
-        <div class="reveal">
-          <button>▶ 점화식 보기</button>
-          <div>
-            <p>첫 칸에 놓는 타일로 나누면 남은 길이가 n−1, n−2, n−3이다.</p>
-            <div class="rec" style="font-size:16px;margin-top:6px">f(n) = <span class="brace"><span>1</span><span class="cond">n = 1</span><span>2</span><span class="cond">n = 2</span><span>4</span><span class="cond">n = 3</span><span>f(n−1) + f(n−2) + f(n−3)</span><span class="cond">n &gt; 3</span></span></div>
-            <p class="footnote">f(4) = 4 + 2 + 1 = 7, f(5) = 13, f(10) = 274</p>
-          </div>
-        </div>
-      </div>
-      <div class="card flat">
-        <h3>2. 삼각형 별 그리기</h3>
+        <h3>삼각형 별 그리기</h3>
         <div class="grid2" style="gap:10px">
           <div><p class="footnote" style="margin:0 0 4px">n = 1</p><pre class="mono" style="font-size:14px;line-height:1.3">  *
  * *
@@ -802,13 +715,20 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         </div>
         <p style="font-size:15px;margin-top:8px">n의 그림은 n−1의 그림 <b>세 개</b>로 이루어진다 — 위 가운데, 아래 왼쪽, 아래 오른쪽.</p>
         <div class="reveal" style="margin-top:10px">
-          <button>▶ 빈칸 정답 보기</button>
+          <button>▶ 푸는 방법 보기</button>
           <div>
-<pre class="code sm">    <span class="kw">else</span>:
-        <span class="fn">f</span>(a, b + y // <span class="nm">2</span>, x // <span class="nm">2</span>, y // <span class="nm">2</span>)       <span class="cm"># 위 가운데</span>
-        <span class="fn">f</span>(a + x // <span class="nm">2</span>, b, x // <span class="nm">2</span>, y // <span class="nm">2</span>)       <span class="cm"># 아래 왼쪽</span>
-        <span class="fn">f</span>(a + x // <span class="nm">2</span>, b + y, x // <span class="nm">2</span>, y // <span class="nm">2</span>)   <span class="cm"># 아래 오른쪽</span></pre>
-            <p class="footnote">x는 그림의 높이, y는 그림 폭의 절반쯤이다. 높이 3짜리 기본 삼각형(별 8개)을 <span class="tt">dx</span>, <span class="tt">dy</span>로 찍는다.</p>
+            <ul class="clean" style="font-size:15px">
+              <li><b>판에 찍고 한 번에 출력한다.</b> 아래 왼쪽과 아래 오른쪽 그림이 같은 줄에 걸쳐 있어서, 위에서부터 한 줄씩 바로 출력할 수 없다. 2차원 리스트를 판으로 만들어 별 자리를 표시한 뒤 마지막에 출력한다.</li>
+              <li><b>n의 그림 높이를 h라 하면</b>(h = 3, 6, 12, …) n−1의 그림 세 개를 다음 자리에서 시작해 그린다.
+                <table class="tbl sm" style="margin-top:8px;max-width:420px">
+                  <tr><th>부분 그림</th><th class="c">시작 행</th><th class="c">시작 열</th></tr>
+                  <tr><td>위 가운데</td><td class="c">0</td><td class="c">h/2</td></tr>
+                  <tr><td>아래 왼쪽</td><td class="c">h/2</td><td class="c">0</td></tr>
+                  <tr><td>아래 오른쪽</td><td class="c">h/2</td><td class="c">h</td></tr>
+                </table>
+              </li>
+              <li><b>n = 1이면</b> 높이 3, 폭 5짜리 기본 삼각형(별 8개)을 그 자리에 찍고 끝낸다.</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -819,7 +739,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
 <!-- ============ C1. 부분 문제는 겹친다 ============ -->
 <section class="slide" data-name="같은 부분 문제가 여러 번">
   <div class="eyebrow">분할 정복법의 한계</div>
-  <h1 class="title">같은 부분 문제가 여러 번 나온다<small>2×n 격자판 코드로 f(6)을 구할 때 불리는 함수를 모두 그려 보자. 분할 정복 알고리즘은 <b>중복 계산</b>의 문제가 발생할 수 있다.</small></h1>
+  <h1 class="title">같은 부분 문제가 여러 번 나온다<small>피보나치수열 f(n) = f(n−1) + f(n−2), f(0) = 0, f(1) = 1을 재귀 함수로 그대로 계산해 f(6)을 구할 때 불리는 함수를 모두 그려 보자. 분할 정복 알고리즘은 <b>중복 계산</b>의 문제가 발생할 수 있다.</small></h1>
   <div class="body">
     <div class="viz">
       <div>
@@ -849,7 +769,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
           </table>
         </div>
         <div class="callout amber" style="font-size:15px">
-          필요한 부분 문제는 f(1)~f(n), <b>n개뿐</b>인데 호출은 지수적으로 늘어난다. 같은 답을 <b>계속 다시 계산</b>하기 때문이다. → <b>작은 것부터 구해서 적어 두자.</b>
+          필요한 부분 문제는 f(0)~f(n), <b>n+1개뿐</b>인데 호출은 지수적으로 늘어난다. 같은 답을 <b>계속 다시 계산</b>하기 때문이다. → <b>작은 것부터 구해서 적어 두자.</b>
         </div>
       </div>
     </div>
@@ -878,11 +798,7 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
         </div>
       </div>
       <div class="vizpanel">
-        
-        <div class="card moss">
-          <h4>분할 정복 vs 동적 계획법</h4>
-          <p style="font-size:14.5px">분할 정복은 f(n)에서 출발해 <b>아래로 쪼개 내려가고</b>, 동적 계획법은 f(1), f(2)에서 출발해 f(n)까지 <b>위로 쌓아 올린다.</b> 점화식은 같고 계산 순서만 뒤집었다.</p>
-        </div>
+
         <div class="callout amber" style="font-size:15px">
           i번째 값을 <b>한 번씩만 계산하므로</b> 시간 복잡도가 <span class="tt">O(2ⁿ)</span>에서 <span class="tt">O(n)</span>으로 줄어든다.
         </div>
@@ -890,80 +806,45 @@ n = <span class="fn">int</span>(<span class="fn">input</span>())
     </div>
   </div>
 </section>
-
-<!-- ============ C3. 2×n 격자판 · 동적 계획법 ============ -->
-<section class="slide" data-name="2×n 격자판 · 동적 계획법">
-  <div class="eyebrow">동적 계획법을 활용한 문제 해결 (1) · 교과서 220~222쪽</div>
-  <h1 class="title">2×n 격자판 채우기를 O(n)으로<small>같은 점화식 f(n) = f(n−1) + f(n−2)를, 이번에는 값을 저장하면서 계산한다.</small></h1>
-  <div class="body">
-    <div class="grid2">
-      <div>
-                <h4 style="margin-bottom:8px">분할 정복 — 앞에서 쓴 격자판 코드</h4>
-<pre class="code sm"><span class="kw">def</span> <span class="fn">f</span>(k):
-    <span class="kw">if</span> k == <span class="nm">1</span>:
-        <span class="kw">return</span> <span class="nm">1</span>
-    <span class="kw">if</span> k == <span class="nm">2</span>:
-        <span class="kw">return</span> <span class="nm">2</span>
-    <span class="kw">return</span> <span class="fn">f</span>(k - <span class="nm">1</span>) + <span class="fn">f</span>(k - <span class="nm">2</span>)</pre>
-        <h4 style="margin:14px 0 8px">반복문을 활용한 동적 계획법</h4>
-<pre class="code sm">data = [<span class="nm">0</span>] * <span class="nm">1000000</span>
-n = <span class="fn">int</span>(<span class="fn">input</span>())
-data[<span class="nm">1</span>] = <span class="nm">1</span>
-data[<span class="nm">2</span>] = <span class="nm">2</span>
-<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>, n + <span class="nm">1</span>):
-    data[i] = data[i - <span class="nm">1</span>] + data[i - <span class="nm">2</span>]
-<span class="fn">print</span>(data[n])                  <span class="cm"># 입력 5 → 8</span></pre>
-      </div>
-      <div class="vizpanel">
-        <div class="statebox">
-          <h4>동적 테이블이 채워지는 순서</h4>
-          <div id="dpRow" style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px"></div>
-        </div>
-        <div class="msg" id="dpMsg"></div>
-        <div class="ctrlbar">
-          <button class="btn ghost" id="dpPrev">이전</button>
-          <button class="btn" id="dpNext">다음 단계</button>
-          <button class="btn ghost sm" id="dpReset">처음으로</button>
-          <span class="chip" id="dpStep" style="font-size:13px;color:var(--ink-soft)"></span>
-        </div>
-        <div class="callout" style="font-size:15px">
-          점화식 <span class="tt">f(k−1) + f(k−2)</span>가 <span class="tt">data[i−1] + data[i−2]</span>로 그대로 옮겨졌다. 반복문 한 번에 칸 하나 — n칸이면 끝난다.
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ============ C4. 별 개수 세기 ============ -->
 <section class="slide" data-name="별 개수 세기">
-  <div class="eyebrow">동적 계획법을 활용한 문제 해결 (2) · 교과서 223~225쪽</div>
-  <h1 class="title">별 그리기에서 사용하는 ‘*’의 개수<small>215쪽 별 그리기 패턴을 출력할 때 사용하는 ‘*’의 개수를 구해 보자. n = 1 → 1개, n = 2 → 4개, n = 3 → 11개</small></h1>
+  <div class="eyebrow">동적 계획법을 활용한 문제 해결 · 교과서 223~225쪽</div>
+  <h1 class="title">별 그리기에서 사용하는 ‘*’의 개수<small>별 그리기 패턴을 출력할 때 사용하는 ‘*’의 개수를 구해 보자.</small></h1>
   <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;align-items:start">
+        <div class="statebox" style="padding:10px 14px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">n = 1 &nbsp;→&nbsp; 1개</div>
+<pre class="mono" style="font-size:14px;line-height:1.35;margin:0">*</pre>
+        </div>
+        <div class="statebox" style="padding:10px 14px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">n = 2 &nbsp;→&nbsp; 4개</div>
+<pre class="mono" style="font-size:14px;line-height:1.35;margin:0">*
+<span style="background:var(--amber-soft);color:#8a5f04;border-radius:4px;padding:0 4px">**</span>
+*</pre>
+        </div>
+        <div class="statebox" style="padding:10px 14px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">n = 3 &nbsp;→&nbsp; 11개</div>
+<pre class="mono" style="font-size:14px;line-height:1.35;margin:0">*
+**
+*
+<span style="background:var(--amber-soft);color:#8a5f04;border-radius:4px;padding:0 4px">***</span>
+*
+**
+*</pre>
+        </div>
+    </div>
+    <div class="rec" style="font-size:16px;margin-bottom:16px">f(n) = <span class="brace"><span>1</span><span class="cond">n = 1</span><span>f(n−1) + n + f(n−1)</span><span class="cond">n &gt; 1</span></span></div>
     <div class="grid2">
-      <div>
+      <div class="card flat">
         <h4 style="margin-bottom:8px"><span class="tag gray">분할 정복</span></h4>
-<pre class="code sm"><span class="kw">def</span> <span class="fn">f</span>(k):
-    <span class="kw">if</span> k == <span class="nm">1</span>:
-        <span class="kw">return</span> <span class="nm">1</span>
-    ans = <span class="nm">0</span>
-    ans = ans + <span class="fn">f</span>(k - <span class="nm">1</span>)
-    ans = ans + k
-    ans = ans + <span class="fn">f</span>(k - <span class="nm">1</span>)
-    <span class="kw">return</span> ans</pre>
-        <p class="footnote">f(k−1)을 <b>두 번</b> 부른다. 호출이 2ⁿ−1번.</p>
+        <p style="font-size:15px">점화식을 재귀 함수로 그대로 계산하면 같은 f(n−1)을 <b>두 번</b> 부른다. 한 단계 내려갈 때마다 호출이 두 배가 되어 <b>2ⁿ−1번</b> 호출한다.</p>
       </div>
-      <div>
+      <div class="card flat">
         <h4 style="margin-bottom:8px"><span class="tag moss">반복문 DP</span></h4>
-<pre class="code sm">data = [<span class="nm">0</span>] * <span class="nm">1000000</span>
-n = <span class="fn">int</span>(<span class="fn">input</span>())
-data[<span class="nm">1</span>] = <span class="nm">1</span>
-<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">2</span>, n + <span class="nm">1</span>):
-    data[i] = data[i-<span class="nm">1</span>] + i + data[i-<span class="nm">1</span>]
-<span class="fn">print</span>(data[n])</pre>
-        <div class="rec" style="font-size:15px;margin-top:10px">f(n) = <span class="brace"><span>1</span><span class="cond">n = 1</span><span>f(n−1) + n + f(n−1)</span><span class="cond">n &gt; 1</span></span></div>
-        <p class="footnote">입력 10 → 실행 결과 2036 (두 코드 모두)</p>
+        <p style="font-size:15px">f(1) = 1부터 f(2), f(3), …, f(n) 순서로 <b>테이블에 적어 가며</b> 구한다. 앞에서 구한 f(i−1)을 꺼내 쓰므로 <b>n−1번</b> 반복하면 끝난다.</p>
       </div>
     </div>
+    <p class="footnote">n = 10이면 두 방법 모두 2036개</p>
     <div class="callout amber" style="margin-top:16px">
       출력해야 하는 <b>별 그림</b>은 2ⁿ−1줄이라 어떻게 해도 지수 시간이 든다. 하지만 별의 <b>개수</b>만 묻는다면 그림을 그리지 않고 관계만으로 O(n)에 구할 수 있다.
     </div>
@@ -973,48 +854,49 @@ data[<span class="nm">1</span>] = <span class="nm">1</span>
 <!-- ============ C5. 스스로 해 보기 7 ============ -->
 <section class="slide" data-name="스스로 해 보기 7">
   <div class="eyebrow">스스로 해 보기 7 · 교과서 226~228쪽</div>
-  <h1 class="title">동적 계획법으로 프로그램 설계하기<small><b>반복문을 활용한 동적 계획법</b>으로 설계해 보자.</small></h1>
+  <h1 class="title">별 개수 세기<small><b>반복문을 활용한 동적 계획법</b>으로 설계해 보자.</small></h1>
   <div class="body">
-    <div class="grid2">
-      <div class="card flat">
-        <h3>1. 타일 채우기</h3>
-        <p style="font-size:15px">1×n의 격자판을 1×1, 1×2, 1×3의 타일을 이용하여 채울 수 있는 서로 다른 경우의 수 — 스스로 해 보기 6-1과 같은 문제다.</p>
-        <div class="reveal" style="margin-top:12px">
-          <button>▶ 답 보기</button>
-          <div>
-<pre class="code sm">data = [<span class="nm">0</span>] * <span class="nm">1000000</span>
-n = <span class="fn">int</span>(<span class="fn">input</span>())
-data[<span class="nm">1</span>] = <span class="nm">1</span>
-data[<span class="nm">2</span>] = <span class="nm">2</span>
-data[<span class="nm">3</span>] = <span class="nm">4</span>
-<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">4</span>, n + <span class="nm">1</span>):
-    data[i] = data[i-<span class="nm">1</span>] + data[i-<span class="nm">2</span>] + data[i-<span class="nm">3</span>]
-<span class="fn">print</span>(data[n])</pre>
-          </div>
+    <p style="font-size:16px;margin-bottom:12px">n의 패턴은 <b>n−1의 패턴 → 별 n개 → n−1의 패턴 → 별 n개 → n−1의 패턴</b>을 차례로 이어 붙여 만든다. 이 패턴을 출력할 때 사용하는 ‘*’의 개수를 구해 보자.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start">
+        <div class="statebox" style="padding:10px 14px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">n = 1 &nbsp;→&nbsp; 1개</div>
+<pre class="mono" style="font-size:13px;line-height:1.25;margin:0">*</pre>
         </div>
-      </div>
-      <div class="card flat">
-        <h3>2. 별 개수 세기</h3>
-        <p style="font-size:15px">다음 패턴으로 출력할 때 사용하는 ‘*’의 개수를 구해 보자.</p>
-        <div class="grid2" style="gap:12px;margin-top:8px">
-          <pre class="mono" style="font-size:14px;line-height:1.5;background:var(--paper);border-radius:9px;padding:10px 12px">n = 1
+        <div class="statebox" style="padding:10px 14px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">n = 2 &nbsp;→&nbsp; 7개</div>
+<pre class="mono" style="font-size:13px;line-height:1.25;margin:0">*
+<span style="background:var(--amber-soft);color:#8a5f04;border-radius:4px;padding:0 4px">**</span>
 *
-
-n &gt; 1
-f(n-1)
-** .. ** (n개)
-f(n-1)
-** .. ** (n개)
-f(n-1)</pre>
-          <div class="reveal">
-            <button>▶ 점화식 보기</button>
-            <div>
-              <p>f(n−1)이 <b>세 번</b>, n개짜리 줄이 <b>두 번</b>이다.</p>
-              <div class="rec" style="font-size:15px;margin-top:6px">f(n) = 3·f(n−1) + 2n</div>
-              <p class="footnote">f(1)=1, f(2)=7, f(3)=27, f(10)=68879</p>
-            </div>
-          </div>
+<span style="background:var(--amber-soft);color:#8a5f04;border-radius:4px;padding:0 4px">**</span>
+*</pre>
         </div>
+        <div class="statebox" style="padding:10px 14px">
+          <div style="font-weight:700;font-size:14px;margin-bottom:6px">n = 3 &nbsp;→&nbsp; 27개</div>
+<pre class="mono" style="font-size:13px;line-height:1.25;margin:0">*
+**
+*
+**
+*
+<span style="background:var(--amber-soft);color:#8a5f04;border-radius:4px;padding:0 4px">***</span>
+*
+**
+*
+**
+*
+<span style="background:var(--amber-soft);color:#8a5f04;border-radius:4px;padding:0 4px">***</span>
+*
+**
+*
+**
+*</pre>
+        </div>
+    </div>
+    <div class="reveal" style="margin-top:14px">
+      <button>▶ 점화식 보기</button>
+      <div>
+        <p>n−1의 패턴이 <b>세 번</b>, 별 n개짜리 줄이 <b>두 번</b> 들어간다.</p>
+        <div class="rec" style="font-size:15px;margin-top:6px">f(n) = 3·f(n−1) + 2n, &nbsp;f(1) = 1</div>
+        <p class="footnote">f(1)=1, f(2)=7, f(3)=27, f(10)=68879</p>
       </div>
     </div>
   </div>
@@ -1058,29 +940,42 @@ f(n-1)</pre>
   <div class="body">
     <div class="grid2">
       <div>
-        <p style="margin-bottom:10px">상태가 <b>두 사람의 위치</b> (a, b)다. X[a][b] = 엄지가 a, 지수가 b에 함께 도착하는 방법의 수. 칸을 눌러 보자.</p>
         <div class="statebox"><div id="ujGrid" style="display:grid;gap:4px"></div></div>
         <div class="msg" id="ujMsg" style="margin-top:10px">칸을 누르면 그 값을 만드는 데 필요한 칸이 표시된다.</div>
+        <div class="card flat" style="margin-top:12px">
+          <h4>3. 0이 많은 이유</h4>
+          <ul class="clean" style="font-size:14.5px">
+            <li><b>X[1][0] = 0</b> — 지수가 제자리에 있는데 엄지만 움직일 수는 없다. 동시에 움직이니까.</li>
+            <li><b>X[1][3] = 0</b> — 엄지는 1칸까지 1턴이면 끝나는데, 지수는 3칸까지 최소 2턴이 걸린다. 같은 턴 수에 도착할 수 없으니 0이다.</li>
+          </ul>
+        </div>
       </div>
       <div class="vizpanel">
         <div class="card flat">
-          <h4>05 · n이 3일 때</h4>
-          <div class="reveal">
-            <button>▶ 정답 보기</button>
-            <div>
-              <p class="mono" style="font-size:14px;line-height:1.8">(1,1) → (2,2) → (3,3)<br>(1,1) → (3,3)<br>(2,2) → (3,3)<br>(1,2) → (3,3)<br>(2,1) → (3,3)</p>
-              <p><b>5가지</b></p>
-            </div>
-          </div>
+          <h4>1. 상태와 규칙</h4>
+          <p style="font-size:14.5px">한 사람이면 위치 하나(n)만 알면 되지만, 두 사람이니까 <b>(엄지 위치 a, 지수 위치 b)</b> 쌍이 상태다. 동시에 움직이니까 매 턴마다 두 사람 모두 1칸 또는 2칸을 올라간다. 한 명만 쉬는 건 안 된다. 그래서 한 턴에 생기는 경우는 <b>2 × 2 = 4가지</b>다.</p>
+          <table class="tbl sm" style="margin-top:8px;max-width:360px">
+            <tr><th>엄지</th><td class="c">+1</td><td class="c">+1</td><td class="c">+2</td><td class="c">+2</td></tr>
+            <tr><th>지수</th><td class="c">+1</td><td class="c">+2</td><td class="c">+1</td><td class="c">+2</td></tr>
+          </table>
         </div>
         <div class="card flat">
-          <h4>06 · X[a][b] 계산에 필요한 값</h4>
-          <p style="font-size:14px;color:var(--ink-soft)">① X[a][b−1] ② X[a][b−2] ③ X[a−1][b] ④ X[a−1][b−1] ⑤ X[a−1][b−2] ⑥ X[a−2][b] ⑦ X[a−2][b−1] ⑧ X[a−2][b−2] ⑨ X[a−3][b−1] ⑩ X[a−3][b−2]</p>
-          <div class="reveal" style="margin-top:8px">
-            <button>▶ 정답 보기</button>
-            <div><p><b>④ ⑤ ⑦ ⑧</b> — 두 사람이 <b>함께</b> 한 번씩 움직이므로 (1칸,1칸), (1칸,2칸), (2칸,1칸), (2칸,2칸) 네 경우다. 한 사람만 움직이는 ①②③⑥은 안 된다.</p></div>
-          </div>
+          <h4>2. 점화식</h4>
+          <p style="font-size:14.5px">(a, b)에 도착하기 직전에는 위 4곳 중 하나에 있었어야 한다.</p>
+          <div class="rec" style="font-size:14px;margin-top:6px;line-height:1.7">X[a][b] = X[a−1][b−1] + X[a−1][b−2] + X[a−2][b−1] + X[a−2][b−2]<br>X[0][0] = 1 &nbsp;(둘 다 출발점에 서 있는 1가지)</div>
+          <p style="font-size:14.5px;margin-top:8px">표에서 <b>빨간 칸 X[3][3]</b>을 누르면 파란 칸 4개가 강조되는 게 바로 이 4곳이다.</p>
+          <p class="mono" style="font-size:14px;margin-top:4px">X[3][3] = X[2][2] + X[2][1] + X[1][2] + X[1][1] = 2 + 1 + 1 + 1 = 5</p>
+          <p style="font-size:14.5px;margin-top:4px">같은 방식으로 X[5][5] = 11 + 5 + 5 + 5 = 26이다. 문제의 답은 <b>대각선 X[n][n]</b>이다.</p>
         </div>
+      </div>
+    </div>
+    <div class="card sea" style="margin-top:14px">
+      <h4>코드는 이렇게 작성한다</h4>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;font-size:14px;line-height:1.6">
+        <div><b>① 표를 만든다.</b> (n+1)×(n+1) 크기의 2차원 리스트 X를 0으로 채우고, X[0][0] = 1로 둔다.</div>
+        <div><b>② 작은 칸부터 채운다.</b> a와 b를 0부터 n까지 이중 for 문으로 돈다. 필요한 칸은 a, b가 모두 더 작으므로 이미 채워져 있다.</div>
+        <div><b>③ 네 직전 칸을 더한다.</b> 엄지가 오른 칸 1·2와 지수가 오른 칸 1·2를 돌며 X[a−엄지][b−지수]를 더한다. 인덱스가 0보다 작아지면 건너뛴다.</div>
+        <div><b>④ 대각선이 답이다.</b> X[n][n]이 답이다.</div>
       </div>
     </div>
   </div>
@@ -1106,13 +1001,14 @@ f(n-1)</pre>
         <div class="callout">
           문어 한 마리는 왼손과 오른손이 <b>서로 다른 손</b>이다. 그래서 수열에서 <b>이웃한 두 숫자는 달라야</b> 하고, 원이므로 <b>마지막 숫자와 첫 숫자도 달라야</b> 한다.
         </div>
-        <div class="card flat">
-          <h4>07 · n = 10 &nbsp;&nbsp; 08 · n = 11</h4>
-          <div class="reveal"><button>▶ 정답 보기</button><div><p>07 <b>1212121212</b><br>08 <b>12121212123</b> — 1과 2를 번갈아 쓰면 11번째가 1이 되어 첫 숫자 1과 붙는다. 그래서 마지막만 3.</p></div></div>
-        </div>
-        <div class="card flat">
-          <h4>09 · 프로그램</h4>
-          <p class="footnote">관계기반이라기보다 <b>탐욕법</b>(5차시)에 가까운 문제다. 앞자리부터 쓸 수 있는 가장 작은 숫자를 고른다.</p>
+        <div class="card sea">
+          <h4>코드는 이렇게 작성한다</h4>
+          <ol class="num" style="font-size:15px">
+            <li><b>앞자리부터 가장 작은 숫자를 쓴다.</b> 바로 앞 숫자와 달라야 하므로 1, 2, 1, 2, …를 번갈아 쓰게 된다.</li>
+            <li><b>n이 짝수면</b> ‘12’를 n÷2번 이어 붙인다. 마지막이 2라서 첫 숫자 1과 다르다.</li>
+            <li><b>n이 홀수면</b> ‘12’를 n÷2(몫)번 이어 붙이고 마지막 한 자리를 정한다. 1은 첫 숫자와, 2는 바로 앞 숫자와 같으므로 <b>3</b>을 쓴다.</li>
+          </ol>
+          <p class="footnote">점화식으로 푸는 문제라기보다 앞자리부터 가장 작은 값을 고르는 <b>탐욕법</b>(5차시)에 가깝다.</p>
         </div>
       </div>
     </div>
@@ -1131,11 +1027,49 @@ f(n-1)</pre>
           <div class="chiprow" id="coinRow"></div>
           <div class="ctrlbar"><button class="btn moss sm" id="coinAns">가장 큰 금액 보기</button><span id="coinSum" class="bignum" style="font-size:20px"></span></div>
         </div>
+        <div class="card flat">
+          <h4>1. 상태가 두 개의 수 (x, y)</h4>
+          <p style="font-size:14.5px">동전마다 할 수 있는 건 <b>줍기 / 건너뛰기</b> 두 가지다. 그런데 이번 동전을 주울 수 있는지는 <b>바로 앞까지 몇 개를 연속으로 주웠는지</b>에 달려 있다. 그래서 x만으로는 부족하다.</p>
+          <ul class="clean" style="font-size:14.5px;margin-top:6px">
+            <li><b>x</b> — 지금 보고 있는 동전의 번호 (0부터)</li>
+            <li><b>y</b> — 바로 앞까지 연속으로 주운 개수 (0, 1, 2)</li>
+            <li><b>f(x, y)</b> — 이 상태에서 남은 동전(x번부터 끝까지)으로 더 얻을 수 있는 최대 금액</li>
+          </ul>
+        </div>
+        <div class="card flat" style="margin-top:12px">
+          <h4>2. 점화식 — 이번 동전을 줍느냐 마느냐</h4>
+          <div class="rec" style="font-size:14px;line-height:1.7">f(x, y) = max( f(x+1, y+1) + 동전[x], &nbsp;f(x+1, 0) )</div>
+          <ul class="clean" style="font-size:14.5px;margin-top:8px">
+            <li>앞은 <b>줍는</b> 경우(연속 개수 +1), 뒤는 <b>건너뛰는</b> 경우(연속 개수 0)다.</li>
+            <li>동전이 더 없으면(x = n) 0이다. 연속 3개(y = 3)가 되면 안 되는 상태라 −10000을 돌려준다. 그러면 max에서 절대 뽑히지 않는다.</li>
+            <li>답은 처음 상태 <b>f(0, 0)</b>이다.</li>
+          </ul>
+        </div>
       </div>
       <div class="vizpanel">
+        <div class="card flat">
+          <h4>3. 표는 뒤에서부터 채운다</h4>
+          <p style="font-size:14.5px">f(x, …)를 구하려면 f(x+1, …)이 먼저 있어야 한다. 그래서 표 data[x][y]를 <b>x가 큰 쪽부터</b> 채운다.</p>
+          <table class="tbl sm" style="margin-top:8px">
+            <tr><th class="c">x</th><th class="c">동전</th><th class="r">y = 0</th><th class="r">y = 1</th><th class="r">y = 2</th></tr>
+            <tr><td class="c">6</td><td class="c">끝</td><td class="r">0</td><td class="r">0</td><td class="r">0</td></tr>
+            <tr><td class="c">5</td><td class="c">1</td><td class="r">1</td><td class="r">1</td><td class="r">0</td></tr>
+            <tr><td class="c">4</td><td class="c">8</td><td class="r">9</td><td class="r">8</td><td class="r">1</td></tr>
+            <tr><td class="c">3</td><td class="c">9</td><td class="r">17</td><td class="r">10</td><td class="r">9</td></tr>
+            <tr><td class="c">2</td><td class="c">13</td><td class="r">23</td><td class="r">22</td><td class="r">17</td></tr>
+            <tr><td class="c">1</td><td class="c">10</td><td class="r">32</td><td class="r">27</td><td class="r">23</td></tr>
+            <tr><td class="c">0</td><td class="c">6</td><td class="r" style="background:var(--moss-soft);font-weight:700">33</td><td class="r">32</td><td class="r">32</td></tr>
+          </table>
+          <p class="footnote">예) data[4][0] = max(data[5][1] + 8, data[5][0]) = max(9, 1) = 9 &nbsp;·&nbsp; 답 data[0][0] = 33</p>
+        </div>
         <div class="card sea">
-          <h4>상태가 두 개의 수 (x, y)</h4>
-          <p style="font-size:15px">x만으로는 부족하다. 다음 동전을 주울 수 있는지는 <b>바로 앞까지 몇 개를 연속으로 주웠는지</b>에 달려 있기 때문이다. 그래서 동적 테이블도 <span class="tt">data[x][y]</span> — 2차원이다.<br>x를 <b>뒤에서부터</b> 채운다. data[x]를 구하려면 data[x+1]이 먼저 있어야 하기 때문이다.</p>
+          <h4>코드는 이렇게 작성한다</h4>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px 16px;font-size:14px;line-height:1.6">
+            <div><b>① 표를 만든다.</b> (n+1)×4 크기의 2차원 리스트 data를 0으로 채운다. data[n][y]는 동전이 없으므로 0이다.</div>
+            <div><b>② 뒤에서부터 채운다.</b> x를 n−1부터 0까지 거꾸로, y를 2부터 0까지 이중 for 문으로 돈다.</div>
+            <div><b>③ 두 경우 중 큰 값.</b> y가 2이면 이번 동전은 주울 수 없으므로 data[x+1][0]을 넣는다. 아니면 줍기 data[x+1][y+1] + 동전[x]와 건너뛰기 data[x+1][0] 중 큰 값을 넣는다.</div>
+            <div><b>④ 처음 상태가 답이다.</b> data[0][0]이 답이다.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1188,22 +1122,13 @@ f(n-1)</pre>
           <div class="fb">‘1 4 5 8’과 ‘2 3 6 7’은 각각 정렬되어 있을 뿐, 이어 붙인다고 정렬되지 않는다. 앞에서부터 비교하며 <b>합병</b>해야 한다. 결합 단계에서 할 일이 없는 것은 <b>퀵 정렬</b>이다.</div>
         </div>
         <div class="q">
-          <div class="qh">Q5. 반복문을 활용한 동적 계획법으로 2×n 격자판의 f(n)을 구할 때, 테이블을 채우는 순서는?</div>
+          <div class="qh">Q5. 반복문을 활용한 동적 계획법으로 피보나치수열 f(n)을 구할 때, 테이블을 채우는 순서는?</div>
           <div class="opts" data-a="1">
-            <button class="opt">data[n]부터 data[1]까지 거꾸로</button>
-            <button class="opt">data[1], data[2]부터 data[n]까지 차례대로</button>
+            <button class="opt">data[n]부터 data[0]까지 거꾸로</button>
+            <button class="opt">data[0], data[1]부터 data[n]까지 차례대로</button>
             <button class="opt">순서는 상관없다</button>
           </div>
           <div class="fb">data[i]를 구하려면 data[i−1]과 data[i−2]가 <b>이미 채워져 있어야</b> 한다. 그래서 작은 부분 문제부터 차례대로 채운다. 각 칸을 한 번씩만 계산하므로 O(n)이다.</div>
-        </div>
-        <div class="q">
-          <div class="qh">Q6. 다음 중 <b>subproblem</b>이 <b>아닌</b> 것은?</div>
-          <div class="opts" data-a="0">
-            <button class="opt">카드 100장 중 짝수 카드만 정리하기</button>
-            <button class="opt">카드 100장을 20장씩 다섯 묶음으로 나누어 정리하기</button>
-            <button class="opt">서울→대전의 가장 빠른 경로 구하기</button>
-          </div>
-          <div class="fb">&lsquo;짝수 카드만&rsquo;은 일부만 다루므로 그 결과를 아무리 모아도 100장 전체가 정리되지 않는다 — <b>partial problem</b>이다.</div>
         </div>
       </div>
     </div>
@@ -1233,8 +1158,7 @@ f(n-1)</pre>
           <table class="tbl sm">
             <tr><th>문제</th><th>점화식</th><th>직접 구한 값</th></tr>
             <tr><td>1부터 n까지의 합</td><td class="mono">f(n−1) + n</td><td class="mono">f(1)=1</td></tr>
-            <tr><td>2×n 격자판 채우기</td><td class="mono">f(n−1) + f(n−2)</td><td class="mono">f(1)=1, f(2)=2</td></tr>
-            <tr><td>1×n 타일 채우기</td><td class="mono">f(n−1) + f(n−2) + f(n−3)</td><td class="mono">f(1)=1, f(2)=2, f(3)=4</td></tr>
+            <tr><td>피보나치수열</td><td class="mono">f(n−1) + f(n−2)</td><td class="mono">f(0)=0, f(1)=1</td></tr>
             <tr><td>별 그리기 · 별의 개수</td><td class="mono">f(n−1) + n + f(n−1)</td><td class="mono">f(1)=1</td></tr>
           </table>
         </div>
@@ -1387,21 +1311,21 @@ function initSum(){
     }});
 }
 
-/* ================= 같은 부분 문제 — 2×n 호출 트리 ================= */
+/* ================= 같은 부분 문제 — 피보나치 호출 트리 ================= */
 function initFib(){
   const svg=document.getElementById('fibSvg'),msg=document.getElementById('fibMsg');
-  const T=buildTree(6,k=>k>2?[{v:k-1},{v:k-2}]:[],680,300,30,270);
+  const T=buildTree(6,k=>k>1?[{v:k-1},{v:k-2}]:[],680,300,30,270);
   function draw(fk){
     const nodes={},edges=[];
     T.forEach(n=>{
-      let st=n.v<=2?'sol':'idle';
+      let st=n.v<=1?'sol':'idle';
       if(fk){st=n.v===fk?'cur':'cut';}
       nodes[n.id]={x:n.x,y:n.y,label:'f'+n.v,st,fs:13};
       if(n.ch)n.ch.forEach(c=>edges.push({a:n.id,b:c.id,cls:fk?'dim':''}));
     });
     paint(svg,nodes,edges,18);
     document.querySelectorAll('[data-fk]').forEach(b=>b.classList.toggle('ghost',+b.dataset.fk!==fk));
-    if(!fk){msg.className='msg';msg.innerHTML='f(6)을 구하려고 함수를 모두 <b>'+T.length+'번</b> 불렀다. 초록은 직접 값을 아는 f(1)=1, f(2)=2다. 버튼을 눌러 같은 부분 문제를 찾아보자.';return;}
+    if(!fk){msg.className='msg';msg.innerHTML='f(6)을 구하려고 함수를 모두 <b>'+T.length+'번</b> 불렀다. 초록은 직접 값을 아는 f(0)=0, f(1)=1이다. 버튼을 눌러 같은 부분 문제를 찾아보자.';return;}
     const c=T.filter(n=>n.v===fk).length;
     msg.className='msg'+(c>1?' cut':'');
     msg.innerHTML='<b>f('+fk+')</b>는 '+c+'번 불렸다.'+(c>1?' 답은 매번 같은데 <b>'+(c-1)+'번은 이미 구한 것을 다시 계산</b>했다.':' 한 번뿐이다.');
@@ -1412,13 +1336,13 @@ function initFib(){
   const r=document.getElementById('fibN');
   function calc(){
     const n=+r.value;
-    const C=[0,1,1];for(let k=3;k<=n;k++)C[k]=1+C[k-1]+C[k-2];
+    const C=[1,1];for(let k=2;k<=n;k++)C[k]=1+C[k-1]+C[k-2];
     document.getElementById('fibNv').textContent='n = '+n;
-    document.getElementById('fibDistinct').textContent=n+'개';
+    document.getElementById('fibDistinct').textContent=(n+1)+'개';
     document.getElementById('fibCalls').textContent=fmt(C[n])+'번';
     const s=C[n]/1e7;
     document.getElementById('fibTime').textContent=s<1?'1초 안':s<60?'약 '+s.toFixed(1)+'초':'약 '+(s/60).toFixed(1)+'분';
-    document.getElementById('fibMemo').textContent=fmt(n-2)+'번';
+    document.getElementById('fibMemo').textContent=fmt(n-1)+'번';
   }
   r.oninput=calc;calc();
 }
@@ -1492,8 +1416,8 @@ function initMergeStep(){
     let m;
     if(j>=R.length){B.push(L[i]);m='오른쪽을 다 썼다(<span class="tt">j &gt; high</span>). 왼쪽 '+L[i]+'을 그대로 옮긴다.';i++;}
     else if(i>=L.length){B.push(R[j]);m='왼쪽을 다 썼다(<span class="tt">i &gt; mid</span>). 오른쪽 '+R[j]+'을 그대로 옮긴다.';j++;}
-    else if(L[i]<=R[j]){B.push(L[i]);m=L[i]+' ≤ '+R[j]+' → 왼쪽 <b>'+L[i]+'</b>을 B에 옮기고 i를 한 칸 민다.';i++;}
-    else{B.push(R[j]);m=L[i]+' &gt; '+R[j]+' → 오른쪽 <b>'+R[j]+'</b>을 B에 옮기고 j를 한 칸 민다.';j++;}
+    else if(L[i]<=R[j]){B.push(L[i]);m=L[i]+' ≤ '+R[j]+' → 왼쪽 <b>'+L[i]+'</b>을 temp에 옮기고 i를 한 칸 민다.';i++;}
+    else{B.push(R[j]);m=L[i]+' &gt; '+R[j]+' → 오른쪽 <b>'+R[j]+'</b>을 temp에 옮기고 j를 한 칸 민다.';j++;}
     steps.push({i,j,B:B.slice(),m:m+(B.length===8?' 비교는 많아야 n번 — 결합은 O(n)이다.':'')});
   }
   const show=(el,arr,p,cls)=>{el.innerHTML='';arr.forEach((v,k)=>{const c=document.createElement('span');c.className='nodechip'+(k<p?' cut':k===p?' '+cls:'');c.textContent=v;el.appendChild(c);});};
@@ -1512,22 +1436,54 @@ function initMergeStep(){
 
 /* ================= 퀵 정렬 ================= */
 function qsPartition(a,lo,hi,log){
+  // 슬라이드의 quick_sort 코드와 같은 순서로, 비교 한 번마다 단계를 기록한다
   const p=a[lo];let i=lo+1,j=hi;
-  while(true){
-    while(i<=hi&&a[i]<=p)i++;
-    while(j>lo&&a[j]>=p)j--;
-    if(i<j){log&&log({a:a.slice(),i,j,sw:[i,j],m:'i는 피벗보다 큰 <b>'+a[i]+'</b>, j는 피벗보다 작은 <b>'+a[j]+'</b>에서 멈췄다 → 교환'});
-      [a[i],a[j]]=[a[j],a[i]];log&&log({a:a.slice(),i,j,m:'교환했다. 계속 찾는다.'});}
-    else break;
+  const L=o=>log&&log(Object.assign({a:a.slice(),i,j},o));
+  while(i<=j){
+    for(let k=i;k<=hi;k++){
+      if(a[k]>p){L({i:k,cmp:k,m:'i: <b>'+a[k]+'</b> &gt; 피벗 '+p+' → 피벗보다 큰 값을 찾았다. <b>i는 여기서 멈춘다.</b>'});break;}
+      L({i:k,cmp:k,m:'i: '+a[k]+' ≤ 피벗 '+p+' → 왼쪽에 있어도 되는 값이다. 한 칸 오른쪽으로.'});
+      i++;
+    }
+    if(i>hi)L({m:'i가 구간 끝을 넘었다. 피벗보다 큰 값이 없다.'});
+    for(let k=j;k>lo;k--){
+      if(a[k]<p){L({j:k,cmp:k,m:'j: <b>'+a[k]+'</b> &lt; 피벗 '+p+' → 피벗보다 작은 값을 찾았다. <b>j는 여기서 멈춘다.</b>'});break;}
+      L({j:k,cmp:k,m:'j: '+a[k]+' ≥ 피벗 '+p+' → 오른쪽에 있어도 되는 값이다. 한 칸 왼쪽으로.'});
+      j--;
+    }
+    if(j===lo)L({m:'j가 피벗 자리까지 왔다. 피벗보다 작은 값이 없다.'});
+    if(i<=j){
+      L({sw:[i,j],m:'i ≤ j → 아직 엇갈리지 않았다. 잘못 놓인 <b>'+a[i]+'</b>과 <b>'+a[j]+'</b>을 교환한다.'});
+      [a[i],a[j]]=[a[j],a[i]];
+      L({m:'교환했다. i와 j가 멈춘 자리부터 다시 찾는다.'});
+    }else if(j===lo){
+      L({m:'i &gt; j → 엇갈렸다. j가 피벗 자리이므로 피벗 '+p+'은 그대로 둔다.'});
+    }else{
+      L({sw:[lo,j],m:'i &gt; j → 엇갈렸다. 피벗 '+p+'과 j 자리의 <b>'+a[j]+'</b>을 교환한다.'});
+      [a[lo],a[j]]=[a[j],a[lo]];
+    }
   }
-  log&&log({a:a.slice(),i,j,sw:[lo,j],m:'i와 j가 엇갈렸다(i='+i+', j='+j+'). 피벗 '+p+'과 j 자리의 <b>'+a[j]+'</b>을 교환한다.'});
-  [a[lo],a[j]]=[a[j],a[lo]];
   return j;
 }
 function initQuick(){
-  const a=[50,80,20,90,40,10,30,60],steps=[{a:a.slice(),m:'맨 앞 <b>50</b>을 피벗으로 고른다.'}];
-  const pj=qsPartition(a,0,a.length-1,s=>steps.push(s));
-  steps.push({a:a.slice(),done:pj,m:'피벗 50이 제자리를 찾았다. 왼쪽은 모두 50보다 작고(<b>부분 문제 1</b>), 오른쪽은 모두 크다(<b>부분 문제 2</b>). 각각을 다시 퀵 정렬한다.'});
+  const a=[50,80,20,90,40,10,30,60],fixed=[],steps=[];
+  const snap=o=>steps.push(Object.assign({a:a.slice(),fixed:fixed.slice()},o));
+  function qs(lo,hi){                       // 교과서 코드의 f(start, end)와 같은 순서로 단계를 기록한다
+    if(lo>hi)return;
+    if(lo===hi){fixed.push(lo);snap({lo,hi,m:'구간 ['+a[lo]+']은 길이 1 → <b>이미 정렬됨</b>. 제자리 확정.'});return;}
+    snap({lo,hi,piv:lo,m:'구간 ['+a.slice(lo,hi+1).join(' ')+']을 정렬한다. 맨 앞 <b>'+a[lo]+'</b>을 피벗으로 고른다.'});
+    const p=qsPartition(a,lo,hi,s=>snap(Object.assign({lo,hi,piv:lo},s)));
+    fixed.push(p);
+    const L=a.slice(lo,p),R=a.slice(p+1,hi+1);
+    const lt=L.length?'왼쪽 ['+L.join(' ')+']은 모두 작고':'왼쪽에는 값이 없고';
+    const rt=R.length?'오른쪽 ['+R.join(' ')+']은 모두 크다':'오른쪽에는 값이 없다';
+    const next=L.length&&R.length?'각각을':'남은 쪽을';
+    snap({lo,hi,piv:p,split:true,m:'피벗 <b>'+a[p]+'</b>이 제자리를 찾았다. '+lt+', '+rt+'. '+next+' 다시 퀵 정렬한다.'});
+    qs(lo,p-1);
+    qs(p+1,hi);
+  }
+  qs(0,a.length-1);
+  snap({lo:0,hi:a.length-1,end:true,m:'모든 값이 제자리를 찾았다 → <b>정렬 완료</b>. 두 쪽을 합치는 결합 단계 없이 끝났다.'});
   const row=document.getElementById('qsRow'),ij=document.getElementById('qsIJ'),msg=document.getElementById('qsMsg');
   bindPlayer({steps,
     nextBtn:document.getElementById('qsNext'),prevBtn:document.getElementById('qsPrev'),
@@ -1536,14 +1492,18 @@ function initQuick(){
       row.innerHTML='';ij.innerHTML='';
       s.a.forEach((v,k)=>{
         const c=document.createElement('span');c.className='nodechip';c.style.minWidth='40px';
-        if(s.done!==undefined){c.classList.add(k===s.done?'top':'');c.style.background=k<s.done?'var(--violet-soft)':k>s.done?'var(--amber-soft)':'';}
-        else if(k===0)c.classList.add('top');
+        if(s.fixed.includes(k)&&k!==s.piv)c.style.background='var(--moss-soft)';
+        if(s.split&&k>=s.lo&&k<s.piv)c.style.background='var(--violet-soft)';
+        if(s.split&&k>s.piv&&k<=s.hi)c.style.background='var(--amber-soft)';
+        if(k===s.piv)c.classList.add('top');
+        if(k<s.lo||k>s.hi)c.style.opacity='.35';   // 지금 정렬하는 구간 밖은 흐리게
+        if(s.cmp===k)c.style.outline='3px solid var(--amber)';   // 지금 피벗과 비교하는 값
         if(s.sw&&s.sw.includes(k))c.style.outline='3px solid var(--sea)';
         c.textContent=v;row.appendChild(c);
         const t=document.createElement('span');t.style.cssText='min-width:40px;text-align:center;color:var(--sea)';
-        t.textContent=s.done===undefined?((s.i===k?'i':'')+(s.j===k?'j':'')):'';ij.appendChild(t);
+        t.textContent=(s.i===k?'i':'')+(s.j===k?'j':'');ij.appendChild(t);
       });
-      msg.className='msg'+(s.done!==undefined?' ok':'');msg.innerHTML=s.m;
+      msg.className='msg'+(s.split||s.end?' ok':'');msg.innerHTML=s.m;
     }});
 
   // 빈칸 트리 — 교과서 212쪽 그림과 같은 배치
@@ -1578,43 +1538,6 @@ function initQuick(){
   document.getElementById('qsAns').onclick=()=>{show=!show;draw();document.getElementById('qsAns').textContent=show?'정답 숨기기':'정답 보기';};
 }
 
-/* ================= 2×n 도미노 ================= */
-function tilings(n){
-  if(n===0)return [[]];if(n<0)return [];
-  const r=[];
-  tilings(n-1).forEach(t=>r.push(t.concat([{c:n-1,v:true}])));
-  tilings(n-2).forEach(t=>r.push(t.concat([{c:n-2,v:false}])));
-  return r;
-}
-function initDomino(){
-  const svg=document.getElementById('domSvg');
-  function draw(n){
-    svg.innerHTML='';
-    const T=tilings(n),u=n===3?30:n===4?26:16,gap=14,ox0=118;
-    const groups=[T.filter(t=>t[t.length-1].v),T.filter(t=>!t[t.length-1].v)];
-    const labels=[['세로 하나로 끝남','f('+(n-1)+') = '+groups[0].length+'가지','#6b4bc4'],['가로 두 개로 끝남','f('+(n-2)+') = '+groups[1].length+'가지','#8a5f04']];
-    groups.forEach((G,gi)=>{
-      const oy=22+gi*(2*u+56);
-      const t1=mk('text',{x:8,y:oy+u-2,fill:labels[gi][2],style:'font-size:13px;font-weight:700'});t1.textContent=labels[gi][0];svg.appendChild(t1);
-      const t2=mk('text',{x:8,y:oy+u+16,fill:'#4a5a70',style:"font-size:12.5px;font-family:'JetBrains Mono'"});t2.textContent=labels[gi][1];svg.appendChild(t2);
-      G.forEach((t,k)=>{
-        const ox=ox0+k*(n*u+gap);
-        t.forEach((d,q)=>{
-          const last=q===t.length-1;
-          const fill=last?(gi===0?'#efeaff':'#fdf3dc'):'#f7f9fc',st=last?(gi===0?'#6b4bc4':'#c98a09'):'#8494a8';
-          if(d.v)svg.appendChild(mk('rect',{x:ox+d.c*u+1,y:oy+1,width:u-2,height:2*u-2,rx:3,fill,stroke:st,'stroke-width':1.6}));
-          else{svg.appendChild(mk('rect',{x:ox+d.c*u+1,y:oy+1,width:2*u-2,height:u-2,rx:3,fill,stroke:st,'stroke-width':1.6}));
-               svg.appendChild(mk('rect',{x:ox+d.c*u+1,y:oy+u+1,width:2*u-2,height:u-2,rx:3,fill,stroke:st,'stroke-width':1.6}));}
-        });
-      });
-    });
-    const e=mk('text',{x:630,y:240,'text-anchor':'end',fill:'#16202e',style:'font-size:14px;font-weight:700'});
-    e.textContent='f('+n+') = '+groups[0].length+' + '+groups[1].length+' = '+T.length;svg.appendChild(e);
-    document.querySelectorAll('[data-dn]').forEach(b=>b.classList.toggle('ghost',+b.dataset.dn!==n));
-  }
-  document.querySelectorAll('[data-dn]').forEach(b=>b.onclick=()=>draw(+b.dataset.dn));
-  draw(4);
-}
 
 /* ================= 별 그리기 ================= */
 function initStars(){
@@ -1639,44 +1562,10 @@ function initStars(){
   document.getElementById('tri2').textContent='     *\n    * *\n   *****\n  *     *\n * *   * *\n***** *****';
 }
 
-/* ================= 1×n 타일 ================= */
-function initTile(){
-  const svg=document.getElementById('tileSvg'),u=34;
-  const rows=[[1,1,1,1],[1,1,2],[1,2,1],[2,1,1],[2,2],[1,3],[3,1]];
-  const col={1:['#f7f9fc','#8494a8'],2:['#e8f0ff','#1d5fd0'],3:['#e2f4ee','#137a5e']};
-  rows.forEach((r,k)=>{
-    const ox=12+(k%4)*128,oy=12+Math.floor(k/4)*52;let x=ox;
-    r.forEach(w=>{svg.appendChild(mk('rect',{x:x+1,y:oy,width:w*u/1.4-2,height:30,rx:4,fill:col[w][0],stroke:col[w][1],'stroke-width':1.6}));x+=w*u/1.4;});
-  });
-  const e=mk('text',{x:510,y:140,'text-anchor':'end',fill:'#4a5a70',style:'font-size:13px;font-weight:600'});e.textContent='n = 4 → 7가지';svg.appendChild(e);
-}
-
-/* ================= 동적 테이블 데모 / 2×n 반복문 ================= */
+/* ================= 동적 테이블 데모 ================= */
 function initDPTable(){
   const demo=document.getElementById('dtDemo');
-  demo.innerHTML='<span class="tt" style="margin-right:6px">data</span>'+[1,2,3,5,8,'·','·'].map((v,k)=>'<span class="nodechip'+(k<5?' done':'')+'" title="data['+(k+1)+']">'+v+'</span>').join('');
-  const N=10,steps=[];
-  const d=Array(N+1).fill(null);
-  steps.push({d:d.slice(),cur:-1,m:'<span class="tt">data = [0] * 1000000</span> — 테이블을 만든다.'});
-  d[1]=1;steps.push({d:d.slice(),cur:1,m:'<span class="tt">data[1] = 1</span> — 직접 구한 값'});
-  d[2]=2;steps.push({d:d.slice(),cur:2,m:'<span class="tt">data[2] = 2</span> — 직접 구한 값'});
-  for(let i=3;i<=N;i++){d[i]=d[i-1]+d[i-2];steps.push({d:d.slice(),cur:i,m:'data['+i+'] = data['+(i-1)+'] + data['+(i-2)+'] = '+d[i-1]+' + '+d[i-2]+' = <b>'+d[i]+'</b>'+(i===N?' — 덧셈은 '+(N-2)+'번뿐이다.':'')});}
-  const row=document.getElementById('dpRow'),msg=document.getElementById('dpMsg');
-  bindPlayer({steps,
-    nextBtn:document.getElementById('dpNext'),prevBtn:document.getElementById('dpPrev'),
-    resetBtn:document.getElementById('dpReset'),stepLabel:document.getElementById('dpStep'),
-    render(s){
-      row.innerHTML='';
-      for(let k=1;k<=N;k++){
-        const c=document.createElement('div');
-        const isCur=k===s.cur,isSrc=s.cur>2&&(k===s.cur-1||k===s.cur-2);
-        c.style.cssText='border:1px solid var(--line);border-radius:8px;text-align:center;font-family:JetBrains Mono;padding:4px 0;'+
-          (isCur?'background:var(--moss);color:#fff;border-color:var(--moss)':isSrc?'background:var(--sea-soft);border-color:#c6dbff':'');
-        c.innerHTML='<div style="font-size:11px;opacity:.7">'+k+'</div><div style="font-weight:700;font-size:15px">'+(s.d[k]===null?'·':s.d[k])+'</div>';
-        row.appendChild(c);
-      }
-      msg.className='msg'+(s.cur===N?' ok':'');msg.innerHTML=s.m;
-    }});
+  demo.innerHTML='<span class="tt" style="margin-right:6px">data</span>'+[0,1,1,2,3,5,'·','·'].map((v,k)=>'<span class="nodechip'+(k<6?' done':'')+'" title="data['+k+']">'+v+'</span>').join('');
 }
 
 /* ================= 공사 중인 계단 ================= */
@@ -1776,7 +1665,7 @@ function initCoin(){
 function initAll(){
   initQuiz();initReveal();
   initSum();initFib();
-  initDC();initMerge();initMergeStep();initQuick();initDomino();initStars();initTile();
+  initDC();initMerge();initMergeStep();initQuick();initStars();
   initDPTable();initBlocked();initUJ();initOct();initCoin();
 }
 </script>
@@ -1786,7 +1675,8 @@ let SLIDES=[],idx=0;
 function mount(){
   const deck=document.getElementById('deck');
   SLIDES=[...deck.querySelectorAll('.slide')];
-  show(0);
+  const n=parseInt(location.hash.slice(1),10);   // 새로고침해도 #번호의 슬라이드부터
+  show(n>=1&&n<=SLIDES.length?n-1:0);
 }
 function show(i){
   if(i<0||i>=SLIDES.length)return;
@@ -1794,6 +1684,7 @@ function show(i){
   SLIDES[i].classList.add('active');
   SLIDES[i].scrollTop=0;
   idx=i;
+  history.replaceState(null,'','#'+(i+1));
   document.getElementById('counter').textContent=(i+1)+' / '+SLIDES.length;
   document.getElementById('slidename').textContent=SLIDES[i].dataset.name||'';
   document.getElementById('progress').style.width=((i+1)/SLIDES.length*100)+'%';
