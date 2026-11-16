@@ -270,8 +270,6 @@ pre.code.sm .hl{width:calc(100% + 14px);margin-left:-14px;padding-left:11px}
       <tr><td class="c"><b>7</b></td><td>공사 중인 계단 <span class="tag moss">동적 계획</span></td><td>바로 아래 세 칸의 합, 공사 칸은 0</td><td class="c mono">106 · 5</td></tr>
       <tr><td class="c"><b>8</b></td><td>엄지와 지수 <span class="tag amber">대단원</span></td><td>네 칸의 합</td><td class="c mono">2317</td></tr>
       <tr><td class="c"><b>9</b></td><td>문어 강강술래 <span class="tag amber">대단원</span></td><td>이웃한 손 번호는 달라야 한다</td><td class="c mono">1212…</td></tr>
-      <tr><td class="c"><b>10 · 11</b></td><td>동전 줍기 <span class="tag amber">대단원</span></td><td>줍는다 vs 건너뛴다 중 큰 쪽</td><td class="c mono">33</td></tr>
-      <tr><td class="c"><b>심화</b></td><td>영일이의 계단 오르기 <span class="tag violet">지도서</span></td><td>3칸 뒤 몇 번 움직였는지를 상태로</td><td class="c mono">7 · 73</td></tr>
     </table>
   </div>
 </section>
@@ -499,63 +497,6 @@ pre.code.sm .hl{width:calc(100% + 14px);margin-left:-14px;padding-left:11px}
   </div>
 </section>
 
-<!-- 문제 10 · 11 -->
-<section class="slide" data-name="문제 10 · 11 · 동전 줍기">
-  <div class="eyebrow">문제 10 · 11 · 대단원 마무리 11</div>
-  <h1 class="title"><span class="qnum">10</span>동전 줍기 — 뒤에서부터 표를 채운다</h1>
-  <div class="ctrlbar" style="margin-top:0">
-    <button class="btn ghost sm" id="cReset">처음으로</button>
-    <button class="btn ghost sm" id="cPrev">◀ 이전</button>
-    <button class="btn sm" id="cNext">다음 ▶</button>
-    <button class="btn ghost sm" id="cEnd">끝까지</button>
-    <span class="mono" id="cStep" style="font-size:13px;color:var(--ink-soft)"></span>
-  </div>
-  <div class="msg" id="cMsg" style="margin-bottom:12px"></div>
-  <div class="body stack">
-    <div class="fig mid"><svg id="c1" viewBox="0 0 860 296"></svg></div>
-    <div class="grid3" style="grid-template-columns:1.2fr 1fr 1fr;align-items:start">
-      <div class="card flat">
-        <h4>data[x][y]</h4>
-        <p style="font-size:14.5px;margin:4px 0 8px">x번째 동전부터 끝까지 남은 동전으로 얻을 수 있는 <b>최대 금액</b><br><span style="color:var(--ink-soft)">(바로 앞까지 y개를 연속으로 주운 상태에서)</span></p>
-        <ul class="clean" style="font-size:14.5px">
-          <li><b>줍는다</b> → <span class="mono">data[x+1][y+1] + coin[x]</span></li>
-          <li><b>건너뛴다</b> → <span class="mono">data[x+1][0]</span></li>
-          <li><b>y = 2</b> 이면 더 주울 수 없다 → 건너뛰기만</li>
-        </ul>
-      </div>
-      <div class="codebox" data-code="p10"><div class="revealbtn"><button class="toggle">문제 10 코드 보기</button><span class="hint">교과서 재귀 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
-      <div class="codebox" data-code="p11"><div class="revealbtn"><button class="toggle">문제 11 빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- 심화 -->
-<section class="slide" data-name="심화 · 영일이의 계단 오르기">
-  <div class="eyebrow">심화 · 지도서 205쪽</div>
-  <h1 class="title"><span class="qnum" style="width:auto;padding:0 8px">심화</span>영일이의 계단 — 3칸 뒤에 몇 번 움직였나</h1>
-  <div class="body grid2">
-    <div class="stack">
-      <div class="fig short"><svg id="y1" viewBox="0 0 870 260"></svg></div>
-      <div class="card flat">
-        <h4>N = 4 일 때 data[x][y]</h4>
-        <table class="tbl sm" style="background:#fff">
-          <tr><th class="c">x</th><th class="c">y = 0</th><th class="c">y = 1</th><th class="c">y = 2</th></tr>
-          <tr><td class="c mono"><b>0</b></td><td class="c mono">5</td><td class="c mono">6</td><td class="c mono" style="background:var(--moss-soft);color:var(--moss);font-weight:700">7</td></tr>
-          <tr><td class="c mono">1</td><td class="c mono">3</td><td class="c mono">3</td><td class="c mono">4</td></tr>
-          <tr><td class="c mono">2</td><td class="c mono">2</td><td class="c mono">2</td><td class="c mono">2</td></tr>
-          <tr><td class="c mono">3</td><td class="c mono">1</td><td class="c mono">1</td><td class="c mono">1</td></tr>
-          <tr><td class="c mono">4 (꼭대기)</td><td class="c mono">1</td><td class="c mono">1</td><td class="c mono">1</td></tr>
-        </table>
-        <p style="font-size:14px;margin-top:8px;color:var(--ink-soft)">처음에는 바로 3칸을 오를 수 있으므로 답은 <span class="mono">data[0][2]</span>.</p>
-      </div>
-    </div>
-    <div class="stack">
-      <div class="fig"><svg id="y2" viewBox="0 0 800 380"></svg></div>
-      <div class="codebox" data-code="py"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
-    </div>
-  </div>
-</section>
-
 <!-- 생각해 보기 -->
 <section class="slide" data-name="생각해 보기">
   <div class="eyebrow">생각해 보기</div>
@@ -605,9 +546,9 @@ pre.code.sm .hl{width:calc(100% + 14px);margin-left:-14px;padding-left:11px}
       <div class="card moss">
         <h3>동적 계획법</h3>
         <ul class="clean moss">
-          <li>같은 부분 문제가 <b>여러 번</b> 나온다 — 별 개수, 계단, 동전</li>
+          <li>같은 부분 문제가 <b>여러 번</b> 나온다 — 별 개수, 계단</li>
           <li>작은 것부터 <b>한 번씩만</b> 구해 표(리스트)에 적는다</li>
-          <li>상태가 하나로 모자라면 <b>칸을 하나 더</b> — X[a][b], data[x][y]</li>
+          <li>상태가 하나로 모자라면 <b>칸을 하나 더</b> — X[a][b]</li>
         </ul>
       </div>
     </div>
@@ -617,8 +558,6 @@ pre.code.sm .hl{width:calc(100% + 14px);margin-left:-14px;padding-left:11px}
       <tr><td>6 · 별 개수 세기</td><td class="mono">data[i] = 3·data[i−1] + 2i</td><td class="c mono">data[1] = 1</td></tr>
       <tr><td>7 · 공사 중인 계단</td><td class="mono">data[i] = data[i−1] + data[i−2] + data[i−3], data[m] = 0</td><td class="c mono">data[0] = 1</td></tr>
       <tr><td>8 · 엄지와 지수</td><td class="mono">X[a][b] = 네 칸 X[a−da][b−db] 의 합</td><td class="c mono">X[0][0] = 1</td></tr>
-      <tr><td>11 · 동전 줍기</td><td class="mono">data[x][y] = max(data[x+1][y+1] + coin[x], data[x+1][0])</td><td class="c mono">data[n][·] = 0</td></tr>
-      <tr><td>심화 · 영일이</td><td class="mono">data[x][y] = 1칸 + 2칸 (+ 3칸, y = 2일 때만)</td><td class="c mono">data[N][·] = 1</td></tr>
     </table>
   </div>
 </section>
@@ -850,47 +789,6 @@ p9: `def smallest(n):
 
 for n in [4, 5, 10, 11]:
     print('n =', n, ':', smallest(n))`,
-p10: `def f(x, y):
-    if y == 3:
-        return -10000
-    if x == n:
-        return 0
-    return max(f(x + 1, y + 1) + ni[x], f(x + 1, 0))
-
-
-n = int(input())
-ni = list(map(int, input().split()))
-print(f(0, 0))`,
-p11: `n = int(input())
-coin = list(map(int, input().split()))
-data = [[0 for i in range(4)] for j in range(n + 1)]
-for x in range(n - 1, -1, -1):
-    for y in range(2, -1, -1):
-        if y == 2:
-»            data[x][y] = data[x + 1][0]
-        else:
-»            data[x][y] = max(data[x + 1][y + 1] + coin[x], data[x + 1][0])
-print(data[0][0])`,
-py: `def solve(N):
-    # data[x][y] = x번째 칸에서 꼭대기까지 가는 방법의 수
-    # y = 마지막 3칸 이후 움직인 횟수 (2 이상은 2로 본다)
-    data = [[0] * 3 for _ in range(N + 3)]
-    for y in range(3):
-        data[N][y] = 1
-    for x in range(N - 1, -1, -1):  # 뒤에서부터 채운다
-        for y in range(3):
-            ny = min(y + 1, 2)
-            r = 0
-»            r = r + data[x + 1][ny]          # 1칸 오르기
-»            r = r + data[x + 2][ny]          # 2칸 오르기
-            if y == 2:
-»                r = r + data[x + 3][0]       # 3칸 오르기
-            data[x][y] = r % 1000000007
-    return data[0][2]              # 처음에는 바로 3칸을 오를 수 있다
-
-
-for N in [4, 8, 10000]:
-    print('N =', N, ':', solve(N))`,
 th: `def f(k):
     if k == 1:
         return 1
@@ -1492,141 +1390,6 @@ function figO() {
   T(svg, 300, 20, '시계 방향 →', 'axn', {'text-anchor': 'middle'});
 }
 
-/* ===== 문제 10 · 11 : 동전 ===== */
-const COIN = [6, 10, 13, 9, 8, 1];
-const CD = (() => {
-  const n = COIN.length;
-  const D = [];
-  for (let x = 0; x <= n; x++) D.push([0, 0, 0, 0]);
-  for (let x = n - 1; x >= 0; x--) for (let y = 2; y >= 0; y--) {
-    D[x][y] = y === 2 ? D[x + 1][0] : Math.max(D[x + 1][y + 1] + COIN[x], D[x + 1][0]);
-  }
-  return D;
-})();
-const CPATH = (() => {
-  const p = [[0, 0]];
-  let x = 0, y = 0;
-  while (x < COIN.length) {
-    if (y < 2 && CD[x + 1][y + 1] + COIN[x] >= CD[x + 1][0]) y = y + 1;
-    else y = 0;
-    x = x + 1;
-    p.push([x, y]);
-  }
-  return p;
-})();
-let cS = 0;
-function figC() {
-  const svg = $('c1');
-  svg.innerHTML = '';
-  defs(svg);
-  const n = COIN.length, last = n + 1;
-  const cx = x => 150 + x * 100, ry = y => 106 + y * 54;
-  const done = cS === last;
-  const curX = cS >= 1 && cS <= n ? n - cS : -1;
-  const picked = new Set();
-  if (done) CPATH.forEach((p, k) => { if (k > 0 && p[1] > 0) picked.add(p[0] - 1); });
-  COIN.forEach((v, x) => {
-    const on = picked.has(x);
-    E('circle', {cx: cx(x), cy: 40, r: 25, fill: done ? (on ? C.amber : '#f3f6fa') : '#fdf3dc', stroke: done && !on ? '#d5dde8' : C.amber, 'stroke-width': 2}, svg);
-    T(svg, cx(x), 45, String(v), 'lm', {'text-anchor': 'middle', fill: done ? (on ? '#fff' : '#b5c0cf') : '#8a5f04', style: 'font-size:15px;font-weight:700'});
-  });
-  for (let x = 0; x <= n; x++) T(svg, cx(x), 86, x === n ? 'x = 6 (끝)' : 'x = ' + x, 'axn', {'text-anchor': 'middle'});
-  ['y = 0', 'y = 1', 'y = 2'].forEach((s, y) => T(svg, 20, ry(y) + 27, s, 'lm', {fill: C.soft}));
-  const onPath = (x, y) => done && CPATH.some(p => p[0] === x && p[1] === y);
-  for (let x = 0; x <= n; x++) for (let y = 0; y <= 2; y++) {
-    const filled = x >= n - cS || done;
-    let cls = filled ? '' : 'dash';
-    if (filled && x === curX) cls = 'sea';
-    if (curX >= 0 && x === curX + 1) cls = 'amber';
-    if (onPath(x, y)) cls = x === 0 ? 'Smoss' : 'moss';
-    box(svg, cx(x) - 36, ry(y) + 5, 72, 44, filled ? CD[x][y] : '', cls);
-  }
-  if (done) {
-    for (let k = 0; k + 1 < CPATH.length; k++) {
-      const [x1, y1] = CPATH[k], [x2, y2] = CPATH[k + 1];
-      const pick = y2 > 0;
-      arr(svg, svg, `M${cx(x1) + 36},${ry(y1) + 27} L${cx(x2) - 40},${ry(y2) + 27}`, pick ? 'amber' : 'gray', {w: 2.2, dash: pick ? null : '5 4'});
-    }
-  } else if (cS < last) {
-    T(svg, cx(0) - 36, 288, '← 뒤에서부터 채운다', 'lbl', {fill: C.sea});
-  }
-  const msg = $('cMsg');
-  if (cS === 0) {
-    msg.className = 'msg';
-    msg.innerHTML = '<b>x = 6</b> — 동전이 더 없다. 어떤 y든 더 주울 금액은 <b>0</b>. 여기서 출발해 왼쪽으로 채운다.';
-  } else if (!done) {
-    const x = curX, c = COIN[x], D = CD;
-    msg.className = 'msg';
-    msg.innerHTML = `<b>x = ${x}</b> (동전 ${c}) &nbsp; y=0 : max(${D[x + 1][1]} + ${c}, ${D[x + 1][0]}) = <b>${D[x][0]}</b> &nbsp;·&nbsp; y=1 : max(${D[x + 1][2]} + ${c}, ${D[x + 1][0]}) = <b>${D[x][1]}</b> &nbsp;·&nbsp; y=2 : ${D[x + 1][0]} <span style="color:var(--ink-soft)">(못 주움)</span> = <b>${D[x][2]}</b>`;
-  } else {
-    msg.className = 'msg ok';
-    msg.innerHTML = `<b>data[0][0] = ${CD[0][0]}</b> — 앞에서부터 큰 쪽을 따라가면 <b>6 + 10</b>, 13은 건너뛰고, <b>9 + 8</b>, 1은 세 개 연속이 되므로 건너뛴다.`;
-  }
-  $('cStep').textContent = (cS + 1) + ' / ' + (last + 1);
-  $('cPrev').disabled = cS === 0;
-  $('cNext').disabled = cS === last;
-}
-function initC() {
-  const last = COIN.length + 1;
-  $('cNext').onclick = () => { if (cS < last) cS++; figC(); };
-  $('cPrev').onclick = () => { if (cS > 0) cS--; figC(); };
-  $('cReset').onclick = () => { cS = 0; figC(); };
-  $('cEnd').onclick = () => { cS = last; figC(); };
-  figC();
-}
-
-/* ===== 심화 : 영일이 ===== */
-function figY1() {
-  const svg = $('y1');
-  defs(svg);
-  const S = [[170, 120, 'y = 0', '방금 3칸'], [420, 120, 'y = 1', '3칸 후 1번'], [670, 120, 'y = 2', '3칸 가능']];
-  arr(svg, svg, 'M214,120 L372,120', 'sea', {w: 2});
-  T(svg, 293, 108, '1칸 · 2칸', 'lm', {'text-anchor': 'middle', fill: C.sea});
-  arr(svg, svg, 'M464,120 L622,120', 'sea', {w: 2});
-  T(svg, 543, 108, '1칸 · 2칸', 'lm', {'text-anchor': 'middle', fill: C.sea});
-  arr(svg, svg, 'M648,82 C628,22 712,22 692,80', 'sea', {w: 2});
-  T(svg, 670, 22, '1칸 · 2칸', 'lm', {'text-anchor': 'middle', fill: C.sea});
-  arr(svg, svg, 'M650,160 C560,250 280,250 192,162', 'coral', {w: 2.5});
-  T(svg, 420, 232, '3칸', 'lblb', {'text-anchor': 'middle', fill: C.coral});
-  arr(svg, svg, 'M800,120 L718,120', 'gray', {w: 2});
-  T(svg, 806, 116, '출발', 'lbl', {fill: C.soft});
-  T(svg, 806, 134, '(처음엔', 'axn');
-  T(svg, 806, 150, ' 3칸 가능)', 'axn');
-  S.forEach(([x, y, a, b], k) => {
-    E('circle', {cx: x, cy: y, r: 44, fill: k === 2 ? '#e2f4ee' : '#fff', stroke: k === 2 ? C.moss : C.ink, 'stroke-width': 2}, svg);
-    T(svg, x, y - 2, a, 'lm', {'text-anchor': 'middle', fill: C.ink, style: 'font-size:15px;font-weight:700'});
-    T(svg, x, y + 18, b, 'lbl', {'text-anchor': 'middle', style: 'font-size:12px'});
-  });
-}
-function figY2() {
-  const svg = $('y2');
-  function draw(x0, sp, y, moves, ok, total) {
-    for (let p = 0; p <= total; p++) E('circle', {cx: x0 + p * sp, cy: y, r: 3, fill: '#c3cedd'}, svg);
-    let pos = 0, last3 = -9;
-    moves.forEach((mv, k) => {
-      const bad = mv === 3 && k - last3 <= 2;
-      if (mv === 3) last3 = k;
-      const a = x0 + pos * sp, b = x0 + (pos + mv) * sp, h = 8 + mv * 8;
-      E('path', {d: `M${a},${y} Q${(a + b) / 2},${y - 2 * h} ${b},${y}`, fill: 'none', stroke: mv === 3 ? C.coral : C.sea, 'stroke-width': 2, 'stroke-dasharray': bad ? '4 3' : 'none'}, svg);
-      if (bad) T(svg, (a + b) / 2, y - h - 4, '✗', 'lblb', {'text-anchor': 'middle', fill: C.coral, style: 'font-size:13px'});
-      pos += mv;
-    });
-    T(svg, x0 + total * sp + 14, y + 5, ok ? '✓' : '✗', 'lblb', {fill: ok ? C.moss : C.coral});
-  }
-  T(svg, 20, 22, '4칸 — 7가지', 'lblb', {style: 'font-size:14px'});
-  T(svg, 360, 22, '8칸 — 되는 것 · 안 되는 것', 'lblb', {style: 'font-size:14px'});
-  ['1111', '112', '121', '211', '22', '13', '31'].forEach((s, k) => {
-    const y = 74 + k * 44;
-    T(svg, 20, y + 5, s.split('').join(' '), 'lm');
-    draw(110, 42, y, s.split('').map(Number), true, 4);
-  });
-  [[[3, 1, 2, 1, 1], true], [[1, 2, 1, 2, 2], true], [[3, 3, 2], false], [[2, 3, 3], false], [[3, 2, 3], false]].forEach(([mv, ok], k) => {
-    const y = 74 + k * 60;
-    T(svg, 360, y + 5, mv.join(' '), 'lm');
-    draw(470, 34, y, mv, ok, 8);
-  });
-}
-
 /* ===== 생각해 보기 : 트리 vs 사슬 ===== */
 function figTh() {
   const svg = $('th');
@@ -1698,9 +1461,6 @@ window.addEventListener('DOMContentLoaded', () => {
   initSt();
   figX();
   figO();
-  initC();
-  figY1();
-  figY2();
   figTh();
   const h = location.hash.match(/^#(\d+)$/);
   show(h ? Math.min(+h[1] - 1, SLIDES.length - 1) : 0);
