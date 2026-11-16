@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6차시 · 교과서 문제 풀이</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202e; --ink-soft:#4a5a70; --line:#dfe5ee; --paper:#f7f9fc; --white:#fff;
+  --sea:#1d5fd0; --sea-soft:#e8f0ff;
+  --coral:#e0533d; --coral-soft:#fdece8;
+  --moss:#137a5e; --moss-soft:#e2f4ee;
+  --amber:#c98a09; --amber-soft:#fdf3dc;
+  --violet:#6b4bc4; --violet-soft:#efeaff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'IBM Plex Sans KR',sans-serif;background:var(--paper);color:var(--ink);overflow:hidden}
+code,kbd,pre,.mono{font-family:'JetBrains Mono','IBM Plex Sans KR',monospace}
+
+#deck{position:relative;width:100vw;height:100vh}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:34px 56px 72px;background:var(--white);overflow-y:auto;overflow-x:hidden}
+.slide.active{display:flex;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}}
+.slide::-webkit-scrollbar{width:9px}
+.slide::-webkit-scrollbar-thumb{background:#c8d2e0;border-radius:9px}
+
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.14em;color:var(--sea);margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--line)}
+h1.title{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.25;margin-bottom:14px}
+.sub{font-size:16px;color:var(--ink-soft);margin-bottom:18px;line-height:1.65}
+p{line-height:1.75;font-size:16px}
+.body{flex:1 0 auto;min-height:0}
+
+ul.clean{list-style:none}
+ul.clean li{position:relative;padding-left:20px;line-height:1.8;font-size:15.5px;margin-bottom:5px}
+ul.clean li::before{content:"";position:absolute;left:2px;top:.75em;width:7px;height:7px;border-radius:2px;background:var(--sea)}
+ul.clean.moss li::before{background:var(--moss)}
+ul.clean.coral li::before{background:var(--coral)}
+ol.num{padding-left:22px}
+ol.num li{line-height:1.8;font-size:15.5px;margin-bottom:5px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid-1-2{display:grid;grid-template-columns:1fr 1.35fr;gap:20px}
+.grid-2-1{display:grid;grid-template-columns:1.35fr 1fr;gap:20px}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.card h3{font-size:17px;font-weight:700;margin-bottom:10px}
+.card h4{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--ink-soft);letter-spacing:.04em}
+.card.sea{background:var(--sea-soft);border-color:#c6dbff}
+.card.moss{background:var(--moss-soft);border-color:#bfe6d8}
+.card.coral{background:var(--coral-soft);border-color:#f7cec4}
+.card.amber{background:var(--amber-soft);border-color:#f0dfae}
+.card.violet{background:var(--violet-soft);border-color:#d8ccff}
+.card.flat{background:var(--paper)}
+
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--sea-soft);color:var(--sea)}
+.tag.moss{background:var(--moss-soft);color:var(--moss)}
+.tag.coral{background:var(--coral-soft);color:var(--coral)}
+.tag.amber{background:var(--amber-soft);color:#8a5f04}
+.tag.violet{background:var(--violet-soft);color:var(--violet)}
+.tag.gray{background:#eef1f6;color:var(--ink-soft)}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:15px}
+table.tbl th,table.tbl td{border:1px solid var(--line);padding:8px 11px;text-align:left;line-height:1.55;vertical-align:top}
+table.tbl th{background:var(--paper);font-weight:600;font-size:14px}
+table.tbl td.c,table.tbl th.c{text-align:center}
+table.tbl.sm{font-size:13.5px}
+table.tbl.sm th,table.tbl.sm td{padding:5px 8px}
+table.tbl .mono{font-family:'JetBrains Mono'}
+
+pre.code{background:#111a26;color:#dbe6f4;border-radius:12px;padding:15px 17px;font-size:14px;line-height:1.62;overflow:auto;font-family:'JetBrains Mono',monospace}
+pre.code.sm{font-size:12.8px;line-height:1.58;padding:12px 14px}
+pre.code .kw{color:#ff9d7a}
+pre.code .fn{color:#7fd3ff}
+pre.code .st{color:#9be59b}
+pre.code .cm{color:#7e93ab;font-style:italic}
+pre.code .nm{color:#e2c07d}
+pre.code .hl{background:#2a3346;display:inline-block;width:100%;margin-left:-17px;padding-left:14px;border-left:3px solid var(--amber)}
+
+.codebox{border:1px dashed #c9d3e0;border-radius:12px;padding:12px;background:var(--paper)}
+.codebox.open{border-style:solid;border-color:var(--line);background:transparent;padding:0}
+.codebox .codewrap{display:none}
+.codebox.open .codewrap{display:block}
+.codebox .revealbtn{display:flex;align-items:center;gap:8px}
+.codebox.open .hint{display:none}
+.codebox .hint{font-size:13.5px;color:var(--ink-soft)}
+.codebox .toggle{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 15px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink)}
+.codebox .toggle:hover{background:var(--sea);color:#fff;border-color:var(--sea)}
+.codebox.open .toggle{margin-bottom:10px}
+.callout{border-left:4px solid var(--sea);background:var(--sea-soft);padding:12px 16px;border-radius:0 10px 10px 0;font-size:15px;line-height:1.7}
+.callout.coral{border-color:var(--coral);background:var(--coral-soft)}
+.callout.moss{border-color:var(--moss);background:var(--moss-soft)}
+.callout.amber{border-color:var(--amber);background:var(--amber-soft)}
+.callout b{font-weight:700}
+
+.io{display:grid;grid-template-columns:auto 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-family:'JetBrains Mono';font-size:14px}
+.io div{padding:8px 12px;border-bottom:1px solid var(--line)}
+.io div:nth-child(2n+1){background:var(--paper);font-weight:600;color:var(--ink-soft);border-right:1px solid var(--line)}
+.io div:nth-last-child(-n+2){border-bottom:none}
+
+.ctrlbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:12px 0}
+.btn{border:none;border-radius:9px;padding:8px 15px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--sea);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.coral{background:var(--coral)}
+.btn.moss{background:var(--moss)}
+input[type=number],input[type=text]{font-family:'JetBrains Mono';font-size:15px;padding:7px 11px;border:1px solid var(--line);border-radius:9px;width:110px;background:#fff;color:var(--ink)}
+input[type=range]{width:230px}
+
+.msg{font-size:15px;line-height:1.65;padding:11px 14px;border-radius:11px;background:var(--sea-soft);border:1px solid #cfe0ff;min-height:56px}
+.msg b{color:var(--sea)}
+.msg.ok{background:var(--moss-soft);border-color:#bfe6d8}
+.msg.ok b{color:var(--moss)}
+.msg.warn{background:var(--amber-soft);border-color:#f0dfae}
+.msg.warn b{color:#8a5f04}
+
+.numgrid{display:flex;flex-wrap:wrap;gap:5px}
+.numgrid span{width:34px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;font-family:'JetBrains Mono';font-size:13.5px;background:var(--paper);border:1px solid var(--line);color:#93a1b3;cursor:default}
+.numgrid span.on{background:var(--moss);color:#fff;border-color:var(--moss);font-weight:700}
+.numgrid.click span{cursor:pointer}
+.numgrid.click span:hover{outline:2px solid var(--sea)}
+.bignum{font-family:'JetBrains Mono';font-size:26px;font-weight:700;color:var(--sea);line-height:1.25}
+.bignum small{display:block;font-family:'IBM Plex Sans KR';font-size:13px;font-weight:500;color:var(--ink-soft)}
+
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;min-height:34px;align-items:center}
+.chip{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;padding:0 10px;border-radius:8px;font-weight:700;font-size:14px;font-family:'JetBrains Mono';background:var(--paper);border:1px solid var(--line)}
+.chip.on{background:var(--moss);color:#fff;border-color:var(--moss)}
+.chip.cur{background:var(--coral);color:#fff;border-color:var(--coral)}
+.grid3{display:grid;grid-template-columns:0.95fr 0.8fr 1.15fr;gap:18px}
+.grouplist{display:flex;flex-direction:column;gap:7px}
+.grp{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.grpk{font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:var(--sea);min-width:58px;flex:none}
+.chip .lp{color:#ffd97d}
+/* 호출 스택 위젯 */
+.stackbox{display:flex;flex-direction:column-reverse;gap:5px;min-height:210px;justify-content:flex-start;
+  padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.frm{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:9px;font-family:'JetBrains Mono';
+  font-size:14px;background:#fff;border:1px solid var(--line);color:var(--ink-soft)}
+.frm b{font-size:15px;color:var(--ink)}
+.frm.top{background:var(--coral);border-color:var(--coral);color:#ffd9d2}
+.frm.top b{color:#fff}
+.frm .sep{flex:1}
+.stackbase{font-size:12px;color:#a9b5c6;text-align:center;padding-bottom:4px;border-bottom:1px dashed var(--line);margin-bottom:4px}
+.trace{border-collapse:collapse;width:100%;font-size:13.5px;font-family:'JetBrains Mono'}
+.trace td{border:1px solid var(--line);padding:5px 8px;line-height:1.5}
+.trace td.k{white-space:nowrap;width:1%}
+.trace tr.live td{background:var(--coral-soft)}
+.trace tr.doneR td{background:var(--moss-soft)}
+.q{color:var(--coral);font-weight:700}
+.v{color:var(--moss);font-weight:700}
+.empty{color:#a9b5c6;font-size:14px}
+
+.vizstage{border:1px solid var(--line);border-radius:14px;background:#fcfdff;padding:6px}
+.vizstage svg{width:100%;display:block}
+.gnode text{font-family:'JetBrains Mono';font-weight:700;pointer-events:none}
+.gedge{stroke:#c3cedd;stroke-width:2.5}
+.gedge.path{stroke:var(--moss);stroke-width:4}
+.gedge.dim{stroke:#e9eef4}
+.elabel{font-family:'JetBrains Mono';font-size:12px;font-weight:700;fill:#57687e}
+
+.cover{justify-content:center;background:linear-gradient(160deg,#fff 0%,#f2f6fd 100%)}
+.cover .num{font-size:14px;font-weight:600;letter-spacing:.16em;color:var(--sea);margin-bottom:14px}
+.cover h1{font-size:46px;font-weight:700;line-height:1.22;letter-spacing:-.025em;margin-bottom:18px}
+.cover .kws{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.footnote{font-size:13.5px;color:var(--ink-soft);line-height:1.8}
+
+.qnum{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:var(--sea);color:#fff;font-weight:700;font-size:15px;margin-right:9px;font-family:'JetBrains Mono'}
+
+#nav{position:fixed;left:0;right:0;bottom:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(255,255,255,.95);border-top:1px solid var(--line);z-index:50}
+#nav .left{display:flex;align-items:center;gap:12px}
+#nav .chip2{font-size:13px;color:var(--ink-soft);font-weight:500}
+.navbtn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 14px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);font-family:inherit}
+.navbtn:hover{background:var(--sea);color:#fff;border-color:var(--sea)}
+.navbtn:disabled{opacity:.35;cursor:default}
+.navbtn:disabled:hover{background:#fff;color:var(--ink);border-color:var(--line)}
+#progress{position:fixed;top:0;left:0;height:3px;background:var(--sea);z-index:60;transition:width .3s}
+#slidename{font-size:13px;color:var(--ink-soft);max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kbdkey{display:inline-block;border:1px solid #c9d3e0;border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:13px;background:#fff;font-family:'JetBrains Mono'}
+
+/* ── 6차시 풀이 : 그림 ───────────── */
+.fig{border:1px solid var(--line);border-radius:14px;background:#fcfdff;padding:10px 12px}
+.fig svg{width:100%;height:auto;max-height:64vh;display:block}
+.fig.short svg{max-height:40vh}
+.fig.mid svg{max-height:50vh}
+.figcap{font-size:14px;color:var(--ink-soft);margin-top:8px;line-height:1.6}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-soft);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.body.grid2,.body.grid-2-1,.body.grid-1-2{align-items:start}
+pre.code{font-variant-ligatures:none}
+.btn.ghost.on{background:var(--sea);color:#fff;border-color:var(--sea)}
+.bx rect{fill:#fff;stroke:#c3cedd;stroke-width:1.5}
+.bx text{font:700 14px 'JetBrains Mono',monospace;fill:#16202e;text-anchor:middle;dominant-baseline:central}
+.bx.sea rect{fill:#e8f0ff;stroke:#1d5fd0} .bx.sea text{fill:#1d5fd0}
+.bx.moss rect{fill:#e2f4ee;stroke:#137a5e} .bx.moss text{fill:#137a5e}
+.bx.coral rect{fill:#fdece8;stroke:#e0533d} .bx.coral text{fill:#e0533d}
+.bx.amber rect{fill:#fdf3dc;stroke:#c98a09} .bx.amber text{fill:#8a5f04}
+.bx.violet rect{fill:#efeaff;stroke:#6b4bc4} .bx.violet text{fill:#6b4bc4}
+.bx.dim rect{fill:#f7f9fc;stroke:#e4eaf2} .bx.dim text{fill:#c0cad8}
+.bx.Smoss rect{fill:#137a5e;stroke:#137a5e} .bx.Smoss text{fill:#fff}
+.bx.Scoral rect{fill:#e0533d;stroke:#e0533d} .bx.Scoral text{fill:#fff}
+.bx.Ssea rect{fill:#1d5fd0;stroke:#1d5fd0} .bx.Ssea text{fill:#fff}
+.bx.Samber rect{fill:#c98a09;stroke:#c98a09} .bx.Samber text{fill:#fff}
+.bx.Sviolet rect{fill:#6b4bc4;stroke:#6b4bc4} .bx.Sviolet text{fill:#fff}
+.bx.dash rect{fill:none;stroke:#c3cedd;stroke-dasharray:4 3} .bx.dash text{fill:#a9b5c6;font-weight:500}
+.lbl{font:500 13px 'IBM Plex Sans KR',sans-serif;fill:#4a5a70}
+.lblb{font:700 15px 'IBM Plex Sans KR',sans-serif;fill:#16202e}
+.lm{font:600 13px 'JetBrains Mono',monospace;fill:#4a5a70}
+.axn{font:500 11.5px 'JetBrains Mono',monospace;fill:#93a1b3}
+.ln{stroke:#c3cedd;stroke-width:1.6;fill:none}
+.clickable{cursor:pointer}
+.steps3{display:flex;gap:8px;align-items:stretch;margin-top:6px}
+.steps3 .st{flex:1;border:1px solid var(--line);border-radius:10px;padding:10px 8px;text-align:center;font-size:14px;line-height:1.5;background:#fff}
+.steps3 .st b{display:block;font-size:15px}
+.steps3 .st.work{background:var(--sea);color:#fff;border-color:var(--sea)}
+.steps3 .st.none{border-style:dashed;color:#a9b5c6}
+.steps3 .ar{align-self:center;color:#9aa8bb;font-weight:700}
+pre.code .hl{display:inline-block;width:calc(100% + 17px);margin-left:-17px;padding-left:14px;background:#2a3346;border-left:3px solid var(--amber)}
+pre.code.sm .hl{width:calc(100% + 14px);margin-left:-14px;padding-left:11px}
+@media (max-width:900px){
+  .grid2,.grid-2-1,.grid-1-2,.grid3{grid-template-columns:1fr}
+  .slide{padding:24px 16px 72px}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="deck">
+
+<!-- 표지 -->
+<section class="slide cover" data-name="표지">
+  <div class="num">6차시 · 관계기반 알고리즘</div>
+  <h1>교과서 문제 풀이<br>그림으로 보는 부분 문제</h1>
+  <p class="sub" style="max-width:760px;font-size:17px">
+    큰 문제를 <b style="color:var(--ink)">작은 같은 문제</b>로 나누고, 작은 문제의 답으로 큰 문제의 답을 만든다.<br>
+    문제마다 그 관계를 먼저 그림으로 보고, 빈칸 정답은 버튼을 눌러 확인한다.
+  </p>
+  <div class="kws">
+    <span class="tag">분할 정복법</span>
+    <span class="tag violet">재귀</span>
+    <span class="tag moss">동적 계획법</span>
+    <span class="tag amber">점화식</span>
+  </div>
+  <p class="footnote" style="margin-top:36px">
+    세종과학고등학교 1학년 정보과학 &nbsp;|&nbsp; 관계기반 알고리즘 (교과서 pp.208~235)<br>
+    <span class="kbdkey">←</span> <span class="kbdkey">→</span> 로 슬라이드를 넘기세요. 파란 버튼이 있는 화면은 직접 눌러 볼 수 있습니다.
+  </p>
+</section>
+
+<!-- 목록 -->
+<section class="slide" data-name="오늘 푸는 문제">
+  <div class="eyebrow">OVERVIEW</div>
+  <h1 class="title">오늘 푸는 문제</h1>
+  <div class="body">
+    <table class="tbl">
+      <tr><th class="c" style="width:58px">번호</th><th>문제</th><th style="width:300px">부분 문제와의 관계</th><th class="c" style="width:150px">답</th></tr>
+      <tr><td class="c"><b>1</b></td><td>합병 정렬 <span class="tag">분할 정복</span></td><td>반씩 정렬한 뒤 <b>합병</b></td><td class="c mono">[1, …, 8]</td></tr>
+      <tr><td class="c"><b>2</b></td><td>퀵 정렬 <span class="tag">분할 정복</span></td><td><b>피벗</b>으로 나눈 뒤 양쪽 정렬</td><td class="c mono">5 1 3 7 8 10</td></tr>
+      <tr><td class="c"><b>3</b></td><td>별 그리기 <span class="tag">분할 정복</span></td><td>f(n−1) · 별 n개 · f(n−1)</td><td class="c mono">—</td></tr>
+      <tr><td class="c"><b>4</b></td><td>삼각형 별 그리기 <span class="tag">분할 정복</span></td><td>작은 그림 <b>세 개</b></td><td class="c mono">—</td></tr>
+      <tr><td class="c"><b>5</b></td><td>별 그리기의 별 개수 <span class="tag moss">동적 계획</span></td><td>2·f(n−1) + n</td><td class="c mono">2036</td></tr>
+      <tr><td class="c"><b>6</b></td><td>별 개수 세기 <span class="tag moss">동적 계획</span></td><td>3·f(n−1) + 2n</td><td class="c mono">68879</td></tr>
+      <tr><td class="c"><b>7</b></td><td>공사 중인 계단 <span class="tag moss">동적 계획</span></td><td>바로 아래 세 칸의 합, 공사 칸은 0</td><td class="c mono">106 · 5</td></tr>
+      <tr><td class="c"><b>8</b></td><td>엄지와 지수 <span class="tag amber">대단원</span></td><td>네 칸의 합</td><td class="c mono">2317</td></tr>
+      <tr><td class="c"><b>9</b></td><td>문어 강강술래 <span class="tag amber">대단원</span></td><td>이웃한 손 번호는 달라야 한다</td><td class="c mono">1212…</td></tr>
+      <tr><td class="c"><b>10 · 11</b></td><td>동전 줍기 <span class="tag amber">대단원</span></td><td>줍는다 vs 건너뛴다 중 큰 쪽</td><td class="c mono">33</td></tr>
+      <tr><td class="c"><b>심화</b></td><td>영일이의 계단 오르기 <span class="tag violet">지도서</span></td><td>3칸 뒤 몇 번 움직였는지를 상태로</td><td class="c mono">7 · 73</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 문제 1 · 나누고 합치기 -->
+<section class="slide" data-name="문제 1 · 나누고 합치기">
+  <div class="eyebrow">문제 1 · 교과서 210쪽</div>
+  <h1 class="title"><span class="qnum">1</span>합병 정렬 — 끝까지 자른 뒤, 거꾸로 합친다</h1>
+  <div class="body stack">
+    <div class="fig mid"><svg id="m1" viewBox="0 0 990 480"></svg></div>
+    <div class="grid3" style="grid-template-columns:1fr 1fr auto;align-items:start">
+      <div class="card sea">
+        <h3>빈칸 ① ② — 정복</h3>
+        <p style="font-size:15px">파란 화살표 두 갈래가 곧 재귀 호출 두 줄이다.</p>
+        <p class="mono" style="font-size:15px;font-weight:700;margin-top:8px;line-height:1.8">merge_sort(low, mid)<br>merge_sort(mid + 1, high)</p>
+      </div>
+      <div class="card moss">
+        <h3>결합</h3>
+        <p style="font-size:15px">두 줄이 끝나면 왼쪽 절반과 오른쪽 절반은 <b>이미 정렬돼 있다</b>고 믿고, 둘을 하나로 합치기만 하면 된다.</p>
+      </div>
+      <div class="legend">
+        <span><i style="background:#1d5fd0"></i>분할</span>
+        <span><i style="background:#c98a09"></i>길이 1 — 이미 정렬</span>
+        <span><i style="background:#137a5e"></i>결합</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 1 · 결합 -->
+<section class="slide" data-name="문제 1 · 결합">
+  <div class="eyebrow">문제 1 · 교과서 210쪽</div>
+  <h1 class="title"><span class="qnum">1</span>마지막 결합 — 맨 앞끼리 비교해서 작은 쪽을 temp로</h1>
+  <div class="body stack">
+    <div class="fig"><svg id="m2" viewBox="0 0 900 360"></svg></div>
+    <div class="legend">
+      <span><i style="background:#6b4bc4"></i>왼쪽에서 가져옴 (i 이동)</span>
+      <span><i style="background:#c98a09"></i>오른쪽에서 가져옴 (j 이동)</span>
+      <span><i style="background:#e4eaf2"></i>이미 쓴 값</span>
+    </div>
+    <div class="codebox" data-code="p1"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+  </div>
+</section>
+
+<!-- 문제 2-1 -->
+<section class="slide" data-name="문제 2-1 · 피벗 찾기">
+  <div class="eyebrow">문제 2 · 교과서 211~212쪽 · 스스로 해 보기 5</div>
+  <h1 class="title"><span class="qnum">2</span>맨 앞 값을 피벗으로 — 초록 칸 여섯 개</h1>
+  <div class="ctrlbar" style="margin-top:0">
+    <button class="btn ghost sm" id="q1Reset">처음으로</button>
+    <button class="btn sm" id="q1Next">다음 단계 ▶</button>
+    <button class="btn moss sm" id="q1Ans">초록 칸 정답 보기</button>
+    <span class="mono" id="q1Step" style="font-size:13px;color:var(--ink-soft)"></span>
+  </div>
+  <div class="body stack">
+    <div class="fig mid"><svg id="q1" viewBox="0 0 900 400"></svg></div>
+    <div class="grid3" style="grid-template-columns:1fr 1fr auto;align-items:start">
+      <div class="card flat">
+        <h4>초록 칸 (위 → 아래, 왼쪽 → 오른쪽)</h4>
+        <div class="chiprow" id="q1Chips"></div>
+      </div>
+      <div class="card sea">
+        <p style="font-size:15px">초록 칸이 피벗이다. 분할이 끝나면 피벗은 제자리에 가고, 그 <b>왼쪽 묶음</b>과 <b>오른쪽 묶음</b>이 아래 줄이 된다.</p>
+      </div>
+      <div class="legend">
+        <span><i style="background:#137a5e"></i>피벗</span>
+        <span><i style="background:#fdf3dc;border:1px solid #c98a09"></i>길이 1 — 끝</span>
+        <span><i style="border:1px dashed #9aa8bb"></i>빈 리스트</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 2-2 -->
+<section class="slide" data-name="문제 2-2 · 피벗 5로 나누기">
+  <div class="eyebrow">문제 2 · 교과서 211쪽</div>
+  <h1 class="title"><span class="qnum">2</span>피벗 5로 한 번 나누기 — left · right 가 만날 때까지</h1>
+  <div class="body stack">
+    <div class="fig"><svg id="q2" viewBox="0 0 900 470"></svg></div>
+    <div class="legend">
+      <span><i style="background:#e2f4ee;border:1px solid #137a5e"></i>피벗</span>
+      <span><i style="background:#6b4bc4"></i>left — 피벗보다 큰 값</span>
+      <span><i style="background:#e0533d"></i>right — 피벗보다 작은 값</span>
+    </div>
+    <div class="codebox" data-code="p2"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+  </div>
+</section>
+
+<!-- 문제 3 -->
+<section class="slide" data-name="문제 3 · 별 그리기">
+  <div class="eyebrow">문제 3 · 교과서 214~215쪽</div>
+  <h1 class="title"><span class="qnum">3</span>별 그리기 — f(n−1), 별 n개, f(n−1)</h1>
+  <div class="ctrlbar" style="margin-top:0">
+    <span style="font-size:14px;font-weight:600;color:var(--ink-soft)">n =</span>
+    <button class="btn ghost sm" data-sn="1">1</button>
+    <button class="btn ghost sm" data-sn="2">2</button>
+    <button class="btn ghost sm on" data-sn="3">3</button>
+    <button class="btn ghost sm" data-sn="4">4</button>
+  </div>
+  <div class="body grid-1-2">
+    <div class="fig"><svg id="s1" viewBox="0 0 240 370"></svg></div>
+    <div class="stack">
+      <div class="fig"><svg id="s2" viewBox="0 0 400 260"></svg></div>
+      <p class="figcap" style="margin-top:0">호출 트리의 <b>맨 아래 줄을 왼쪽부터 읽으면</b> 출력 순서와 같다. 같은 색은 같은 함수가 찍은 줄이다.</p>
+      <div class="codebox" data-code="p3"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 4 -->
+<section class="slide" data-name="문제 4 · 삼각형 별 그리기">
+  <div class="eyebrow">문제 4 · 교과서 216~217쪽 · 스스로 해 보기 6-2</div>
+  <h1 class="title"><span class="qnum">4</span>삼각형 — 작은 그림 세 개를 어디서 시작할까</h1>
+  <div class="ctrlbar" style="margin-top:0">
+    <span style="font-size:14px;font-weight:600;color:var(--ink-soft)">n =</span>
+    <button class="btn ghost sm" data-tn="1">1</button>
+    <button class="btn ghost sm on" data-tn="2">2</button>
+    <button class="btn ghost sm" data-tn="3">3</button>
+    <button class="btn ghost sm" data-tn="4">4</button>
+  </div>
+  <div class="body grid-2-1">
+    <div class="fig"><svg id="t1" viewBox="0 0 400 300"></svg></div>
+    <div class="stack">
+      <div class="card flat" id="tLegend"></div>
+      <div class="codebox" data-code="p4"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 5 -->
+<section class="slide" data-name="문제 5 · 별의 개수">
+  <div class="eyebrow">문제 5 · 교과서 223~225쪽</div>
+  <h1 class="title"><span class="qnum">5</span>별의 개수 — 같은 f(k)를 몇 번이나 다시 구할까</h1>
+  <div class="body grid-2-1">
+    <div class="stack">
+      <div class="fig"><svg id="d1" viewBox="0 0 870 260"></svg></div>
+      <div class="fig short"><svg id="d1b" viewBox="0 0 810 118"></svg></div>
+    </div>
+    <div class="stack">
+      <div class="card coral">
+        <h3>① 분할 정복</h3>
+        <p class="mono" style="font-size:15px;font-weight:700">f(k) = f(k−1) + k + f(k−1)</p>
+        <p style="font-size:15px;margin-top:8px">f(4) 하나를 구하는 데 f(3) 2번, f(2) 4번, f(1) 8번. n = 10이면 f(1)만 512번이다.</p>
+      </div>
+      <div class="card moss">
+        <h3>② 반복문 DP</h3>
+        <p class="mono" style="font-size:15px;font-weight:700">data[i] = data[i−1] + i + data[i−1]</p>
+        <p style="font-size:15px;margin-top:8px">작은 i부터 한 번씩만 구해 칸에 적어 둔다. 앞 칸 하나만 보면 다음 칸이 나온다.</p>
+      </div>
+      <div class="codebox" data-code="p5"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 6 -->
+<section class="slide" data-name="문제 6 · 별 개수 세기">
+  <div class="eyebrow">문제 6 · 스스로 해 보기 7-2</div>
+  <h1 class="title"><span class="qnum">6</span>f(n−1)이 세 번, 별 n개가 두 번</h1>
+  <div class="body grid-1-2">
+    <div class="fig"><svg id="d2" viewBox="0 0 400 380"></svg></div>
+    <div class="stack">
+      <div class="card sea">
+        <h3>점화식</h3>
+        <p class="mono" style="font-size:18px;font-weight:700;line-height:1.7">f(n) = 3·f(n−1) + 2n<br><span style="font-size:15px;font-weight:500;color:var(--ink-soft)">f(1) = 1</span></p>
+        <p style="font-size:15px;margin-top:8px">n = 3이면 3 × 7 + 2 × 3 = <b>27</b>. 그림의 별을 세어 보면 맞다.</p>
+      </div>
+      <div class="fig short"><svg id="d2b" viewBox="0 0 810 118"></svg></div>
+      <div class="codebox" data-code="p6"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 7 -->
+<section class="slide" data-name="문제 7 · 공사 중인 계단">
+  <div class="eyebrow">문제 7 · 교과서 231~232쪽 · 중단원 마무리</div>
+  <h1 class="title"><span class="qnum">7</span>공사 중인 계단 — 바로 아래 세 칸에서 온다</h1>
+  <div class="ctrlbar" style="margin-top:0">
+    <span style="font-size:14px;font-weight:600;color:var(--ink-soft)">공사 중인 칸 m =</span>
+    <span id="stMs" style="display:flex;gap:5px;flex-wrap:wrap"></span>
+    <span style="font-size:13px;color:var(--ink-soft)">① <b>없음</b>으로 표를 먼저 채우고 ② m을 골라 그 칸을 0으로 바꿔 보자 · 계단을 누르면 그 칸으로 오는 길이 보인다</span>
+  </div>
+  <div class="msg" id="stMsg" style="margin-bottom:12px"></div>
+  <div class="body stack">
+    <div class="fig mid"><svg id="st1" viewBox="0 0 900 370"></svg></div>
+    <div class="codebox" data-code="p7"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+  </div>
+</section>
+
+<!-- 문제 8 -->
+<section class="slide" data-name="문제 8 · 엄지와 지수">
+  <div class="eyebrow">문제 8 · 대단원 마무리 05~06</div>
+  <h1 class="title"><span class="qnum">8</span>엄지와 지수 — 한 칸 X[a][b]는 네 칸에서 온다</h1>
+  <div class="body grid-2-1">
+    <div class="fig"><svg id="x1" viewBox="0 0 520 520"></svg></div>
+    <div class="stack">
+      <div class="msg" id="xMsg"></div>
+      <div class="card flat">
+        <h4>두 사람이 함께 한 번 움직이는 네 가지</h4>
+        <table class="tbl sm" style="background:#fff">
+          <tr><th class="c">엄지</th><th class="c">지수</th><th>어디서 왔나</th></tr>
+          <tr><td class="c mono">+1</td><td class="c mono">+1</td><td class="mono">X[a−1][b−1]</td></tr>
+          <tr><td class="c mono">+1</td><td class="c mono">+2</td><td class="mono">X[a−1][b−2]</td></tr>
+          <tr><td class="c mono">+2</td><td class="c mono">+1</td><td class="mono">X[a−2][b−1]</td></tr>
+          <tr><td class="c mono">+2</td><td class="c mono">+2</td><td class="mono">X[a−2][b−2]</td></tr>
+        </table>
+        <p style="font-size:14px;margin-top:8px;color:var(--ink-soft)">답은 <b style="color:var(--moss)">초록 테두리</b> 대각선 X[n][n] — 동시에 n번째 칸.</p>
+      </div>
+      <div class="codebox" data-code="p8"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 9 -->
+<section class="slide" data-name="문제 9 · 문어 강강술래">
+  <div class="eyebrow">문제 9 · 대단원 마무리 07~09</div>
+  <h1 class="title"><span class="qnum">9</span>문어 강강술래 — 한 문어의 두 손은 번호가 다르다</h1>
+  <div class="body stack">
+    <div class="fig"><svg id="o1" viewBox="0 0 900 330"></svg></div>
+    <div class="grid2">
+      <div class="callout">
+        숫자 하나 = 이웃한 두 문어가 잡은 손. 이웃한 두 숫자는 <b>같은 문어</b>의 두 손이라서 달라야 한다. 원이므로 <b>마지막 숫자와 첫 숫자</b>도 1번 문어에서 만난다.
+      </div>
+      <div class="codebox" data-code="p9"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 문제 10 · 11 -->
+<section class="slide" data-name="문제 10 · 11 · 동전 줍기">
+  <div class="eyebrow">문제 10 · 11 · 대단원 마무리 11</div>
+  <h1 class="title"><span class="qnum">10</span>동전 줍기 — 뒤에서부터 표를 채운다</h1>
+  <div class="ctrlbar" style="margin-top:0">
+    <button class="btn ghost sm" id="cReset">처음으로</button>
+    <button class="btn ghost sm" id="cPrev">◀ 이전</button>
+    <button class="btn sm" id="cNext">다음 ▶</button>
+    <button class="btn ghost sm" id="cEnd">끝까지</button>
+    <span class="mono" id="cStep" style="font-size:13px;color:var(--ink-soft)"></span>
+  </div>
+  <div class="msg" id="cMsg" style="margin-bottom:12px"></div>
+  <div class="body stack">
+    <div class="fig mid"><svg id="c1" viewBox="0 0 860 296"></svg></div>
+    <div class="grid3" style="grid-template-columns:1.2fr 1fr 1fr;align-items:start">
+      <div class="card flat">
+        <h4>data[x][y]</h4>
+        <p style="font-size:14.5px;margin:4px 0 8px">x번째 동전부터 끝까지 남은 동전으로 얻을 수 있는 <b>최대 금액</b><br><span style="color:var(--ink-soft)">(바로 앞까지 y개를 연속으로 주운 상태에서)</span></p>
+        <ul class="clean" style="font-size:14.5px">
+          <li><b>줍는다</b> → <span class="mono">data[x+1][y+1] + coin[x]</span></li>
+          <li><b>건너뛴다</b> → <span class="mono">data[x+1][0]</span></li>
+          <li><b>y = 2</b> 이면 더 주울 수 없다 → 건너뛰기만</li>
+        </ul>
+      </div>
+      <div class="codebox" data-code="p10"><div class="revealbtn"><button class="toggle">문제 10 코드 보기</button><span class="hint">교과서 재귀 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+      <div class="codebox" data-code="p11"><div class="revealbtn"><button class="toggle">문제 11 빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 심화 -->
+<section class="slide" data-name="심화 · 영일이의 계단 오르기">
+  <div class="eyebrow">심화 · 지도서 205쪽</div>
+  <h1 class="title"><span class="qnum" style="width:auto;padding:0 8px">심화</span>영일이의 계단 — 3칸 뒤에 몇 번 움직였나</h1>
+  <div class="body grid2">
+    <div class="stack">
+      <div class="fig short"><svg id="y1" viewBox="0 0 870 260"></svg></div>
+      <div class="card flat">
+        <h4>N = 4 일 때 data[x][y]</h4>
+        <table class="tbl sm" style="background:#fff">
+          <tr><th class="c">x</th><th class="c">y = 0</th><th class="c">y = 1</th><th class="c">y = 2</th></tr>
+          <tr><td class="c mono"><b>0</b></td><td class="c mono">5</td><td class="c mono">6</td><td class="c mono" style="background:var(--moss-soft);color:var(--moss);font-weight:700">7</td></tr>
+          <tr><td class="c mono">1</td><td class="c mono">3</td><td class="c mono">3</td><td class="c mono">4</td></tr>
+          <tr><td class="c mono">2</td><td class="c mono">2</td><td class="c mono">2</td><td class="c mono">2</td></tr>
+          <tr><td class="c mono">3</td><td class="c mono">1</td><td class="c mono">1</td><td class="c mono">1</td></tr>
+          <tr><td class="c mono">4 (꼭대기)</td><td class="c mono">1</td><td class="c mono">1</td><td class="c mono">1</td></tr>
+        </table>
+        <p style="font-size:14px;margin-top:8px;color:var(--ink-soft)">처음에는 바로 3칸을 오를 수 있으므로 답은 <span class="mono">data[0][2]</span>.</p>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="fig"><svg id="y2" viewBox="0 0 800 380"></svg></div>
+      <div class="codebox" data-code="py"><div class="revealbtn"><button class="toggle">빈칸 정답 보기</button><span class="hint">노란 줄이 빈칸에 들어갈 코드</span></div><div class="codewrap"><pre class="code sm"></pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 생각해 보기 -->
+<section class="slide" data-name="생각해 보기">
+  <div class="eyebrow">생각해 보기</div>
+  <h1 class="title">두 가지 질문</h1>
+  <div class="body grid2">
+    <div class="card flat">
+      <h3>1. 실제로 일을 하는 단계는?</h3>
+      <p style="font-size:14px;font-weight:700;color:var(--ink-soft);margin-top:6px">합병 정렬</p>
+      <div class="steps3">
+        <div class="st"><b>분할</b>반으로 자르기<br>mid 계산뿐</div><div class="ar">→</div>
+        <div class="st"><b>정복</b>재귀 두 번</div><div class="ar">→</div>
+        <div class="st work"><b>결합</b>맨 앞끼리 비교하며 합병</div>
+      </div>
+      <p style="font-size:14px;font-weight:700;color:var(--ink-soft);margin-top:16px">퀵 정렬</p>
+      <div class="steps3">
+        <div class="st work"><b>분할</b>left · right 교환<br>피벗을 제자리로</div><div class="ar">→</div>
+        <div class="st"><b>정복</b>재귀 두 번</div><div class="ar">→</div>
+        <div class="st none"><b>결합</b>할 일 없음</div>
+      </div>
+      <div class="callout" style="margin-top:16px">합병 정렬은 <b>합칠 때</b>, 퀵 정렬은 <b>나눌 때</b> 일한다. 그래서 합병 정렬은 재귀 호출이 일 <b>앞</b>에, 퀵 정렬은 일 <b>뒤</b>에 온다.</div>
+    </div>
+    <div class="card flat">
+      <h3>2. f(k−1)을 한 번만 부르면?</h3>
+      <div class="fig short" style="margin-top:6px"><svg id="th" viewBox="0 0 620 230"></svg></div>
+      <div class="grid2" style="margin-top:12px;gap:12px">
+        <pre class="code sm" id="thCode"></pre>
+        <div class="callout moss" style="font-size:14.5px">①과 ③은 <b>같은 그림</b>이라 값도 같다. 한 번 구해 변수에 두면 호출이 2<sup>n</sup>−1번에서 <b>n번</b>으로 준다. 네, 빨라진다. 이미 구한 값을 다시 쓰는 것 — 그것이 동적 계획법의 생각이다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 정리 -->
+<section class="slide" data-name="정리">
+  <div class="eyebrow">SUMMARY</div>
+  <h1 class="title">관계를 찾으면 코드는 따라온다</h1>
+  <div class="body">
+    <div class="grid2">
+      <div class="card sea">
+        <h3>분할 정복법</h3>
+        <ul class="clean">
+          <li>부분 문제가 <b>서로 겹치지 않는다</b> — 합병·퀵 정렬, 별 그리기</li>
+          <li>재귀 호출 줄은 따라 들어가지 말고 <b>“끝나면 해결돼 있다”</b>고 믿는다</li>
+          <li>재귀를 일 앞에 둘지 뒤에 둘지는 <b>무엇이 먼저 필요한가</b>로 정한다</li>
+        </ul>
+      </div>
+      <div class="card moss">
+        <h3>동적 계획법</h3>
+        <ul class="clean moss">
+          <li>같은 부분 문제가 <b>여러 번</b> 나온다 — 별 개수, 계단, 동전</li>
+          <li>작은 것부터 <b>한 번씩만</b> 구해 표(리스트)에 적는다</li>
+          <li>상태가 하나로 모자라면 <b>칸을 하나 더</b> — X[a][b], data[x][y]</li>
+        </ul>
+      </div>
+    </div>
+    <table class="tbl" style="margin-top:20px">
+      <tr><th style="width:200px">문제</th><th>관계</th><th class="c" style="width:200px">처음 값</th></tr>
+      <tr><td>5 · 별의 개수</td><td class="mono">data[i] = 2·data[i−1] + i</td><td class="c mono">data[1] = 1</td></tr>
+      <tr><td>6 · 별 개수 세기</td><td class="mono">data[i] = 3·data[i−1] + 2i</td><td class="c mono">data[1] = 1</td></tr>
+      <tr><td>7 · 공사 중인 계단</td><td class="mono">data[i] = data[i−1] + data[i−2] + data[i−3], data[m] = 0</td><td class="c mono">data[0] = 1</td></tr>
+      <tr><td>8 · 엄지와 지수</td><td class="mono">X[a][b] = 네 칸 X[a−da][b−db] 의 합</td><td class="c mono">X[0][0] = 1</td></tr>
+      <tr><td>11 · 동전 줍기</td><td class="mono">data[x][y] = max(data[x+1][y+1] + coin[x], data[x+1][0])</td><td class="c mono">data[n][·] = 0</td></tr>
+      <tr><td>심화 · 영일이</td><td class="mono">data[x][y] = 1칸 + 2칸 (+ 3칸, y = 2일 때만)</td><td class="c mono">data[N][·] = 1</td></tr>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<div id="nav">
+  <div class="left">
+    <button class="navbtn" id="prev">← 이전</button>
+    <button class="navbtn" id="next">다음 →</button>
+    <span class="chip2" id="counter"></span>
+  </div>
+  <div id="slidename"></div>
+</div>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const C = {ink:'#16202e', soft:'#4a5a70', gray:'#9aa8bb', sea:'#1d5fd0', coral:'#e0533d', moss:'#137a5e', amber:'#c98a09', violet:'#6b4bc4'};
+const KC = {1:'violet', 2:'sea', 3:'moss', 4:'amber'};
+
+function E(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function T(parent, x, y, s, cls, extra) {
+  const t = E('text', Object.assign({x: x, y: y, class: cls || 'lbl'}, extra || {}), parent);
+  if (extra && extra.fill) t.style.fill = extra.fill;
+  t.textContent = s;
+  return t;
+}
+function box(parent, x, y, w, h, val, cls) {
+  const g = E('g', {class: 'bx ' + (cls || '')}, parent);
+  E('rect', {x: x, y: y, width: w, height: h, rx: 6}, g);
+  T(g, x + w / 2, y + h / 2, String(val), '');
+  return g;
+}
+function defs(svg) {
+  const d = E('defs', {}, svg);
+  for (const k in C) {
+    const m = E('marker', {id: svg.id + '-' + k, viewBox: '0 0 10 10', refX: '8.5', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto-start-reverse'}, d);
+    E('path', {d: 'M0,0 L10,5 L0,10 z', fill: C[k]}, m);
+  }
+  return d;
+}
+function arr(svg, parent, d, color, opt) {
+  opt = opt || {};
+  const a = {d: d, fill: 'none', stroke: C[color], 'stroke-width': opt.w || 1.8, 'marker-end': 'url(#' + svg.id + '-' + color + ')'};
+  if (opt.both) a['marker-start'] = a['marker-end'];
+  if (opt.dash) a['stroke-dasharray'] = opt.dash;
+  return E('path', a, parent);
+}
+function bracket(svg, x, y, h, label, color) {
+  E('path', {d: `M${x},${y} h6 v${h} h-6`, fill: 'none', stroke: C[color], 'stroke-width': 2}, svg);
+  T(svg, x + 12, y + h / 2, label, 'lm', {'dominant-baseline': 'central', fill: C[color]});
+}
+
+/* ===== 코드 상자 ===== */
+const CODES = {
+p1: `data = [8, 4, 1, 5, 7, 3, 2, 6]
+temp = [0] * len(data)
+
+
+def merge_sort(low, high):
+    if low >= high:                # 길이 1 이하 → 이미 정렬됨
+        return
+    mid = (low + high) // 2        # 분할
+»    merge_sort(low, mid)           # 정복 (왼쪽)
+»    merge_sort(mid + 1, high)      # 정복 (오른쪽)
+
+    i = low                        # 결합
+    j = mid + 1
+    for k in range(low, high + 1):
+        if j > high:               # 오른쪽을 다 썼다
+            temp[k] = data[i]
+            i = i + 1
+        elif i > mid:              # 왼쪽을 다 썼다
+            temp[k] = data[j]
+            j = j + 1
+        elif data[i] <= data[j]:
+»            temp[k] = data[i]
+»            i = i + 1
+        else:
+»            temp[k] = data[j]
+»            j = j + 1
+    for k in range(low, high + 1):
+        data[k] = temp[k]          # temp를 data로 복사
+
+
+merge_sort(0, len(data) - 1)
+print(data)`,
+p2: `data = [5, 6, 2, 8, 1, 7, 9, 4, 10, 3]
+
+
+def quick_sort(start, end):
+    if start >= end:               # 길이 1 이하 → 이미 정렬됨
+        return
+    pivot = start                  # 맨 앞 값을 피벗으로
+    left = start + 1
+    right = end
+    while left <= right:           # 분할
+        for k in range(left, end + 1):       # 피벗보다 큰 값을 찾는다
+            if data[k] > data[pivot]:
+                break
+            left = left + 1
+        for k in range(right, start, -1):    # 피벗보다 작은 값을 찾는다
+            if data[k] < data[pivot]:
+                break
+            right = right - 1
+        if left <= right:          # 엇갈리지 않았다 → 둘을 교환
+            data[left], data[right] = data[right], data[left]
+        else:                      # 엇갈렸다 → 피벗을 제자리로
+»            data[right], data[pivot] = data[pivot], data[right]
+    print('피벗', data[right], ':', data[start:right], data[right + 1:end + 1])
+»    quick_sort(start, right - 1)   # 정복 (피벗 왼쪽)
+»    quick_sort(right + 1, end)     # 정복 (피벗 오른쪽)
+
+
+quick_sort(0, len(data) - 1)
+print(data)`,
+p3: `def f(n):
+    if n == 1:
+        print('*')
+        return
+»    f(n - 1)                       # ①
+    for i in range(n):             # ② n개 별 출력하기
+        print('*', end='')
+    print()
+»    f(n - 1)                       # ③
+
+
+n = 3
+f(n)`,
+p4: `A = [[0 for _ in range(100)] for _ in range(100)]
+dx = [0, 1, 1, 2, 2, 2, 2, 2]
+dy = [2, 1, 3, 0, 1, 2, 3, 4]
+
+
+def f(row, col, size):
+    if size == 3:
+        for i in range(8):
+            A[row + dx[i]][col + dy[i]] = 1
+    else:
+        half = size // 2
+»        f(row, col + half, half)           # 위 가운데
+»        f(row + half, col, half)           # 아래 왼쪽
+»        f(row + half, col + size, half)    # 아래 오른쪽`,
+p5: `n = 10
+
+# ① 분할 정복
+def f(k):
+    if k == 1:
+        return 1
+    ans = 0
+»    ans = ans + f(k - 1)
+»    ans = ans + k
+»    ans = ans + f(k - 1)
+    return ans
+
+
+print('① 분할 정복 :', f(n))
+
+
+# ② 반복문을 활용한 동적 계획법
+data = [0] * 1000000
+data[1] = 1
+for i in range(2, n + 1):
+»    data[i] = data[i - 1] + i + data[i - 1]
+
+print('② 반복문 DP :', data[n])`,
+p6: `n = 10
+data = [0] * 1000000
+data[1] = 1
+for i in range(2, n + 1):
+»    data[i] = 3 * data[i - 1] + 2 * i
+
+print(data[n])`,
+p7: `# 1. 관계기반 설계
+def f(k, m):
+    if k < 0:                      # 계단 아래로는 갈 수 없다
+        return 0
+    if k == m:                     # 공사 중인 칸
+»        return 0
+    if k == 0:                     # 출발점 — 가만히 있는 1가지
+        return 1
+»    return f(k - 1, m) + f(k - 2, m) + f(k - 3, m)
+
+
+print('1.', f(10, 4), f(5, 2))
+
+
+# 2. 반복문을 활용한 동적 계획법
+n = 100000
+m = 50000
+data = [0] * (n + 1)
+data[0] = 1
+for i in range(1, n + 1):
+    if i == m:                     # 공사 중인 칸은 0 으로 둔다
+        continue
+    data[i] = data[i - 1]
+    if i >= 2:
+»        data[i] = data[i] + data[i - 2]
+    if i >= 3:
+»        data[i] = data[i] + data[i - 3]
+
+print('2.', data[n] % 1000000007)`,
+p8: `n = 10
+X = [[0] * (n + 1) for _ in range(n + 1)]
+X[0][0] = 1
+for a in range(n + 1):
+    for b in range(n + 1):
+        if a == 0 and b == 0:
+            continue
+        for da in (1, 2):              # 엄지가 오른 칸
+            for db in (1, 2):          # 지수가 오른 칸
+                if a - da >= 0 and b - db >= 0:
+»                    X[a][b] = X[a][b] + X[a - da][b - db]
+
+for k in range(1, n + 1):
+    print('n =', k, ':', X[k][k])`,
+p9: `def smallest(n):
+    s = '12' * (n // 2)
+    if n % 2 == 1:
+»        s = s + '3'                # 1로 끝나면 첫 숫자 1과 붙는다
+    return s
+
+
+for n in [4, 5, 10, 11]:
+    print('n =', n, ':', smallest(n))`,
+p10: `def f(x, y):
+    if y == 3:
+        return -10000
+    if x == n:
+        return 0
+    return max(f(x + 1, y + 1) + ni[x], f(x + 1, 0))
+
+
+n = int(input())
+ni = list(map(int, input().split()))
+print(f(0, 0))`,
+p11: `n = int(input())
+coin = list(map(int, input().split()))
+data = [[0 for i in range(4)] for j in range(n + 1)]
+for x in range(n - 1, -1, -1):
+    for y in range(2, -1, -1):
+        if y == 2:
+»            data[x][y] = data[x + 1][0]
+        else:
+»            data[x][y] = max(data[x + 1][y + 1] + coin[x], data[x + 1][0])
+print(data[0][0])`,
+py: `def solve(N):
+    # data[x][y] = x번째 칸에서 꼭대기까지 가는 방법의 수
+    # y = 마지막 3칸 이후 움직인 횟수 (2 이상은 2로 본다)
+    data = [[0] * 3 for _ in range(N + 3)]
+    for y in range(3):
+        data[N][y] = 1
+    for x in range(N - 1, -1, -1):  # 뒤에서부터 채운다
+        for y in range(3):
+            ny = min(y + 1, 2)
+            r = 0
+»            r = r + data[x + 1][ny]          # 1칸 오르기
+»            r = r + data[x + 2][ny]          # 2칸 오르기
+            if y == 2:
+»                r = r + data[x + 3][0]       # 3칸 오르기
+            data[x][y] = r % 1000000007
+    return data[0][2]              # 처음에는 바로 3칸을 오를 수 있다
+
+
+for N in [4, 8, 10000]:
+    print('N =', N, ':', solve(N))`,
+th: `def f(k):
+    if k == 1:
+        return 1
+    t = f(k - 1)
+    return t + k + t`
+};
+const KW = new Set(['def', 'if', 'elif', 'else', 'for', 'in', 'return', 'while', 'and', 'or', 'not', 'break', 'continue', 'pass']);
+function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function hlLine(s) {
+  const re = /(#.*$)|('[^']*'|"[^"]*")|([A-Za-z_]\w*)|(\d+)/g;
+  let out = '', last = 0, m;
+  while ((m = re.exec(s))) {
+    out += esc(s.slice(last, m.index));
+    if (m[1]) out += '<span class="cm">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="st">' + esc(m[2]) + '</span>';
+    else if (m[3]) {
+      const w = m[3];
+      if (KW.has(w)) out += '<span class="kw">' + w + '</span>';
+      else if (/^\s*\(/.test(s.slice(re.lastIndex))) out += '<span class="fn">' + w + '</span>';
+      else out += w;
+    } else if (m[4]) out += '<span class="nm">' + m[4] + '</span>';
+    last = re.lastIndex;
+  }
+  return out + esc(s.slice(last));
+}
+function renderCode(src) {
+  return src.split('\n').map(l => l.startsWith('»') ? '<span class="hl">' + hlLine(l.slice(1)) + '</span>' : hlLine(l)).join('\n');
+}
+function initCode() {
+  document.querySelectorAll('.codebox').forEach(box => {
+    box.querySelector('pre').innerHTML = renderCode(CODES[box.dataset.code]);
+    const btn = box.querySelector('.toggle');
+    const label = btn.textContent;
+    btn.onclick = () => {
+      box.classList.toggle('open');
+      btn.textContent = box.classList.contains('open') ? '숨기기' : label;
+    };
+  });
+  $('thCode').innerHTML = renderCode(CODES.th);
+}
+
+/* ===== 문제 1 : 합병 정렬 트리 ===== */
+function figM1() {
+  const svg = $('m1');
+  defs(svg);
+  const W = 34, H = 30, OX = 110;
+  const P2 = [112.5, 337.5, 562.5, 787.5];
+  const S = [56.25, 168.75, 281.25, 393.75, 506.25, 618.75, 731.25, 843.75];
+  const rows = [
+    {y: 20, cls: '', g: [[8, 4, 1, 5, 7, 3, 2, 6]], cx: [450]},
+    {y: 90, cls: '', g: [[8, 4, 1, 5], [7, 3, 2, 6]], cx: [225, 675]},
+    {y: 160, cls: '', g: [[8, 4], [1, 5], [7, 3], [2, 6]], cx: P2},
+    {y: 230, cls: 'amber', g: [[8], [4], [1], [5], [7], [3], [2], [6]], cx: S},
+    {y: 300, cls: 'moss', g: [[4, 8], [1, 5], [3, 7], [2, 6]], cx: P2},
+    {y: 370, cls: 'moss', g: [[1, 4, 5, 8], [2, 3, 6, 7]], cx: [225, 675]},
+    {y: 440, cls: 'Smoss', g: [[1, 2, 3, 4, 5, 6, 7, 8]], cx: [450]}
+  ];
+  const ge = E('g', {}, svg), gb = E('g', {}, svg);
+  rows.forEach((r, ri) => {
+    r.g.forEach((vals, gi) => {
+      const cx = r.cx[gi] + OX, x0 = cx - vals.length * W / 2;
+      vals.forEach((v, k) => box(gb, x0 + k * W, r.y, W, H, v, r.cls));
+      if (ri < 3) {
+        [2 * gi, 2 * gi + 1].forEach(ci => {
+          const c = rows[ri + 1].cx[ci] + OX;
+          arr(svg, ge, `M${cx},${r.y + H + 2} L${c},${rows[ri + 1].y - 4}`, 'sea', {w: 1.5});
+        });
+      }
+      if (ri >= 4) {
+        [2 * gi, 2 * gi + 1].forEach(pi => {
+          const p = rows[ri - 1].cx[pi] + OX;
+          arr(svg, ge, `M${p},${rows[ri - 1].y + H + 2} L${cx},${r.y - 4}`, 'moss', {w: 1.5});
+        });
+      }
+    });
+  });
+  T(svg, 395, 66, 'merge_sort(0, 3)', 'lm', {'text-anchor': 'end', fill: C.sea});
+  T(svg, 725, 66, 'merge_sort(4, 7)', 'lm', {fill: C.sea});
+  [[20, 190, '분할', 'sea'], [230, 260, '길이 1', 'amber'], [300, 470, '결합', 'moss']].forEach(([y1, y2, s, c]) => {
+    E('rect', {x: 14, y: y1, width: 4, height: y2 - y1, rx: 2, fill: C[c]}, svg);
+    T(svg, 26, (y1 + y2) / 2 + 5, s, 'lblb', {fill: C[c]});
+  });
+}
+
+/* ===== 문제 1 : 결합 한 단계씩 ===== */
+function figM2() {
+  const svg = $('m2');
+  const L = [1, 4, 5, 8], R = [2, 3, 6, 7];
+  const W = 34, H = 28, G = 4;
+  const xL = 200, xR = xL + 4 * (W + G) + 30, xT = xR + 4 * (W + G) + 50;
+  T(svg, xL, 16, '왼쪽 (i)', 'lblb', {fill: C.violet});
+  T(svg, xR, 16, '오른쪽 (j)', 'lblb', {fill: C.amber});
+  T(svg, xT, 16, 'temp', 'lblb', {fill: C.moss});
+  let i = 0, j = 0;
+  const temp = [];
+  for (let k = 0; k < 8; k++) {
+    const y = 32 + k * 40;
+    let side, msg;
+    if (j > 3) { side = 'L'; msg = '오른쪽 끝 → 왼쪽'; }
+    else if (i > 3) { side = 'R'; msg = '왼쪽 끝 → 오른쪽'; }
+    else if (L[i] <= R[j]) { side = 'L'; msg = `${L[i]} ≤ ${R[j]} → 왼쪽`; }
+    else { side = 'R'; msg = `${L[i]} > ${R[j]} → 오른쪽`; }
+    T(svg, 10, y + H / 2 + 5, 'k=' + k, 'axn');
+    T(svg, 50, y + H / 2 + 5, msg, 'lm', {fill: side === 'L' ? C.violet : C.amber});
+    L.forEach((v, t) => {
+      let cls = t < i ? 'dim' : (t === i ? (side === 'L' ? 'Sviolet' : 'violet') : '');
+      box(svg, xL + t * (W + G), y, W, H, v, cls);
+    });
+    R.forEach((v, t) => {
+      let cls = t < j ? 'dim' : (t === j ? (side === 'R' ? 'Samber' : 'amber') : '');
+      box(svg, xR + t * (W + G), y, W, H, v, cls);
+    });
+    temp.push(side === 'L' ? L[i] : R[j]);
+    if (side === 'L') i++;
+    else j++;
+    E('path', {d: `M${xT - 36},${y + H / 2} h22`, stroke: '#c3cedd', 'stroke-width': 1.5}, svg);
+    temp.forEach((v, t) => box(svg, xT + t * (W + G), y, W, H, v, t === k ? 'Smoss' : 'moss'));
+  }
+}
+
+/* ===== 문제 2-1 : 피벗 트리 ===== */
+const QN = [
+  {id: 'r', v: [5, 6, 2, 8, 1, 7, 9, 4, 10, 3], cx: 450, lv: 0},
+  {id: 'a', v: [1, 3, 2, 4], cx: 230, lv: 1, p: 'r'},
+  {id: 'b', v: [7, 9, 8, 10, 6], cx: 670, lv: 1, p: 'r'},
+  {id: 'aL', v: [], cx: 140, lv: 2, p: 'a'},
+  {id: 'aR', v: [3, 2, 4], cx: 300, lv: 2, p: 'a'},
+  {id: 'bL', v: [6], cx: 560, lv: 2, p: 'b'},
+  {id: 'bR', v: [8, 10, 9], cx: 740, lv: 2, p: 'b'},
+  {id: 'aRL', v: [2], cx: 250, lv: 3, p: 'aR'},
+  {id: 'aRR', v: [4], cx: 350, lv: 3, p: 'aR'},
+  {id: 'bRL', v: [], cx: 670, lv: 3, p: 'bR'},
+  {id: 'bRR', v: [10, 9], cx: 800, lv: 3, p: 'bR'},
+  {id: 'bRRL', v: [9], cx: 760, lv: 4, p: 'bRR'},
+  {id: 'bRRR', v: [], cx: 850, lv: 4, p: 'bRR'}
+];
+const PIVOTS = [5, 1, 3, 7, 8, 10];
+let qLv = 0, qAns = false;
+function figQ1() {
+  const svg = $('q1');
+  svg.innerHTML = '';
+  const W = 32, H = 32, yOf = lv => 20 + lv * 78;
+  const byId = {};
+  QN.forEach(n => { byId[n.id] = n; });
+  QN.forEach(n => {
+    if (!n.p || n.lv > qLv) return;
+    const p = byId[n.p];
+    E('line', {x1: p.cx, y1: yOf(p.lv) + H + 2, x2: n.cx, y2: yOf(n.lv) - 2, class: 'ln'}, svg);
+  });
+  QN.forEach(n => {
+    if (n.lv > qLv) return;
+    const y = yOf(n.lv);
+    if (n.v.length === 0) {
+      box(svg, n.cx - W / 2, y, W, H, '[ ]', 'dash');
+      return;
+    }
+    const x0 = n.cx - n.v.length * W / 2;
+    n.v.forEach((v, k) => {
+      let cls = '';
+      let s = v;
+      if (n.v.length === 1) cls = 'amber';
+      else if (k === 0) {
+        cls = 'Smoss';
+        s = qAns ? v : '?';
+      }
+      box(svg, x0 + k * W, y, W, H, s, cls);
+    });
+  });
+  $('q1Step').textContent = (qLv + 1) + ' / 5 단계';
+  $('q1Next').disabled = qLv >= 4;
+  $('q1Chips').innerHTML = PIVOTS.map(v => `<span class="chip ${qAns ? 'on' : ''}">${qAns ? v : '?'}</span>`).join('');
+}
+function initQ1() {
+  $('q1Next').onclick = () => { if (qLv < 4) qLv++; figQ1(); };
+  $('q1Reset').onclick = () => { qLv = 0; qAns = false; figQ1(); };
+  $('q1Ans').onclick = () => { qAns = !qAns; qLv = 4; figQ1(); };
+  figQ1();
+}
+
+/* ===== 문제 2-2 : 피벗 5로 분할 ===== */
+function figQ2() {
+  const svg = $('q2');
+  defs(svg);
+  const rows = [
+    {a: [5, 6, 2, 8, 1, 7, 9, 4, 10, 3], L: 1, R: 9, sw: [1, 9], c: 'amber',
+     msg: ['left → 6 (5보다 큼)', 'right → 3 (5보다 작음)', '엇갈리지 않았다 → 둘을 교환']},
+    {a: [5, 3, 2, 8, 1, 7, 9, 4, 10, 6], L: 3, R: 7, sw: [3, 7], c: 'amber',
+     msg: ['left → 8', 'right → 4', '엇갈리지 않았다 → 둘을 교환']},
+    {a: [5, 3, 2, 4, 1, 7, 9, 8, 10, 6], L: 5, R: 4, sw: [0, 4], c: 'moss',
+     msg: ['left → 7', 'right → 1', 'left > right, 엇갈렸다', '→ 피벗과 data[right] 교환']},
+    {a: [1, 3, 2, 4, 5, 7, 9, 8, 10, 6], fin: true,
+     msg: ['피벗 5가 제자리(4번 칸)에 왔다', '왼쪽은 모두 5보다 작고', '오른쪽은 모두 5보다 크다']}
+  ];
+  const W = 40, G = 4, H = 34, X0 = 24;
+  const cx = t => X0 + t * (W + G) + W / 2;
+  rows.forEach((r, ri) => {
+    const y = 40 + ri * 112;
+    r.a.forEach((v, t) => {
+      let cls = '';
+      if (r.fin) cls = t < 4 ? 'sea' : (t === 4 ? 'Smoss' : 'amber');
+      else if (t === 0) cls = 'moss';
+      else if (t === r.L) cls = 'Sviolet';
+      else if (t === r.R) cls = 'Scoral';
+      box(svg, X0 + t * (W + G), y, W, H, v, cls);
+    });
+    if (!r.fin) {
+      const [s1, s2] = r.sw;
+      const x1 = cx(s1), x2 = cx(s2), h = 18 + Math.abs(s2 - s1) * 2.5;
+      arr(svg, svg, `M${x1},${y - 3} Q${(x1 + x2) / 2},${y - h} ${x2},${y - 3}`, r.c, {both: true, w: 2});
+      T(svg, cx(r.L), y + H + 18, '▲ left', 'lm', {'text-anchor': r.L < r.R ? 'middle' : 'start', fill: C.violet});
+      T(svg, cx(r.R), y + H + 18, 'right ▲', 'lm', {'text-anchor': r.L < r.R ? 'middle' : 'end', fill: C.coral});
+    } else {
+      T(svg, (cx(0) + cx(3)) / 2, y + H + 20, 'quick_sort(0, 3)', 'lm', {'text-anchor': 'middle', fill: C.sea});
+      T(svg, (cx(5) + cx(9)) / 2, y + H + 20, 'quick_sort(5, 9)', 'lm', {'text-anchor': 'middle', fill: C.amber});
+    }
+    r.msg.forEach((s, k) => T(svg, 490, y + 4 + k * 19, s, k === r.msg.length - 1 ? 'lblb' : 'lbl', {style: 'font-size:14px'}));
+    if (ri < 3) E('line', {x1: 20, y1: y + H + 34, x2: 880, y2: y + H + 34, stroke: '#eef1f6', 'stroke-width': 1.5}, svg);
+  });
+}
+
+/* ===== 문제 3 : 별 그리기 ===== */
+function starRows(n) {
+  if (n === 1) return [{len: 1, by: 1}];
+  const s = starRows(n - 1);
+  return [...s, {len: n, by: n}, ...s];
+}
+function figS1(n) {
+  const svg = $('s1');
+  svg.innerHTML = '';
+  const rows = starRows(n), CS = 20, G = 3, P = CS + G;
+  rows.forEach((r, i) => {
+    for (let c = 0; c < r.len; c++) E('rect', {x: 10 + c * P, y: 10 + i * P, width: CS, height: CS, rx: 4, fill: C[KC[r.by]]}, svg);
+  });
+  if (n > 1) {
+    const h = 2 ** (n - 1) - 1, bx = 10 + n * P + 10;
+    bracket(svg, bx, 10, h * P - G, 'f(' + (n - 1) + ')', KC[n - 1]);
+    bracket(svg, bx, 10 + h * P, CS, '별 ' + n + '개', KC[n]);
+    bracket(svg, bx, 10 + (h + 1) * P, h * P - G, 'f(' + (n - 1) + ')', KC[n - 1]);
+  }
+  svg.setAttribute('viewBox', `0 0 ${10 + n * P + 100} ${20 + rows.length * P}`);
+}
+function figS2(n) {
+  const svg = $('s2');
+  svg.innerHTML = '';
+  const LW = 46, top = 22, DY = 58;
+  let leaf = 0;
+  const nodes = [], edges = [], leaves = [];
+  function rec(k, depth) {
+    const y = top + depth * DY;
+    if (k === 1) {
+      const x = 20 + LW / 2 + leaf * LW;
+      leaves.push({x: x, s: '*', k: 1});
+      leaf++;
+      const nd = {x: x, y: y, k: 1};
+      nodes.push(nd);
+      return nd;
+    }
+    const a = rec(k - 1, depth + 1);
+    const x = 20 + LW / 2 + leaf * LW;
+    leaves.push({x: x, s: '*'.repeat(k), k: k});
+    leaf++;
+    const b = rec(k - 1, depth + 1);
+    const nd = {x: x, y: y, k: k};
+    nodes.push(nd);
+    edges.push([nd, a], [nd, b]);
+    return nd;
+  }
+  rec(n, 0);
+  const ly = top + n * DY;
+  edges.forEach(([p, c]) => E('line', {x1: p.x, y1: p.y + 12, x2: c.x, y2: c.y - 12, class: 'ln'}, svg));
+  nodes.forEach(nd => {
+    E('line', {x1: nd.x, y1: nd.y + 12, x2: nd.x, y2: ly - 14, stroke: C[KC[nd.k]], 'stroke-width': 1.3, 'stroke-dasharray': '3 3', opacity: .6}, svg);
+    E('rect', {x: nd.x - 21, y: nd.y - 12, width: 42, height: 24, rx: 7, fill: '#fff', stroke: C[KC[nd.k]], 'stroke-width': 2}, svg);
+    T(svg, nd.x, nd.y + 5, 'f(' + nd.k + ')', 'lm', {'text-anchor': 'middle', fill: C[KC[nd.k]]});
+  });
+  leaves.forEach(l => T(svg, l.x, ly + 4, l.s, 'lm', {'text-anchor': 'middle', fill: C[KC[l.k]], style: 'font-size:15px;font-weight:700'}));
+  arr(svg, svg, `M20,${ly + 18} L${20 + leaves.length * LW},${ly + 18}`, 'gray', {w: 1.2});
+  T(svg, 20, ly + 34, '출력 순서', 'axn');
+  svg.setAttribute('viewBox', `0 0 ${40 + leaves.length * LW} ${ly + 42}`);
+  defs(svg);
+}
+function initS() {
+  const btns = document.querySelectorAll('[data-sn]');
+  btns.forEach(b => {
+    b.onclick = () => {
+      btns.forEach(x => x.classList.toggle('on', x === b));
+      figS1(+b.dataset.sn);
+      figS2(+b.dataset.sn);
+    };
+  });
+  figS1(3);
+  figS2(3);
+}
+
+/* ===== 문제 4 : 삼각형 ===== */
+function figT(n) {
+  const svg = $('t1');
+  svg.innerHTML = '';
+  let size = 3;
+  for (let i = 0; i < n - 1; i++) size *= 2;
+  const dx = [0, 1, 1, 2, 2, 2, 2, 2], dy = [2, 1, 3, 0, 1, 2, 3, 4];
+  const A = {}, boxes = [];
+  function f(row, col, s, owner, depth) {
+    if (depth === 1) boxes.push({row: row, col: col, s: s, owner: owner});
+    if (s === 3) {
+      for (let i = 0; i < 8; i++) A[(row + dx[i]) + ',' + (col + dy[i])] = {o: owner, i: i};
+      return;
+    }
+    const h = s / 2;
+    f(row, col + h, h, depth === 0 ? 0 : owner, depth + 1);
+    f(row + h, col, h, depth === 0 ? 1 : owner, depth + 1);
+    f(row + h, col + s, h, depth === 0 ? 2 : owner, depth + 1);
+  }
+  f(0, 0, size, -1, 0);
+  const base = n === 1;
+  const cols = 2 * size - 1, CS = n === 4 ? 11 : (n === 3 ? 20 : (n === 2 ? 30 : 56)), OX = base ? 70 : 34, OY = base ? 56 : 30;
+  const OC = {'-1': 'amber', 0: 'sea', 1: 'moss', 2: 'coral'};
+  if (base) {
+    T(svg, OX, OY - 34, '열 방향 dy →', 'lm', {fill: C.coral});
+    T(svg, OX - 12, OY - 12, 'dx ↓', 'lm', {'text-anchor': 'end', fill: C.sea});
+  }
+  const showAx = k => n < 4 || (k - 1) % 5 === 0
+  for (let c = 1; c <= cols; c++) if (showAx(c)) T(svg, OX + (c - 1) * CS + CS / 2, OY - 10, String(c - 1), base ? 'lm' : 'axn', base ? {'text-anchor': 'middle', fill: C.coral} : {'text-anchor': 'middle'});
+  for (let r = 1; r <= size; r++) if (showAx(r)) T(svg, OX - 12, OY + (r - 1) * CS + CS / 2 + 4, String(r - 1), base ? 'lm' : 'axn', base ? {'text-anchor': 'end', fill: C.sea} : {'text-anchor': 'end'});
+  for (let r = 1; r <= size; r++) {
+    for (let c = 1; c <= cols; c++) {
+      const x = OX + (c - 1) * CS, y = OY + (r - 1) * CS, a = A[(r - 1) + ',' + (c - 1)];
+      const corner = base && r === 1 && c === 1;
+      E('rect', {x: x + 1, y: y + 1, width: CS - 2, height: CS - 2, rx: 3, fill: a ? C[OC[a.o]] : (corner ? '#fdf3dc' : '#f3f6fa'), stroke: corner ? C.amber : 'none', 'stroke-width': 2, 'stroke-dasharray': corner ? '4 3' : ''}, svg);
+      if (corner) {
+        T(svg, x + CS / 2, y + CS / 2 - 2, 'row,', 'axn', {'text-anchor': 'middle', fill: C.amber});
+        T(svg, x + CS / 2, y + CS / 2 + 11, 'col', 'axn', {'text-anchor': 'middle', fill: C.amber});
+      }
+      if (a && base) {
+        T(svg, x + CS / 2, y + CS / 2 - 3, 'i=' + a.i, 'lm', {'text-anchor': 'middle', fill: '#fff'});
+        T(svg, x + CS / 2, y + CS / 2 + 13, '(' + dx[a.i] + ',' + dy[a.i] + ')', 'axn', {'text-anchor': 'middle', fill: '#fff'});
+      }
+    }
+  }
+  const NUM = ['①', '②', '③'];
+  boxes.forEach(b => {
+    const x = OX + b.col * CS - 2, y = OY + b.row * CS - 2;
+    E('rect', {x: x, y: y, width: (2 * b.s - 1) * CS + 4, height: b.s * CS + 4, rx: 6, fill: 'none', stroke: C[OC[b.owner]], 'stroke-width': 2, 'stroke-dasharray': '6 4'}, svg);
+    E('circle', {cx: x + 2 + CS / 2, cy: y + 2 + CS / 2, r: Math.max(9, Math.min(CS / 2 - 1, 11)), fill: '#fff', stroke: C[OC[b.owner]], 'stroke-width': 2}, svg);
+    T(svg, x + 2 + CS / 2, y + 2 + CS / 2 + 4, String(b.owner + 1), 'lm', {'text-anchor': 'middle', fill: C[OC[b.owner]], style: 'font-size:12px'});
+  });
+  svg.setAttribute('viewBox', `0 0 ${OX + cols * CS + 10} ${OY + size * CS + 10}`);
+  const lg = $('tLegend');
+  if (n === 1) {
+    lg.innerHTML = `<h4>n = 1 — 더 나누지 않는다 (size == 3)</h4>
+      <p style="font-size:15px">점선 칸이 <span class="mono">(row, col)</span> 이다. 이 칸에서 <b style="color:${C.sea}">dx[i] 칸 아래</b>, <b style="color:${C.coral}">dy[i] 칸 오른쪽</b>에 i번째 별을 찍는다.</p>
+      <p style="font-size:15px;margin-top:6px">별 칸 안의 <span class="mono">(dx, dy)</span> 는 <span class="mono">(dx[i], dy[i])</span> 다. 예: i = 3 이면 <span class="mono" style="white-space:nowrap">(dx[3], dy[3]) = (2, 0)</span> — 아래 표에서 i = 3 열을 읽으면 된다.</p>
+      <table class="tbl sm" style="background:#fff;margin-top:8px"><tr><th class="c">i</th>${dx.map((_, i) => `<td class="c mono">${i}</td>`).join('')}</tr><tr><th class="c" style="color:${C.sea}">dx</th>${dx.map(v => `<td class="c mono">${v}</td>`).join('')}</tr><tr><th class="c" style="color:${C.coral}">dy</th>${dy.map(v => `<td class="c mono">${v}</td>`).join('')}</tr></table>`;
+  } else {
+    const h = size / 2;
+    const rowsHtml = boxes.map((b, k) => {
+      const name = ['위 가운데', '아래 왼쪽', '아래 오른쪽'][k];
+      const expr = ['f(row, col + half, half)', 'f(row + half, col, half)', 'f(row + half, col + size, half)'][k];
+      return `<tr><td class="c"><b style="color:${C[OC[k]]}">${NUM[k]}</b></td><td>${name}</td><td class="mono">${expr}</td><td class="c mono">(${b.row}, ${b.col})</td></tr>`;
+    }).join('');
+    lg.innerHTML = `<h4>f(0, 0, ${size}) — size = ${size}, half = ${h}</h4>
+      <table class="tbl sm" style="background:#fff"><tr><th class="c">번호</th><th>자리</th><th>호출</th><th class="c">시작 (행, 열)</th></tr>${rowsHtml}</table>
+      <p style="font-size:14px;margin-top:8px;color:var(--ink-soft)">아래 오른쪽 그림은 <b>${size}번 열</b>에서 시작한다 (<span class="mono">col + size</span>).</p>`;
+  }
+}
+function initT() {
+  const btns = document.querySelectorAll('[data-tn]');
+  btns.forEach(b => {
+    b.onclick = () => {
+      btns.forEach(x => x.classList.toggle('on', x === b));
+      figT(+b.dataset.tn);
+    };
+  });
+  figT(2);
+}
+
+/* ===== 문제 5 · 6 : DP ===== */
+function figD1() {
+  const svg = $('d1');
+  function rec(k, depth, xl, xr) {
+    const x = (xl + xr) / 2, y = 24 + depth * 64;
+    if (k > 1) {
+      const m = (xl + xr) / 2;
+      [[xl, m], [m, xr]].forEach(([a, b]) => {
+        E('line', {x1: x, y1: y + 13, x2: (a + b) / 2, y2: y + 64 - 13, class: 'ln'}, svg);
+        rec(k - 1, depth + 1, a, b);
+      });
+      T(svg, x, y + 34, '+' + k, 'lm', {'text-anchor': 'middle', fill: C.amber});
+    }
+    E('rect', {x: x - 25, y: y - 13, width: 50, height: 26, rx: 8, fill: '#fff', stroke: C[KC[k]], 'stroke-width': 2}, svg);
+    T(svg, x, y + 5, 'f(' + k + ')', 'lm', {'text-anchor': 'middle', fill: C[KC[k]]});
+  }
+  rec(4, 0, 20, 760);
+  ['f(4) 1번', 'f(3) 2번', 'f(2) 4번', 'f(1) 8번'].forEach((s, d) => T(svg, 782, 29 + d * 64, s, 'lm', { fill: C[KC[4 - d]], style: 'font-size:12px'}));
+}
+function dpRow(id, vals, lab) {
+  const svg = $(id);
+  defs(svg);
+  const W = 70, P = 78, y = 46;
+  vals.forEach((v, k) => {
+    const x = 20 + k * P;
+    T(svg, x + W / 2, y + 56, 'data[' + (k + 1) + ']', 'axn', {'text-anchor': 'middle'});
+    box(svg, x, y, W, 36, v, k === vals.length - 1 ? 'Smoss' : 'moss');
+    if (k > 0) {
+      const x1 = x - P + W / 2, x2 = x + W / 2 - 4;
+      arr(svg, svg, `M${x1},${y - 3} Q${(x1 + x2) / 2},${y - 30} ${x2},${y - 4}`, 'gray', {w: 1.3});
+      T(svg, (x1 + x2) / 2, y - 22, lab(k + 1), 'axn', {'text-anchor': 'middle', fill: C.amber, style: 'font-size:11px;font-weight:700'});
+    }
+  });
+}
+function figD2() {
+  const svg = $('d2');
+  function rows6(k) {
+    if (k === 1) return [{len: 1, by: 1}];
+    const s = rows6(k - 1);
+    return [...s, {len: k, by: k}, ...s, {len: k, by: k}, ...s];
+  }
+  const CS = 16, P = 18, Y0 = 34;
+  const cols = [{n: 1, x: 16}, {n: 2, x: 84}, {n: 3, x: 178}];
+  cols.forEach(c => {
+    const rs = rows6(c.n);
+    const cnt = rs.reduce((a, r) => a + r.len, 0);
+    T(svg, c.x, 16, 'n = ' + c.n, 'lblb', {style: 'font-size:14px'});
+    T(svg, c.x, Y0 + rs.length * P + 18, cnt + '개', 'lm', {fill: C.moss, style: 'font-size:14px;font-weight:700'});
+    rs.forEach((r, i) => {
+      for (let t = 0; t < r.len; t++) E('rect', {x: c.x + t * P, y: Y0 + i * P, width: CS, height: CS, rx: 3, fill: C[KC[r.by]]}, svg);
+    });
+  });
+  const bx = 178 + 3 * P + 10;
+  let y = Y0;
+  [[5, 'f(2)', 'sea'], [1, '별 3개', 'moss'], [5, 'f(2)', 'sea'], [1, '별 3개', 'moss'], [5, 'f(2)', 'sea']].forEach(([h, s, c]) => {
+    bracket(svg, bx, y, h * P - 2, s, c);
+    y += h * P;
+  });
+  svg.setAttribute('viewBox', `0 0 340 ${Y0 + 17 * P + 30}`);
+}
+
+/* ===== 문제 7 : 계단 ===== */
+let stM = -1, stT = 7;
+function stairWays(n, m) {
+  const d = new Array(n + 1).fill(0);
+  d[0] = 1;
+  for (let i = 1; i <= n; i++) {
+    if (i === m) continue;
+    d[i] = d[i - 1] + (i >= 2 ? d[i - 2] : 0) + (i >= 3 ? d[i - 3] : 0);
+  }
+  return d;
+}
+function figSt() {
+  const svg = $('st1');
+  svg.innerHTML = '';
+  const ds = defs(svg);
+  const pat = E('pattern', {id: 'hatch', width: 8, height: 8, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)'}, ds);
+  E('rect', {width: 8, height: 8, fill: '#fdece8'}, pat);
+  E('rect', {width: 3, height: 8, fill: '#f2a596'}, pat);
+  const n = 10, d = stairWays(n, stM), d0 = stairWays(n, -1);
+  const SW = 78, X0 = 16, BASE = 330, RISE = 24;
+  const arcs = E('g', {}, svg);
+  const top = i => BASE - (i + 1) * RISE;
+  const bx = i => X0 + i * SW + SW / 2;
+  const by = i => top(i) - 20;
+  for (let i = 0; i <= n; i++) {
+    const g = E('g', {class: i > 0 ? 'clickable' : ''}, svg);
+    const blocked = i === stM, tgt = i === stT;
+    E('rect', {x: X0 + i * SW, y: top(i), width: SW - 2, height: BASE - top(i), rx: 3,
+      fill: blocked ? 'url(#hatch)' : (tgt ? '#e8f0ff' : '#eef2f8'), stroke: blocked ? C.coral : (tgt ? C.sea : '#c3cedd'), 'stroke-width': 1.5}, g);
+    T(g, bx(i), BASE + 18, i === 0 ? '0 출발' : String(i), 'lm', {'text-anchor': 'middle', fill: blocked ? C.coral : C.soft});
+    if (blocked) T(g, bx(i), top(i) + 18, '공사 중', 'lbl', {'text-anchor': 'middle', fill: C.coral, style: 'font-size:12px;font-weight:700'});
+    if (stM > 0 && !blocked && d[i] !== d0[i]) T(g, bx(i), top(i) + 18, '원래 ' + d0[i], 'axn', {'text-anchor': 'middle', fill: C.gray});
+    E('circle', {cx: bx(i), cy: by(i), r: 18, fill: tgt ? C.sea : '#fff', stroke: blocked ? C.coral : (tgt ? C.sea : C.moss), 'stroke-width': 2}, g);
+    T(g, bx(i), by(i) + 5, String(d[i]), 'lm', {'text-anchor': 'middle', fill: tgt ? '#fff' : (blocked ? C.coral : C.moss), style: 'font-size:13.5px;font-weight:700'});
+    if (i > 0) g.addEventListener('click', () => { stT = i; figSt(); });
+  }
+  const terms = [];
+  for (let s = 1; s <= 3; s++) {
+    const p = stT - s;
+    if (p < 0) continue;
+    terms.push(p);
+    const x1 = bx(p), y1 = by(p) - 18, x2 = bx(stT) - 7, y2 = by(stT) - 19;
+    const off = p === stM ? {dash: '5 4'} : {};
+    off.w = 2;
+    arr(svg, arcs, `M${x1},${y1} Q${(x1 + x2) / 2},${Math.min(y1, y2) - 12 - s * 12} ${x2},${y2}`, p === stM ? 'coral' : 'moss', off);
+  }
+  const msg = $('stMsg');
+  if (stT === stM) {
+    msg.className = 'msg warn';
+    msg.innerHTML = `<b>${stT}번 칸은 공사 중</b> — 이 칸에 도착하는 방법은 0가지로 둔다. 그래야 이 칸을 <b>밟고 지나가는 길</b>도 모두 빠진다.`;
+  } else {
+    msg.className = 'msg';
+    const names = terms.map(p => `data[${p}]`).join(' + ');
+    const vals = terms.map(p => p === stM ? `<span style="color:var(--coral)">0</span>` : d[p]).join(' + ');
+    const tail = stM > 0
+      ? `m = ${stM} 이면 꼭대기 10번 칸까지 <b>${d[10]}</b>가지 (공사 칸이 없으면 ${d0[10]}가지)`
+      : `공사 칸이 없으면 꼭대기 10번 칸까지 <b>${d[10]}</b>가지`;
+    msg.innerHTML = `<b>data[${stT}]</b> = ${names} = ${vals} = <b>${d[stT]}</b> &nbsp;·&nbsp; ${tail}`;
+  }
+  document.querySelectorAll('#stMs button').forEach(b => b.classList.toggle('on', +b.dataset.m === stM));
+}
+function initSt() {
+  const wrap = $('stMs');
+  const none = document.createElement('button');
+  none.className = 'btn ghost sm';
+  none.dataset.m = -1;
+  none.textContent = '없음';
+  none.onclick = () => { stM = -1; figSt(); };
+  wrap.appendChild(none);
+  for (let m = 1; m <= 9; m++) {
+    const b = document.createElement('button');
+    b.className = 'btn ghost sm';
+    b.dataset.m = m;
+    b.textContent = m;
+    b.onclick = () => { stM = m; figSt(); };
+    wrap.appendChild(b);
+  }
+  figSt();
+}
+
+/* ===== 문제 8 : 엄지와 지수 ===== */
+let xSel = [3, 3];
+function figX() {
+  const svg = $('x1');
+  svg.innerHTML = '';
+  defs(svg);
+  const N = 6;
+  const X = [];
+  for (let a = 0; a <= N; a++) X.push(new Array(N + 1).fill(0));
+  X[0][0] = 1;
+  for (let a = 0; a <= N; a++) for (let b = 0; b <= N; b++) {
+    if (a === 0 && b === 0) continue;
+    for (const da of [1, 2]) for (const db of [1, 2]) if (a - da >= 0 && b - db >= 0) X[a][b] += X[a - da][b - db];
+  }
+  const CS = 58, OX = 70, OY = 70;
+  const [sa, sb] = xSel;
+  const preds = [];
+  for (const da of [1, 2]) for (const db of [1, 2]) if (sa - da >= 0 && sb - db >= 0) preds.push([sa - da, sb - db]);
+  T(svg, OX, 22, '지수가 선 칸 b →', 'lblb', {fill: C.amber, style: 'font-size:14px'});
+  T(svg, 10, OY - 14, '엄지 a ↓', 'lblb', {fill: C.violet, style: 'font-size:14px'});
+  for (let b = 0; b <= N; b++) T(svg, OX + b * CS + CS / 2, OY - 12, String(b), 'lm', {'text-anchor': 'middle', fill: C.amber});
+  for (let a = 0; a <= N; a++) T(svg, OX - 14, OY + a * CS + CS / 2 + 5, String(a), 'lm', {'text-anchor': 'end', fill: C.violet});
+  for (let a = 0; a <= N; a++) for (let b = 0; b <= N; b++) {
+    let cls = X[a][b] === 0 ? 'dim' : '';
+    if (a === sa && b === sb) cls = 'Scoral';
+    else if (preds.some(p => p[0] === a && p[1] === b)) cls = 'Samber';
+    const g = box(svg, OX + b * CS + 3, OY + a * CS + 3, CS - 6, CS - 6, X[a][b], cls);
+    g.classList.add('clickable');
+    if (a === b && cls !== 'Scoral') E('rect', {x: OX + b * CS + 3, y: OY + a * CS + 3, width: CS - 6, height: CS - 6, rx: 6, style: 'fill:none;stroke:#137a5e;stroke-width:3'}, g);
+    g.addEventListener('click', () => { xSel = [a, b]; figX(); });
+  }
+  const ctr = (a, b) => [OX + b * CS + CS / 2, OY + a * CS + CS / 2];
+  preds.forEach(([a, b]) => {
+    const [x1, y1] = ctr(a, b), [x2, y2] = ctr(sa, sb);
+    const len = Math.hypot(x2 - x1, y2 - y1);
+    const ux = (x2 - x1) / len, uy = (y2 - y1) / len;
+    arr(svg, svg, `M${x1 + ux * 30},${y1 + uy * 30} L${x2 - ux * 32},${y2 - uy * 32}`, 'coral', {w: 2});
+  });
+  const msg = $('xMsg');
+  if (sa === 0 && sb === 0) {
+    msg.innerHTML = '<b>X[0][0] = 1</b> — 둘 다 출발점에 가만히 있는 한 가지.';
+  } else if (preds.length === 0) {
+    msg.innerHTML = `<b>X[${sa}][${sb}] = 0</b> — 함께 움직여서는 이 자리에 올 수 없다.`;
+  } else {
+    msg.innerHTML = `<b>X[${sa}][${sb}]</b> = ` + preds.map(p => `X[${p[0]}][${p[1]}]`).join(' + ') + ' = ' + preds.map(p => X[p[0]][p[1]]).join(' + ') + ` = <b>${X[sa][sb]}</b><br><span style="font-size:13.5px;color:var(--ink-soft)">다른 칸을 눌러 보자.</span>`;
+  }
+}
+
+/* ===== 문제 9 : 문어 ===== */
+function figO() {
+  const svg = $('o1');
+  const panels = [
+    {cx: 150, n: 4, d: '1212', ok: true, cap: 'n = 4 : 1212'},
+    {cx: 450, n: 5, d: '12121', ok: false, cap: 'n = 5 : 12121 ✗'},
+    {cx: 750, n: 5, d: '12123', ok: true, cap: 'n = 5 : 12123 ✓'}
+  ];
+  panels.forEach(p => {
+    const R = 100, cy = 150;
+    const pos = [];
+    for (let k = 0; k < p.n; k++) {
+      const th = (-90 + 360 * k / p.n) * Math.PI / 180;
+      pos.push([p.cx + R * Math.cos(th), cy + R * Math.sin(th)]);
+    }
+    for (let k = 0; k < p.n; k++) {
+      const a = pos[k], b = pos[(k + 1) % p.n];
+      const bad = !p.ok && (k === 0 || k === p.n - 1);
+      E('line', {x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: bad ? C.coral : '#c3cedd', 'stroke-width': bad ? 3 : 2}, svg);
+      const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2;
+      E('circle', {cx: mx, cy: my, r: 14, fill: bad ? C.coral : '#fff', stroke: bad ? C.coral : C.sea, 'stroke-width': 2}, svg);
+      T(svg, mx, my + 5, p.d[k], 'lm', {'text-anchor': 'middle', fill: bad ? '#fff' : C.sea, style: 'font-size:14px;font-weight:700'});
+    }
+    pos.forEach((q, k) => {
+      const bad = !p.ok && k === 0;
+      E('circle', {cx: q[0], cy: q[1], r: 22, fill: bad ? '#fdece8' : '#efeaff', stroke: bad ? C.coral : C.violet, 'stroke-width': 2}, svg);
+      T(svg, q[0], q[1] + 5, (k + 1) + '번', 'lbl', {'text-anchor': 'middle', fill: bad ? C.coral : C.violet, style: 'font-size:12px;font-weight:700'});
+    });
+    T(svg, p.cx, 296, p.cap, 'lm', {'text-anchor': 'middle', fill: p.ok ? C.moss : C.coral, style: 'font-size:15px;font-weight:700'});
+    if (!p.ok) T(svg, p.cx, 318, '1번 문어가 두 손 모두 1번?', 'lbl', {'text-anchor': 'middle', fill: C.coral});
+    else if (p.n === 5) T(svg, p.cx, 318, '마지막을 3으로 바꾼다', 'lbl', {'text-anchor': 'middle', fill: C.moss});
+    else T(svg, p.cx, 318, '짝수면 12를 반복하면 끝', 'lbl', {'text-anchor': 'middle', fill: C.moss});
+  });
+  T(svg, 300, 20, '시계 방향 →', 'axn', {'text-anchor': 'middle'});
+}
+
+/* ===== 문제 10 · 11 : 동전 ===== */
+const COIN = [6, 10, 13, 9, 8, 1];
+const CD = (() => {
+  const n = COIN.length;
+  const D = [];
+  for (let x = 0; x <= n; x++) D.push([0, 0, 0, 0]);
+  for (let x = n - 1; x >= 0; x--) for (let y = 2; y >= 0; y--) {
+    D[x][y] = y === 2 ? D[x + 1][0] : Math.max(D[x + 1][y + 1] + COIN[x], D[x + 1][0]);
+  }
+  return D;
+})();
+const CPATH = (() => {
+  const p = [[0, 0]];
+  let x = 0, y = 0;
+  while (x < COIN.length) {
+    if (y < 2 && CD[x + 1][y + 1] + COIN[x] >= CD[x + 1][0]) y = y + 1;
+    else y = 0;
+    x = x + 1;
+    p.push([x, y]);
+  }
+  return p;
+})();
+let cS = 0;
+function figC() {
+  const svg = $('c1');
+  svg.innerHTML = '';
+  defs(svg);
+  const n = COIN.length, last = n + 1;
+  const cx = x => 150 + x * 100, ry = y => 106 + y * 54;
+  const done = cS === last;
+  const curX = cS >= 1 && cS <= n ? n - cS : -1;
+  const picked = new Set();
+  if (done) CPATH.forEach((p, k) => { if (k > 0 && p[1] > 0) picked.add(p[0] - 1); });
+  COIN.forEach((v, x) => {
+    const on = picked.has(x);
+    E('circle', {cx: cx(x), cy: 40, r: 25, fill: done ? (on ? C.amber : '#f3f6fa') : '#fdf3dc', stroke: done && !on ? '#d5dde8' : C.amber, 'stroke-width': 2}, svg);
+    T(svg, cx(x), 45, String(v), 'lm', {'text-anchor': 'middle', fill: done ? (on ? '#fff' : '#b5c0cf') : '#8a5f04', style: 'font-size:15px;font-weight:700'});
+  });
+  for (let x = 0; x <= n; x++) T(svg, cx(x), 86, x === n ? 'x = 6 (끝)' : 'x = ' + x, 'axn', {'text-anchor': 'middle'});
+  ['y = 0', 'y = 1', 'y = 2'].forEach((s, y) => T(svg, 20, ry(y) + 27, s, 'lm', {fill: C.soft}));
+  const onPath = (x, y) => done && CPATH.some(p => p[0] === x && p[1] === y);
+  for (let x = 0; x <= n; x++) for (let y = 0; y <= 2; y++) {
+    const filled = x >= n - cS || done;
+    let cls = filled ? '' : 'dash';
+    if (filled && x === curX) cls = 'sea';
+    if (curX >= 0 && x === curX + 1) cls = 'amber';
+    if (onPath(x, y)) cls = x === 0 ? 'Smoss' : 'moss';
+    box(svg, cx(x) - 36, ry(y) + 5, 72, 44, filled ? CD[x][y] : '', cls);
+  }
+  if (done) {
+    for (let k = 0; k + 1 < CPATH.length; k++) {
+      const [x1, y1] = CPATH[k], [x2, y2] = CPATH[k + 1];
+      const pick = y2 > 0;
+      arr(svg, svg, `M${cx(x1) + 36},${ry(y1) + 27} L${cx(x2) - 40},${ry(y2) + 27}`, pick ? 'amber' : 'gray', {w: 2.2, dash: pick ? null : '5 4'});
+    }
+  } else if (cS < last) {
+    T(svg, cx(0) - 36, 288, '← 뒤에서부터 채운다', 'lbl', {fill: C.sea});
+  }
+  const msg = $('cMsg');
+  if (cS === 0) {
+    msg.className = 'msg';
+    msg.innerHTML = '<b>x = 6</b> — 동전이 더 없다. 어떤 y든 더 주울 금액은 <b>0</b>. 여기서 출발해 왼쪽으로 채운다.';
+  } else if (!done) {
+    const x = curX, c = COIN[x], D = CD;
+    msg.className = 'msg';
+    msg.innerHTML = `<b>x = ${x}</b> (동전 ${c}) &nbsp; y=0 : max(${D[x + 1][1]} + ${c}, ${D[x + 1][0]}) = <b>${D[x][0]}</b> &nbsp;·&nbsp; y=1 : max(${D[x + 1][2]} + ${c}, ${D[x + 1][0]}) = <b>${D[x][1]}</b> &nbsp;·&nbsp; y=2 : ${D[x + 1][0]} <span style="color:var(--ink-soft)">(못 주움)</span> = <b>${D[x][2]}</b>`;
+  } else {
+    msg.className = 'msg ok';
+    msg.innerHTML = `<b>data[0][0] = ${CD[0][0]}</b> — 앞에서부터 큰 쪽을 따라가면 <b>6 + 10</b>, 13은 건너뛰고, <b>9 + 8</b>, 1은 세 개 연속이 되므로 건너뛴다.`;
+  }
+  $('cStep').textContent = (cS + 1) + ' / ' + (last + 1);
+  $('cPrev').disabled = cS === 0;
+  $('cNext').disabled = cS === last;
+}
+function initC() {
+  const last = COIN.length + 1;
+  $('cNext').onclick = () => { if (cS < last) cS++; figC(); };
+  $('cPrev').onclick = () => { if (cS > 0) cS--; figC(); };
+  $('cReset').onclick = () => { cS = 0; figC(); };
+  $('cEnd').onclick = () => { cS = last; figC(); };
+  figC();
+}
+
+/* ===== 심화 : 영일이 ===== */
+function figY1() {
+  const svg = $('y1');
+  defs(svg);
+  const S = [[170, 120, 'y = 0', '방금 3칸'], [420, 120, 'y = 1', '3칸 후 1번'], [670, 120, 'y = 2', '3칸 가능']];
+  arr(svg, svg, 'M214,120 L372,120', 'sea', {w: 2});
+  T(svg, 293, 108, '1칸 · 2칸', 'lm', {'text-anchor': 'middle', fill: C.sea});
+  arr(svg, svg, 'M464,120 L622,120', 'sea', {w: 2});
+  T(svg, 543, 108, '1칸 · 2칸', 'lm', {'text-anchor': 'middle', fill: C.sea});
+  arr(svg, svg, 'M648,82 C628,22 712,22 692,80', 'sea', {w: 2});
+  T(svg, 670, 22, '1칸 · 2칸', 'lm', {'text-anchor': 'middle', fill: C.sea});
+  arr(svg, svg, 'M650,160 C560,250 280,250 192,162', 'coral', {w: 2.5});
+  T(svg, 420, 232, '3칸', 'lblb', {'text-anchor': 'middle', fill: C.coral});
+  arr(svg, svg, 'M800,120 L718,120', 'gray', {w: 2});
+  T(svg, 806, 116, '출발', 'lbl', {fill: C.soft});
+  T(svg, 806, 134, '(처음엔', 'axn');
+  T(svg, 806, 150, ' 3칸 가능)', 'axn');
+  S.forEach(([x, y, a, b], k) => {
+    E('circle', {cx: x, cy: y, r: 44, fill: k === 2 ? '#e2f4ee' : '#fff', stroke: k === 2 ? C.moss : C.ink, 'stroke-width': 2}, svg);
+    T(svg, x, y - 2, a, 'lm', {'text-anchor': 'middle', fill: C.ink, style: 'font-size:15px;font-weight:700'});
+    T(svg, x, y + 18, b, 'lbl', {'text-anchor': 'middle', style: 'font-size:12px'});
+  });
+}
+function figY2() {
+  const svg = $('y2');
+  function draw(x0, sp, y, moves, ok, total) {
+    for (let p = 0; p <= total; p++) E('circle', {cx: x0 + p * sp, cy: y, r: 3, fill: '#c3cedd'}, svg);
+    let pos = 0, last3 = -9;
+    moves.forEach((mv, k) => {
+      const bad = mv === 3 && k - last3 <= 2;
+      if (mv === 3) last3 = k;
+      const a = x0 + pos * sp, b = x0 + (pos + mv) * sp, h = 8 + mv * 8;
+      E('path', {d: `M${a},${y} Q${(a + b) / 2},${y - 2 * h} ${b},${y}`, fill: 'none', stroke: mv === 3 ? C.coral : C.sea, 'stroke-width': 2, 'stroke-dasharray': bad ? '4 3' : 'none'}, svg);
+      if (bad) T(svg, (a + b) / 2, y - h - 4, '✗', 'lblb', {'text-anchor': 'middle', fill: C.coral, style: 'font-size:13px'});
+      pos += mv;
+    });
+    T(svg, x0 + total * sp + 14, y + 5, ok ? '✓' : '✗', 'lblb', {fill: ok ? C.moss : C.coral});
+  }
+  T(svg, 20, 22, '4칸 — 7가지', 'lblb', {style: 'font-size:14px'});
+  T(svg, 360, 22, '8칸 — 되는 것 · 안 되는 것', 'lblb', {style: 'font-size:14px'});
+  ['1111', '112', '121', '211', '22', '13', '31'].forEach((s, k) => {
+    const y = 74 + k * 44;
+    T(svg, 20, y + 5, s.split('').join(' '), 'lm');
+    draw(110, 42, y, s.split('').map(Number), true, 4);
+  });
+  [[[3, 1, 2, 1, 1], true], [[1, 2, 1, 2, 2], true], [[3, 3, 2], false], [[2, 3, 3], false], [[3, 2, 3], false]].forEach(([mv, ok], k) => {
+    const y = 74 + k * 60;
+    T(svg, 360, y + 5, mv.join(' '), 'lm');
+    draw(470, 34, y, mv, ok, 8);
+  });
+}
+
+/* ===== 생각해 보기 : 트리 vs 사슬 ===== */
+function figTh() {
+  const svg = $('th');
+  defs(svg);
+  function rec(k, depth, xl, xr) {
+    const x = (xl + xr) / 2, y = 24 + depth * 52;
+    if (k > 1) {
+      const m = (xl + xr) / 2;
+      [[xl, m], [m, xr]].forEach(([a, b]) => {
+        E('line', {x1: x, y1: y + 11, x2: (a + b) / 2, y2: y + 52 - 11, class: 'ln'}, svg);
+        rec(k - 1, depth + 1, a, b);
+      });
+    }
+    E('rect', {x: x - 20, y: y - 11, width: 40, height: 22, rx: 7, fill: '#fff', stroke: C[KC[k]], 'stroke-width': 2}, svg);
+    T(svg, x, y + 5, 'f(' + k + ')', 'lm', {'text-anchor': 'middle', fill: C[KC[k]], style: 'font-size:11.5px'});
+  }
+  rec(4, 0, 10, 410);
+  T(svg, 210, 222, '두 번씩 부르면 15번', 'lbl', {'text-anchor': 'middle', fill: C.coral, style: 'font-weight:700'});
+  for (let k = 4; k >= 1; k--) {
+    const y = 24 + (4 - k) * 52;
+    if (k > 1) arr(svg, svg, `M530,${y + 11} L530,${y + 52 - 13}`, 'gray', {w: 1.5});
+    E('rect', {x: 510, y: y - 11, width: 40, height: 22, rx: 7, fill: '#fff', stroke: C[KC[k]], 'stroke-width': 2}, svg);
+    T(svg, 530, y + 5, 'f(' + k + ')', 'lm', {'text-anchor': 'middle', fill: C[KC[k]], style: 'font-size:11.5px'});
+    if (k > 1) T(svg, 546, y + 30, 't × 2 + ' + k, 'axn', {fill: C.amber});
+  }
+  T(svg, 530, 222, '한 번만 부르면 4번', 'lbl', {'text-anchor': 'middle', fill: C.moss, style: 'font-weight:700'});
+}
+
+/* ===== 슬라이드 엔진 ===== */
+let SLIDES = [], idx = 0;
+function show(i) {
+  if (i < 0 || i >= SLIDES.length) return;
+  SLIDES.forEach(s => s.classList.remove('active'));
+  SLIDES[i].classList.add('active');
+  SLIDES[i].scrollTop = 0;
+  idx = i;
+  $('counter').textContent = (i + 1) + ' / ' + SLIDES.length;
+  $('slidename').textContent = SLIDES[i].dataset.name || '';
+  $('progress').style.width = ((i + 1) / SLIDES.length * 100) + '%';
+  $('prev').disabled = (i === 0);
+  $('next').disabled = (i === SLIDES.length - 1);
+  try {
+    history.replaceState(null, '', '#' + (i + 1))
+  } catch (e) {}
+}
+document.addEventListener('keydown', e => {
+  const t = e.target.tagName;
+  if (t === 'INPUT' || t === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') { show(idx + 1); e.preventDefault(); }
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(idx - 1); e.preventDefault(); }
+  if (e.key === 'Home') { show(0); e.preventDefault(); }
+  if (e.key === 'End') { show(SLIDES.length - 1); e.preventDefault(); }
+});
+window.addEventListener('DOMContentLoaded', () => {
+  $('prev').onclick = () => show(idx - 1);
+  $('next').onclick = () => show(idx + 1);
+  SLIDES = [...$('deck').querySelectorAll('.slide')];
+  initCode();
+  figM1();
+  figM2();
+  initQ1();
+  figQ2();
+  initS();
+  initT();
+  figD1();
+  dpRow('d1b', [1, 4, 11, 26, 57, 120, 247, 502, 1013, 2036], i => '×2+' + i);
+  figD2();
+  dpRow('d2b', [1, 7, 27, 89, 277, 843, 2543, 7645, 22953, 68879], i => '×3+' + (2 * i));
+  initSt();
+  figX();
+  figO();
+  initC();
+  figY1();
+  figY2();
+  figTh();
+  const h = location.hash.match(/^#(\d+)$/);
+  show(h ? Math.min(+h[1] - 1, SLIDES.length - 1) : 0);
+});
+</script>
+</body>
+</html>
