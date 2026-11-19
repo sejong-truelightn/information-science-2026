@@ -156,6 +156,9 @@
   .sv-bar .sv-range{ position:absolute; bottom:-19px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:11px; font-weight:800; color:var(--accent2); white-space:nowrap;}
   .sv-bar .sv-imark{ position:absolute; bottom:-37px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:11px; font-weight:800; color:#fff; background:var(--good); padding:1px 8px; border-radius:100px; white-space:nowrap; opacity:0; transition:opacity .2s;}
   .sv-bar.imark-on .sv-imark{ opacity:1; }
+  .sv-bars.has-jmark{ margin-bottom:58px; }
+  .sv-bar .sv-jmark{ position:absolute; bottom:-57px; left:50%; transform:translateX(-50%); font-family:var(--mono); font-size:11px; font-weight:800; color:#fff; background:var(--accent); padding:1px 8px; border-radius:100px; white-space:nowrap; opacity:0; transition:opacity .2s;}
+  .sv-bar.jmark-on .sv-jmark{ opacity:1; }
   .sv-bar .sv-keybadge{ position:absolute; top:-46px; left:50%; transform:translateX(-50%); background:var(--accent2); color:#fff; font-family:var(--mono); font-size:11px; font-weight:800; padding:2px 9px; border-radius:100px; white-space:nowrap; opacity:0; transition:opacity .2s;}
   .sv-bar.hole{ background:repeating-linear-gradient(45deg, #E6E9FC, #E6E9FC 6px, #D3D9F7 6px, #D3D9F7 12px); border:2px dashed var(--accent2); }
   .sv-bar.hole .sv-keybadge{ opacity:1; }
@@ -790,7 +793,7 @@ for i in 1..n:
             <div class="lg"><span class="sw" style="background:var(--danger);"></span>교환</div>
             <div class="lg"><span class="sw" style="background:var(--good);"></span>위치 확정</div>
           </div>
-          <p class="txt soft" style="font-size:12.5px; margin:6px 0 0 0;">보라색 <span class="term" style="font-size:11px;">피벗</span> 배지가 붙은 막대가 지금 구간의 기준값입니다. 비교는 항상 "현재 값 vs 이 피벗"이며, 두 값끼리 직접 비교하는 것이 아닙니다.<br>초록색 <span class="term" style="font-size:11px;">i</span> 배지는 "피벗보다 작은 값들의 경계"입니다. 새로 작은 값을 찾으면 i가 한 칸씩 오른쪽으로 이동합니다.</p>
+          <p class="txt soft" style="font-size:12.5px; margin:6px 0 0 0;">보라색 <span class="term" style="font-size:11px;">피벗</span> 배지가 붙은 막대가 지금 구간의 기준값입니다. 비교는 항상 "현재 값 vs 이 피벗"이며, 두 값끼리 직접 비교하는 것이 아닙니다.<br>초록색 <span class="term" style="font-size:11px;">i</span> 배지는 "피벗보다 작은 값들의 경계"입니다. 새로 작은 값을 찾으면 i가 한 칸씩 오른쪽으로 이동합니다.<br>주황색 <span class="term" style="font-size:11px;">j</span> 배지는 "지금 피벗과 비교하는 위치"입니다. j는 매 단계 한 칸씩 오른쪽으로 이동하며 구간을 처음부터 끝까지 훑습니다.</p>
           <div class="sv-desc" id="desc-quick">'다음' 버튼을 눌러 정렬을 시작하세요.</div>
           <div class="sv-controls">
             <button class="secondary" data-act="reset">⟲ 처음부터</button>
@@ -1079,19 +1082,18 @@ for i in 1..n:
       let i = low - 1;
       steps.push({arr:arr.slice(), compare:[], swap:[], sorted:[...sorted], pivot:high, iPos:i, range:[low,high], line:11, desc:`구간 [${low}, ${high}] 의 마지막 값 arr[${high}]=${pivotVal} 을 피벗으로 정합니다.`});
       for(let j=low; j<high; j++){
-        steps.push({arr:arr.slice(), compare:[j,high], swap:[], sorted:[...sorted], pivot:high, iPos:i, range:[low,high], line:14, desc:`arr[${j}]=${arr[j]} 와 피벗(${pivotVal}) 을 비교합니다.`});
+        steps.push({arr:arr.slice(), compare:[j,high], swap:[], sorted:[...sorted], pivot:high, iPos:i, jPos:j, range:[low,high], line:14, desc:`j=${j}: arr[${j}]=${arr[j]} 와 피벗(${pivotVal}) 을 비교합니다.`});
         if(arr[j] <= pivotVal){
           i++;
           const willSwap = (i !== j);
-          steps.push({arr:arr.slice(), compare:[], swap:[], sorted:[...sorted], pivot:high, iPos:i, range:[low,high], line:15, desc: willSwap
-            ? `피벗보다 작거나 같으므로 i를 ${i}로 늘립니다. 다음 단계에서 arr[${i}] 와 arr[${j}] 를 교환합니다.`
-            : `피벗보다 작거나 같으므로 i를 ${i}로 늘립니다. i와 j가 같은 위치라 실제로 값은 바뀌지 않습니다.`});
-          if(willSwap){
-            [arr[i],arr[j]] = [arr[j],arr[i]];
-            steps.push({arr:arr.slice(), compare:[], swap:[i,j], sorted:[...sorted], pivot:high, iPos:i, range:[low,high], line:16, desc:`arr[${i}] 와 arr[${j}] 를 교환합니다.`});
-          }
+          steps.push({arr:arr.slice(), compare:[], swap:[], sorted:[...sorted], pivot:high, iPos:i, jPos:j, range:[low,high], line:15, desc:`피벗보다 작거나 같으므로 i를 ${i}로 늘립니다.`});
+          [arr[i],arr[j]] = [arr[j],arr[i]];
+          steps.push({arr:arr.slice(), compare:[], swap:[i,j], sorted:[...sorted], pivot:high, iPos:i, jPos:j, range:[low,high], line:16, desc: willSwap
+            ? `arr[${i}] 와 arr[${j}] 를 교환합니다.`
+            : `arr[${i}] 와 arr[${j}] 를 교환합니다. i와 j가 같은 위치라 자기 자신과 바꾸는 셈이어서 값은 그대로입니다.`});
         }
       }
+      steps.push({arr:arr.slice(), compare:[], swap:[], sorted:[...sorted], pivot:high, iPos:i, range:[low,high], line:13, desc:`j가 피벗 바로 앞(index ${high-1})까지 모두 훑었으므로 반복문을 끝냅니다.`});
       [arr[i+1],arr[high]] = [arr[high],arr[i+1]];
       steps.push({arr:arr.slice(), compare:[], swap:[i+1,high], sorted:[...sorted], pivot:null, iPos:null, range:[low,high], line:17, desc:`피벗을 올바른 위치(index ${i+1})로 옮깁니다.`});
       sorted.add(i+1);
@@ -1146,12 +1148,16 @@ for i in 1..n:
       b.appendChild(val);
       b.appendChild(range);
       b.appendChild(imark);
+      const jmark = document.createElement('span');
+      jmark.className = 'sv-jmark';
+      b.appendChild(jmark);
       b.appendChild(key);
       barsEl.appendChild(b);
       return b;
     });
     if(steps.some(s => s.range)) barsEl.classList.add('has-range');
     if(steps.some(s => s.iPos !== undefined && s.iPos !== null)) barsEl.classList.add('has-imark');
+    if(steps.some(s => s.jPos !== undefined && s.jPos !== null)) barsEl.classList.add('has-jmark');
     if(steps.some(s => (s.hole !== undefined && s.hole !== null) || (s.pivot !== undefined && s.pivot !== null))) barsEl.classList.add('has-key');
 
     let cur = 0;
@@ -1177,6 +1183,9 @@ for i in 1..n:
         if(isPivot) b.classList.add('pivot-badge');
         const isIMark = (s.iPos !== undefined && s.iPos !== null && s.iPos === i);
         if(isIMark) b.classList.add('imark-on');
+        const isJMark = (s.jPos !== undefined && s.jPos !== null && s.jPos === i);
+        if(isJMark) b.classList.add('jmark-on');
+        b.querySelector('.sv-jmark').textContent = isJMark ? 'j' : '';
         let label = '';
         if(s.range){
           const [lo, hi] = s.range;
